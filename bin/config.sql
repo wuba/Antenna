@@ -1,0 +1,15 @@
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (1, 'PLATFORM_DOMAIN', 0, '58.cn', '2022-01-13 14:20:33', '2022-01-13 14:20:34');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (2, 'DNS_DOMAIN', 1, 'ns0.58.com', '2022-01-13 14:22:40', '2022-01-13 14:22:45');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (3, 'DNS_PORT', 1, '2333', '2022-01-13 14:22:43', '2022-01-13 14:22:46');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (4, 'NS1_DOMAIN', 1, 'ns1.58.com', '2022-01-13 14:23:10', '2022-01-13 14:23:12');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (5, 'NS2_DOMAIN', 1, '58.cn', '2022-01-13 14:23:42', '2022-01-13 14:23:44');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (6, 'SERVER_IP', 0, '0.0.0.0', '2022-01-13 14:25:06', '2022-01-13 14:25:08');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (7, 'JNDI_PORT', 1, '2345', '2022-01-13 14:25:56', '2022-01-13 14:25:58');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (8, 'OPEN_REGISTER', 0, '0', '2022-01-13 14:28:05', '2022-01-13 14:28:09');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (9, 'INVITE_TO_REGISTER', 0, '0', '2022-01-13 14:28:07', '2022-01-13 14:28:11');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (10, 'OPEN_EMAIL', 0, '1', '2022-01-13 14:29:14', '2022-01-13 14:29:16');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (11, 'EMAIL_HOST', 0, 'smtp.qq.com', '2022-01-13 14:31:32', '2022-01-13 14:31:34');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (12, 'EMAIL_PORT', 0, '465', '2022-01-13 14:32:13', '2022-01-13 14:32:15');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (13, 'EMAIL_HOST_USER', 0, '58@58.com', '2022-01-13 14:33:58', '2022-01-13 14:34:00');
+INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (14, 'EMAIL_HOST_PASSWORD', 0, '123456789', '2022-01-13 14:34:41', '2022-01-13 14:34:43');
+INSERT INTO antenna.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) VALUES (1, 'pbkdf2_sha256$260000$xGOtY8UIDmVOhMxxf97MrC$zyrByum510+7GTa/lr1WaVLNh+cbFzJuuxnM81OTYcw=', '2022-08-09 20:12:29.151182', 0, 'antenna@58.com', '', '', 'antenna@58.com', 1, 1, '2022-08-09 19:34:15.075340');
