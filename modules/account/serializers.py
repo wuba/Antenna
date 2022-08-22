@@ -98,7 +98,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError('验证码错误')
             # 判断验证码是否过期
             five_minutes_ago = datetime.datetime.now() - datetime.timedelta(hours=0, minutes=5, seconds=0)  # 获取5分钟之前的时间
-            if verify_records.create_time < five_minutes_ago:
+            if verify_records.create_time < five_minutes_ago.replace(tzinfo=None):
                 raise serializers.ValidationError('验证码过期')
             # 不用将verify_code返回到数据库中，只是做验证
         else:

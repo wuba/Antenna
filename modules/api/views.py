@@ -34,7 +34,7 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
         key = ApiKey.objects.filter(user_id=self.request.user).first().key
         url_list = [
             {
-                "url": f"http://{PLATFORM_DOMAIN}/api/v1/messages/manage/api/?apilkey={key}&uri=&task__name=&message_type=&page=&page_size=",
+                "url": f"http://{PLATFORM_DOMAIN}/api/v1/messages/manage/api/?apikey={key}&uri=&task__name=&message_type=&page=&page_size=",
                 "method": "GET",
                 "detail": {"uri": "访问的url路径", "task__name": "任务名",
                            "message_type": "消息类型，1为HTTP，2为DNS，3为LDAP，4为RMI"}}
