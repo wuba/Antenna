@@ -37,5 +37,12 @@ key=d=$(echo $RANDOM | md5 | head -c 32)
 echo "INSERT INTO antenna.api_key (id, key, update_time, user_id) VALUES (1, '$key', '2022-01-11 15:16:35', 1);" >>"$project_path/bin/config.sql"
 echo '######导入初始数据######'
 mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD antenna <"$project_path/bin/config.sql"
-#nohup python3 ./manage.py runserver --noreload &
-echo '######完成安装######'
+echo '######启动系统######'
+#nohup python3 ./manage.py 0.0.0.0:80 runserver --noreload &
+cd "$project_path/templates/"
+npm install -g pm2
+npm install -g yarn
+yarn
+yarn prepare
+yarn start
+
