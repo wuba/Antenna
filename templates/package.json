@@ -3,9 +3,9 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "callback": "vue-cli-service build && rm -rf node_modules && cd deploy && npm i",
+        "prepare": "vue-cli-service build && rm -rf node_modules && cd deploy && npm i",
         "start": "pm2 start ./deploy/server.js --name cloud",
-        "arthur-stop": "pm2 stop cloud",
+        "stop": "pm2 stop cloud",
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
         "lint": "vue-cli-service lint",
