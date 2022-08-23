@@ -8,26 +8,15 @@
 Antenna是58同城安全团队打造的一款辅助安全从业人员辅助验证网络中多种漏洞是否存在以及可利用性的工具。其基于带外应用安全测试(OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形式进行集合，通过与目标进行out-bind的数据通信方式进行辅助检测。
 ## Antenna的目标
 我们绝不仅仅只是将Antenna做成一款只能监听DNS、HTTP等协议来简单判断无回显类型漏洞的工具，我们的目标是尝试在良好使用体验的基础上支持高度灵活的自定义组件能力，满足用户通过Antenna探索并实现各种应用安全漏洞场景的辅助检测。尽可能得实现通过Antenna这款产品降低各种安全漏洞场景的检测成本。
-## 安装部署及使用教程
+## 部署教程
+部署前所需
 
-### 安装教程
-#### 一、源码部署
-前提准备
+1、一台公网服务器
 
-1.一台安装python3环境并支持mysql命令的linux服务器
+2、一个申请好的域名
+### 源码部署
 
-python3安装可参考链接 
-```https://blog.csdn.net/Alex_Sheng_Sea/article/details/123259315```
-
-2.mysql数据库
-
-mysql安装可参考链接
-```https://blog.csdn.net/Aykl119/article/details/122223582```
-
-3.node环境
-
-node安装可参考链接
-```https://www.jianshu.com/p/f0969208b9ba```
+源码部署服务器系统推荐使用centos，如需部署其他服务器系统需修改项目中install.sh 中部分安装命令
 
 下载源码
 ```
@@ -39,39 +28,56 @@ cd ./Antenna/bin
 chmod +x ./*
 ./install.sh
 ```
-脚本运行按照提示填写连接数据库配置信息
-![img.png](imgs/img_1.png)
+脚本运行按照提示填写连接数据库配置与域名信息
+![img.png](imgs/img_plat.png)
 填写示例
 ```angular2html
 mysql ip: 127.0.0.1
 mysql port: 3306
 mysql username: root
 mysql password: 123456
+plateform_domain: test.com
 ```
 系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com
-访问安装系统服务器8000端口，可进行登录访问
-![img.png](imgs/img.png)
+访问安装系统服务器8000端口，可访问系统后台并访问
+![img.png](imgs/img_start.png)
 
-二、Docker部署
+### Docker部署
+
+## 使用教程
+### Antenna初始配置教程
+#### 平台设置
+##### 授权码设置及QQ邮箱授权码申请教程
+#### 协议设置
+##### 域名配置及阿里云dns服务修改教程
+
 
 
 ### Antenna产品基础使用教程
-官方演示靶场：
-通过上述的安装操作，初始管理员账户登陆系统主页，初次登录系统会有使用导航
-#### 新建任务
-用户通过新建任务的方式对自己后续生成拥有各种能力的链接进行区分,再创建账户时默认会创建一个初始任务
-，针对自动化多个目标检测建议使用多个任务进行区分.
+#### 消息监听与漏洞利用组件
+演示平台：x.x.x.x
 
-点击新建任务
-![img.png](imgs/img_2.png)
+漏洞靶场：x.x.x.x
 
-#### 新建组件实例(利用链接)
+Antenna 初始开放HTTP、DNS、RMI、LDAP 四个监听组件以及XSS、XXE、HTTP_CUSTOM(SSRF/JSONP)等多个漏洞场景利用组件
+其组件最终以链接等方式进行生成。
+平台通过任务的形式对拥有各种能力的链接进行区分,新用户默认创建初始任务与支持的所有监听组件实例
+##### 新建组件实例(利用链接)
+以创建XSS漏洞场景利用链接为例，首先点击初始任务查看任务详情，然后点击新建开始选择漏洞场景类型
+![img.png](img.png)
+选择XSS组件，平台初始支持get_cookie(获取cookie)与get_page_sources(获取源码)两种利用方式，可进行多选并点击确定
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+点击确定后便会生成支持获取cookie与源码xss漏洞的利用payload
+##### 组件实例(利用链接)的使用
+
 #### Open API
-#### 平台设置
-##### 邮箱设置
 
 
-### Antenna组件使用教程
+
+
+
+## Antenna组件使用教程
 ### 自定义组件编写教程
 
 
