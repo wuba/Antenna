@@ -11,7 +11,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from utils.helper import generate_code, get_result_data, get_payload
+from utils.helper import generate_code, get_payload
 
 
 class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin,
@@ -84,6 +84,7 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
 
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
+
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated, ])
     def multi_update_status(self, request, *args, **kwargs):
         """

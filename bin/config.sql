@@ -1,6 +1,5 @@
 INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (1, 'PLATFORM_DOMAIN', 0, '58.cn', '2022-01-13 14:20:33', '2022-01-13 14:20:34');
 INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (2, 'DNS_DOMAIN', 1, 'ns0.58.com', '2022-01-13 14:22:40', '2022-01-13 14:22:45');
-INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (3, 'DNS_PORT', 1, '2333', '2022-01-13 14:22:43', '2022-01-13 14:22:46');
 INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (4, 'NS1_DOMAIN', 1, 'ns1.58.com', '2022-01-13 14:23:10', '2022-01-13 14:23:12');
 INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (5, 'NS2_DOMAIN', 1, '58.cn', '2022-01-13 14:23:42', '2022-01-13 14:23:44');
 INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (6, 'SERVER_IP', 1, '0.0.0.0', '2022-01-13 14:25:06', '2022-01-13 14:25:08');
@@ -47,5 +46,5 @@ INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, templa
 INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (3, '{}', 1, 3, 2, 2);
 INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (4, '{}', 1, 4, 3, 3);
 INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (5, '{}', 1, 5, 4, 4);
-INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (5, '{}', 1, 5, 5, 4);
-INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (6, '{"path": "/etc/passwd"}', 1, 6, 6, 11);
+INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (6, '{}', 1, 5, 5, 4);
+INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (7, '{"path": "/etc/passwd"}', 1, 6, 6, 11);

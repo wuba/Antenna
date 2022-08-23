@@ -13,7 +13,7 @@ try:
     # 做 dns 记录的域名,可以和平台域名用作同一个
     DNS_DOMAIN = config_record.get(name="DNS_DOMAIN").value
     # 监听DNS端口
-    DNS_PORT = int(config_record.get(name="DNS_PORT").value)
+    # DNS_PORT = int(config_record.get(name="DNS_PORT").value)
     # NS域名
     NS1_DOMAIN = config_record.get(name="NS1_DOMAIN").value
     NS2_DOMAIN = config_record.get(name="NS2_DOMAIN").value

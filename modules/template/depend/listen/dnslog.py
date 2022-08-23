@@ -137,7 +137,7 @@ def main():
     resolver = ZoneResolver(zone, True)
     logger = MysqlLogger()
     print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
-    udp_server = DNSServer(resolver, port=DNS_PORT, address="0.0.0.0", logger=logger)
+    udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
     udp_server.start()
 
 
