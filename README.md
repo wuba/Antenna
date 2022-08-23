@@ -102,16 +102,16 @@ plateform_domain: test.com
 这里已购买test.com，antenna系统所在服务器公网地址为1.1.1.1为例
 
 点击操作栏中的管理
-![img_6.png](img_6.png)
+![img_6.png](imgs/img_6.png)
 进入管理界面后点击左侧导航栏DNS管理-自定义DNS HOST
 
-![img_7.png](img_7.png)
+![img_7.png](imgs/img_7.png)
 点击创建DNS服务器，然后创建ns1.test.com和ns2.test.com，其ip地址设置为antenna系统所在服务器公网地址
-![img_9.png](img_9.png)
+![img_9.png](imgs/img_9.png)
 创建后点击同步再进入左侧导航栏DNS管理-DNS修改，点击修改DNS服务器按钮，将test.com的dns服务器修改为刚才设置的ns1.test.com与ns2.test.com
-![img_10.png](img_10.png)
+![img_10.png](imgs/img_10.png)
 点击同步后回到Antenna系统保存协议相关设置
-![img_8.png](img_8.png)
+![img_8.png](imgs/img_8.png)
 注意！！！服务器防火墙需开启上述配置端口的进出规则，DNS默认使用53端口也需对外开放！！！
 
 ### Antenna产品基础使用教程
@@ -130,15 +130,15 @@ Antenna 初始开放HTTP、DNS、RMI、LDAP 四个监听组件以及XSS、XXE、
 以创建XSS漏洞场景利用链接为例，首先点击初始任务查看任务详情，然后点击新建开始选择漏洞场景类型
 ![img.png](imgs/img.png)
 选择XSS组件，平台初始支持get_cookie(获取cookie)与get_page_sources(获取源码)两种利用方式，可进行多选并点击确定
-![img_1.png](img_1.png)
-![img_2.png](img_2.png)
+![img_1.png](imgs/img_1.png)
+![img_2.png](imgs/img_2.png)
 
 点击确定后便会生成支持获取cookie与源码xss漏洞的利用payload
-![img_3.png](img_3.png)
+![img_3.png](imgs/img_3.png)
 打开官方靶场尝试利用xss生成链接
-![img_4.png](img_4.png)
+![img_4.png](imgs/img_4.png)
 查看消息列表，已经获取到漏洞页面的请求cookie与源码
-![img_5.png](img_5.png)
+![img_5.png](imgs/img_5.png)
 
 ### Antennna 消息获取教程
 
@@ -179,4 +179,4 @@ Antenna 提供对外API供用户主动查询平台接收到的消息
 
 如有问题想与技术同学沟通，请联系并添加微信号：bios_000
 
-Antenna用户交流群：![img_11.png](img_11.png)
+Antenna用户交流群：![img_11.png](imgs/img_11.png)
