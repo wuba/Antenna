@@ -17,12 +17,15 @@ read -p "mysql port:" MYSQL_PORT
 read -p "mysql username:" MYSQL_USERNAME
 # shellcheck disable=SC2162
 read -p "mysql password:" MYSQL_PASSWORD
+read -p "platform domain:" PLATFORM_DOMAIN
 cd "$project_path/bin/"
 echo "MYSQL_HOST = '$MYSQL_HOST'" >./database_config.py
 # shellcheck disable=SC2129
 echo "MYSQL_PORT =  $MYSQL_PORT" >>./database_config.py
 echo "MYSQL_USERNAME = '$MYSQL_USERNAME'" >>./database_config.py
 echo "MYSQL_PASSWORD = '$MYSQL_PASSWORD'" >>./database_config.py
+cd "$project_path/templates/"
+echo "http://'$MYSQL_PASSWORD'" >./reqUrl.txt
 # shellcheck disable=SC2164
 echo "######创建数据库antenna#####"
 mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "CREATE DATABASE antenna;"
@@ -37,12 +40,14 @@ key=d=$(echo $RANDOM | md5 | head -c 32)
 echo "INSERT INTO antenna.api_key (id, key, update_time, user_id) VALUES (1, '$key', '2022-01-11 15:16:35', 1);" >>"$project_path/bin/config.sql"
 echo '######导入初始数据######'
 mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD antenna <"$project_path/bin/config.sql"
-echo '######启动系统######'
-#nohup python3 ./manage.py 0.0.0.0:80 runserver --noreload &
+echo '######启动前端######'
 cd "$project_path/templates/"
 npm install -g pm2
 npm install -g yarn
 yarn
 yarn prepare
 yarn start
-
+echo '######前端成功启动######'
+echo '######启动后端######'
+nohup python3 ./manage.py 0.0.0.0:80 runserver --noreload &
+echo '######后端成功启动######'

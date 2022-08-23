@@ -186,3 +186,4 @@ Antenna 提供对外API供用户主动查询平台接收到的消息
 如有问题想与技术同学沟通，请联系并添加微信号：bios_000
 
 Antenna用户交流群：![img_11.png](imgs/img_11.png)
+[![Stargazers over time](https://starchart.cc/yaklang/yakit.svg)](https://starchart.cc/yaklang/yakit)
