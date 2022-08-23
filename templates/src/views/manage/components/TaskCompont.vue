@@ -129,7 +129,7 @@
                     <a-form-model-item
                         v-for="(domain, index) in dynamicValidateForm.utilize"
                         :key="index"
-                        :ref="'domains.' + index + '.value'"
+                        :ref="'utilize.' + index + '.value'"
                     >
                         <a-row :gutter="3">
                             <a-col :span="22" class="contain">
@@ -300,6 +300,7 @@ export default {
             },
             dynamicValidateForm: {
                 domains: [],
+                utilize: [],
             },
             taskNameForm: {
                 name: '',
@@ -576,6 +577,7 @@ export default {
                     if (_this.id) {
                         Service.getTasksConfigsDel(item.task_config_id).then((res) => {
                             // console.log(res, '要删除的信息 的返回值', item);
+                            debugger
                             if (res.code === 1) {
                                 _this.$message.success('操作成功')
                                 let index =

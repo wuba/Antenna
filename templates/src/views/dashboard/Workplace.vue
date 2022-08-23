@@ -39,7 +39,7 @@
 
                     <div class="overflow leftbutton">{{ Object.keys(item)[1] }}</div>
                     <a-input :value="item[Object.keys(item)[1]]" placeholder="请输入域名" :readOnly="true">
-                        <my-copy slot="suffix" :text="item[Object.keys(item)[0]]"></my-copy>
+                        <my-copy slot="suffix" :text="item[Object.keys(item)[1]]"></my-copy>
                     </a-input>
                 </div>
             </div>
