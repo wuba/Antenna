@@ -42,8 +42,8 @@ class TestEmailSerializer(serializers.Serializer):
         config_record = Config.objects.all()
         OLD_EMAIL_HOST = config_record.get(name="EMAIL_HOST").value
         OLD_EMAIL_PORT = config_record.get(name="EMAIL_PORT").value
-        OLD_EMAIL_HOST_USER = config_record.get(name="EMAIL_PORT").value
-        OLD_EMAIL_HOST_PASSWORD = config_record.get(name="EMAIL_PORT").value
+        OLD_EMAIL_HOST_USER = config_record.get(name="EMAIL_HOST_USER").value
+        OLD_EMAIL_HOST_PASSWORD = config_record.get(name="EMAIL_HOST_PASSWORD").value
         if OLD_EMAIL_HOST != attrs["EMAIL_HOST"] or OLD_EMAIL_PORT != attrs["EMAIL_PORT"] or OLD_EMAIL_HOST_USER != \
                 attrs["EMAIL_HOST_USER"] or OLD_EMAIL_HOST_PASSWORD != attrs["EMAIL_HOST_PASSWORD"]:
             raise serializers.ValidationError('测试数据未保存，请保存后再进行测试')
