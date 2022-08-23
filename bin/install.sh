@@ -37,7 +37,7 @@ echo "make migrations success!"
 python3 ./manage.py migrate
 echo "migrate success!"
 echo "######生成个人api_key######"
-key=d=$(echo $RANDOM | md5 | head -c 32)
+key=$(echo $RANDOM | md5sum | head -c 32)
 echo "INSERT INTO antenna.api_key (id, key, update_time, user_id) VALUES (1, '$key', '2022-01-11 15:16:35', 1);" >>"$project_path/bin/config.sql"
 echo '######导入初始数据######'
 mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD antenna <"$project_path/bin/config.sql"

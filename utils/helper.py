@@ -6,16 +6,21 @@ import random
 import smtplib
 import socket
 import string
+import sys
 import time
 from email.mime.text import MIMEText
 from functools import wraps
 
+import django
+
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
+sys.path.append(PROJECT_ROOT)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
+django.setup()
+
 from django.conf import settings
 import requests
 from django_filters.filters import Filter
-from modules.template.models import Template
-from rest_framework import status
-from rest_framework.response import Response
 from modules.task.models import Task, TaskConfig
 from modules.config.setting import JNDI_PORT, PLATFORM_DOMAIN, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, \
     EMAIL_HOST_PASSWORD
@@ -153,65 +158,6 @@ def send_mail(to, message):
     smtp.sendmail(username_send, username_recv, mail.as_string())  # 参数分别是发送者，接收者，第三个是把上面的发送邮件的内容变成字符串
     smtp.quit()  # 发送完毕后退出smtp
     return True
-
-
-def get_result_data(data):
-    """
-    修改任务详情接口返回格式
-    """
-    if not data:
-        return Response(data={}, status=status.HTTP_200_OK)
-    listen_data_list = []
-    payload_data_list = []
-    for i in data:
-        task_config_status = 1
-        task_config_id = i["task_config"]
-        template_id = i["template"]
-        task_id = i["task"]
-        task_config_item_id = i["id"]
-        template_config_item_id = i["template_config_item"]
-        value = i["value"]
-        key = TaskConfig.objects.get(id=task_config_id).key
-        template_record = Template.objects.get(id=template_id)
-        url = get_payload(key, template_record.payload)
-        for _data_old in payload_data_list:
-            if task_config_id == _data_old.get("task_config_id", 0):
-                _data_old["task_config_item_list"].append({
-                    "template_config_item": template_config_item_id,
-                    "id": task_config_item_id,
-                    "value": value})
-                task_config_status = 0
-        if task_config_status:
-            _data = {
-                "task": task_id,
-                "template": template_id,
-                "template_name": template_record.name,
-                "template_type": template_record.type,
-                "template_choice_type": template_record.choice_type,
-                "task_config_id": task_config_id,
-                "key": url,
-                "task_config_item_list": [{
-                    "template_config_item": template_config_item_id,
-                    "id": task_config_item_id,
-                    "value": value}]
-            }
-
-            if template_record.type == 1:
-                listen_data_list.append(_data)
-            else:
-                payload_data_list.append(_data)
-    task_record = Task.objects.get(id=int(data[0]["task"]))
-    result = {
-        "task_info": {
-            "task_id": task_id,
-            "task_name": task_record.name,
-            "callback_url": task_record.callback_url,
-            "callback_url_headers": task_record.callback_url_headers,
-            "show_dashboard": bool(task_record.show_dashboard)},
-        "listen_template_info": listen_data_list,
-        "payload_template_info": payload_data_list,
-    }
-    return Response(result, status=status.HTTP_200_OK)
 
 
 def is_base64(content):
