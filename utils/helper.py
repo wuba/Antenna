@@ -218,6 +218,7 @@ def is_base64(content):
     """
     判断内容是否base64编码
     """
+    content = content.replace(' ', '+')
     if len(content) % 4 != 0:
         return content
     for i in content:

