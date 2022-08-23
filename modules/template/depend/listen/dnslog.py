@@ -9,6 +9,7 @@ from dnslib import QTYPE, RCODE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
 
 from modules.message.constants import MESSAGE_TYPES
+from utils.helper import send_message
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
@@ -43,8 +44,8 @@ class MysqlLogger():
     def log_request(self, handler, request):
         domain = request.q.qname.__str__().lower()
         print('domain=======>', domain)
-        type1 = QTYPE[request.q.qtype]
-        print(type1)
+        # type1 = QTYPE[request.q.qtype]
+        # print(type1)
         if domain.endswith(DNS_DOMAIN + '.'):
             udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
             print('udomain=======>', udomain)
@@ -58,6 +59,8 @@ class MysqlLogger():
                     Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
                                            remote_addr=handler.client_address[0],
                                            task_id=task_config_item.task_id, template_id=8)
+                    send_message(url=domain, remote_addr=handler.client_address[0], uri='', header='',
+                                 message_type=MESSAGE_TYPES.HTTP, content='', task_id=task_config_item.task_id)
 
     def log_send(self, handler, data):
         pass
@@ -130,7 +133,7 @@ def main():
         dnsdomain=DNS_DOMAIN,
         ns1domain=NS1_DOMAIN,
         ns2domain=NS2_DOMAIN,
-        serverip="42.187.161.143")
+        serverip=SERVER_IP)
     resolver = ZoneResolver(zone, True)
     logger = MysqlLogger()
     print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))

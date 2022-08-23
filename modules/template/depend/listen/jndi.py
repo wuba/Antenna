@@ -5,6 +5,8 @@ import sys
 
 import django
 
+from utils.helper import send_message
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
@@ -86,6 +88,8 @@ class SocketTemplate(BaseTemplate):
                     task_id = task_config_record.task_id
                     Message.objects.create(domain=DNS_DOMAIN, remote_addr=remote_addr, uri=path,
                                            message_type=MESSAGE_TYPES.LDAP, task_id=task_id, template_id=10)
+                    send_message(url=DNS_DOMAIN, remote_addr=remote_addr, uri=path, header='',
+                                 message_type=MESSAGE_TYPES.LDAP, content='', task_id=task_id)
                 coon.close()
             # rmi协议
             if self.check_rmi(data):
@@ -100,6 +104,8 @@ class SocketTemplate(BaseTemplate):
                     task_id = task_config_record.task_id
                     Message.objects.create(domain=DNS_DOMAIN, remote_addr=remote_addr, uri=path,
                                            message_type=MESSAGE_TYPES.RMI, task_id=task_id, template_id=10)
+                    send_message(url=DNS_DOMAIN, remote_addr=remote_addr, uri=path, header='',
+                                 message_type=MESSAGE_TYPES.RMI, content='', task_id=task_id)
                 coon.close()
 
         except Exception as e:

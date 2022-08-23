@@ -50,7 +50,6 @@ class XxeTemplate(BaseTemplate):
             for i in config:
                 item_name = i["name"]
                 for name in self.__dir__():
-                    print(name)
                     if name == item_name:
                         code = code + getattr(self, name)(i)
             return HttpResponse(code, content_type='application/xhtml+xml')

@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$c$ul+6ti8f1-hkj-rkgjv$)im$c)8e)n-en4wx4lg=g!gu7ay'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -62,7 +62,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'antenna.urls'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-# ALLOWED_HOSTS = ['58antenna.cn']
+ALLOWED_HOSTS = ['*']
 
 TEMPLATES = [
     {
