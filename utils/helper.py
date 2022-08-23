@@ -13,12 +13,12 @@ from functools import wraps
 from django.conf import settings
 import requests
 from django_filters.filters import Filter
-from modules.config.models import Config
 from modules.template.models import Template
 from rest_framework import status
 from rest_framework.response import Response
 from modules.task.models import Task, TaskConfig
-from modules.config.setting import JNDI_PORT, PLATFORM_DOMAIN
+from modules.config.setting import JNDI_PORT, PLATFORM_DOMAIN, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, \
+    EMAIL_HOST_PASSWORD
 
 
 def get_host_ip():
@@ -136,10 +136,10 @@ def send_mail(to, message):
     """
     发送邮件
     """
-    mailserver = Config.objects.get(name="EMAIL_HOST").value  # 邮箱服务器地址
-    port = int(Config.objects.get(name="EMAIL_PORT").value)
-    username_send = Config.objects.get(name="EMAIL_HOST_USER").value  # 邮箱用户名
-    password = Config.objects.get(name="EMAIL_HOST_PASSWORD").value  # 邮箱密码：需要使用授权码
+    mailserver = EMAIL_HOST  # 邮箱服务器地址
+    port = EMAIL_PORT
+    username_send = EMAIL_HOST_USER  # 邮箱用户名
+    password = EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
     username_recv = "".join(to)  # 收件人，多个收件人用逗号隔开
     mail = MIMEText(message)
     mail['Subject'] = 'Antenna平台邮件'
