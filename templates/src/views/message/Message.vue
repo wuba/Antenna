@@ -91,26 +91,7 @@ export default {
                 // { title: '更新时间', dataIndex: 'updata_time', key: 'updata_time' },
                 { title: '操作', key: 'action', scopedSlots: { customRender: 'action' } },
             ],
-            data: [
-                {
-                    id: 1,
-                    name: '这是一个特点就是名字很长的在线任务哦',
-                    num: '34',
-                    status: '2',
-                    start_time: '2021-05-19 15:12:32',
-                    updata_time: '2021-05-20 15:12:32',
-                    expande: '12',
-                },
-                {
-                    id: 2,
-                    name: '任务名称2',
-                    num: '423',
-                    status: '2',
-                    start_time: '2020-10-20 05:58:01',
-                    updata_time: '2021-05-20 15:12:32',
-                    expande: 'sss',
-                },
-            ],
+            data: [],
             pagination: {
                 pageSizeOptions: ['10', '20', '30', '40', '50'],
                 showSizeChanger: true,
