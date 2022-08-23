@@ -2,10 +2,11 @@
 echo "#####安装系统所需组件#####"
 # shellcheck disable=SC2046
 project_path="$(pwd)/../"
-echo "$project_path"
 pip3 install --upgrade pip
 # shellcheck disable=SC2164
 cd "$project_path"
+yum install mysql-server
+yum install mysql-devel
 pip3 install -r requirements.txt -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 echo "pip install success!"
 echo "#####配置系统连接mysql数据#####"
@@ -25,7 +26,7 @@ echo "MYSQL_PORT =  $MYSQL_PORT" >>./database_config.py
 echo "MYSQL_USERNAME = '$MYSQL_USERNAME'" >>./database_config.py
 echo "MYSQL_PASSWORD = '$MYSQL_PASSWORD'" >>./database_config.py
 cd "$project_path/templates/"
-echo "http://'$MYSQL_PASSWORD'" >./reqUrl.txt
+echo "http://$PLATFORM_DOMAIN" >./reqUrl.txt
 # shellcheck disable=SC2164
 echo "######创建数据库antenna#####"
 mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "CREATE DATABASE antenna;"
@@ -45,7 +46,6 @@ cd "$project_path/templates/"
 npm install -g pm2
 npm install -g yarn
 yarn
-yarn prepare
 yarn start
 echo '######前端成功启动######'
 echo '######启动后端######'

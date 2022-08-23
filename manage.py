@@ -4,9 +4,9 @@ import multiprocessing
 import os
 import sys
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
-sys.path.append(PROJECT_ROOT)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'magpie.settings'
+# PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
+# sys.path.append(PROJECT_ROOT)
+# os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 
 from modules.template.depend.listen import dnslog, jndi
 
