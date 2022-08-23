@@ -105,7 +105,8 @@ plateform_domain: test.com
 ![img_6.png](imgs/img_6.png)
 进入管理界面后点击左侧导航栏DNS管理-自定义DNS HOST
 
-![img_7.png](imgs/img_7.png)
+![img.png](imgs/img_7.png)
+
 点击创建DNS服务器，然后创建ns1.test.com和ns2.test.com，其ip地址设置为antenna系统所在服务器公网地址
 ![img_9.png](imgs/img_9.png)
 创建后点击同步再进入左侧导航栏DNS管理-DNS修改，点击修改DNS服务器按钮，将test.com的dns服务器修改为刚才设置的ns1.test.com与ns2.test.com
@@ -172,7 +173,7 @@ Antenna 提供对外API供用户主动查询平台接收到的消息
 `http://test.com/get_message`
 如接口需要Authorization等认证方式可写在接口header中，例如
 `{"Authorization": "admin"}`
-平台接收到该任务的消息后会向http://test.com/get_message发送接收到的请求消息数据
+平台接收到该任务的消息后会向test.com/get_message发送接收到的请求消息数据
 
 ## Antenna组件开发教程
 
