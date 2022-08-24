@@ -576,8 +576,6 @@ export default {
                 onOk() {
                     if (_this.id) {
                         Service.getTasksConfigsDel(item.task_config_id).then((res) => {
-                            // console.log(res, '要删除的信息 的返回值', item);
-                            debugger
                             if (res.code === 1) {
                                 _this.$message.success('操作成功')
                                 let index =

@@ -65,6 +65,7 @@ export default {
                         if (out) {
                             sessionStorage.setItem('firstLogin', 'false')
                         }
+                        out = true
                     },
                 })
                 driver.defineSteps([
