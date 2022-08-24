@@ -1,3 +1,5 @@
+from modules.template.models import Template
+
 from django_filters.rest_framework import DjangoFilterBackend
 from modules.task.constants import TASK_STATUS, TASK_TMP
 from modules.task.models import Task, TaskConfig, TaskConfigItem
@@ -9,7 +11,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from utils.helper import generate_code, get_result_data
+from utils.helper import generate_code, get_payload
 
 
 class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin,
@@ -82,6 +84,7 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
 
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
+
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated, ])
     def multi_update_status(self, request, *args, **kwargs):
         """
@@ -122,16 +125,74 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         user_id = self.request.user.id
         return TaskConfigItem.objects.filter(task_config__task__user=user_id)
 
+    @staticmethod
+    def get_result_data(data):
+        """
+        修改任务详情接口返回格式
+        """
+        if not data:
+            return Response(data={}, status=status.HTTP_200_OK)
+        listen_data_list = []
+        payload_data_list = []
+        for i in data:
+            task_config_status = 1
+            task_config_id = i["task_config"]
+            template_id = i["template"]
+            task_id = i["task"]
+            task_config_item_id = i["id"]
+            template_config_item_id = i["template_config_item"]
+            value = i["value"]
+            key = TaskConfig.objects.get(id=task_config_id).key
+            template_record = Template.objects.get(id=template_id)
+            url = get_payload(key, template_record.payload)
+            for _data_old in payload_data_list:
+                if task_config_id == _data_old.get("task_config_id", 0):
+                    _data_old["task_config_item_list"].append({
+                        "template_config_item": template_config_item_id,
+                        "id": task_config_item_id,
+                        "value": value})
+                    task_config_status = 0
+            if task_config_status:
+                _data = {
+                    "task": task_id,
+                    "template": template_id,
+                    "template_name": template_record.name,
+                    "template_type": template_record.type,
+                    "template_choice_type": template_record.choice_type,
+                    "task_config_id": task_config_id,
+                    "key": url,
+                    "task_config_item_list": [{
+                        "template_config_item": template_config_item_id,
+                        "id": task_config_item_id,
+                        "value": value}]
+                }
+
+                if template_record.type == 1:
+                    listen_data_list.append(_data)
+                else:
+                    payload_data_list.append(_data)
+        task_record = Task.objects.get(id=int(data[0]["task"]))
+        result = {
+            "task_info": {
+                "task_id": task_id,
+                "task_name": task_record.name,
+                "callback_url": task_record.callback_url,
+                "callback_url_headers": task_record.callback_url_headers,
+                "show_dashboard": bool(task_record.show_dashboard)},
+            "listen_template_info": listen_data_list,
+            "payload_template_info": payload_data_list,
+        }
+        return Response(result, status=status.HTTP_200_OK)
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            print(serializer.data)
-            return get_result_data(serializer.data)
+            return self.get_result_data(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-        return get_result_data(serializer.data)
+        return self.get_result_data(serializer.data)
 
     def create(self, request, *args, **kwargs):
         """
@@ -167,7 +228,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         queryset = self.filter_queryset(
             TaskConfigItem.objects.filter(task_config__task__user=self.request.user.id, task_id=task_id))
         serializer = self.get_serializer(queryset, many=True)
-        return get_result_data(serializer.data)
+        return self.get_result_data(serializer.data)
 
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated])
     def update_config(self, request, *args, **kwargs):
@@ -208,7 +269,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         queryset = self.filter_queryset(
             TaskConfigItem.objects.filter(task_config__task__user=self.request.user.id, task_id=task_id))
         serializer = self.get_serializer(queryset, many=True)
-        return get_result_data(serializer.data)
+        return self.get_result_data(serializer.data)
 
     @action(methods=["delete"], detail=False, permission_classes=[IsAuthenticated])
     def delete_config(self, request, *args, **kwargs):
@@ -225,4 +286,4 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         queryset = self.filter_queryset(
             TaskConfigItem.objects.filter(task_config__task__user=self.request.user.id, task_id=task_id))
         serializer = self.get_serializer(queryset, many=True)
-        return get_result_data(serializer.data)
+        return self.get_result_data(serializer.data)
