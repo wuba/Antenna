@@ -66,6 +66,7 @@ platform_ip:1.1.1.1
 ![img.png](imgs/img_start.png)
 
 ### 1.2 Docker部署
+编写中
 
 ## 2. 使用教程
 
@@ -131,9 +132,9 @@ platform_ip:1.1.1.1
 Antenna 初始开放HTTP、DNS、RMI、LDAP 四个监听组件以及XSS、XXE、HTTP_CUSTOM(SSRF/JSONP)等多个漏洞场景利用组件，
 其组件最终以链接等方式进行生成。平台通过任务的形式对拥有各种能力的链接进行区分,新用户默认创建初始任务与支持的所有监听组件实例
 
-演示平台：x.x.x.x
+演示平台：搭建中
 
-漏洞靶场：x.x.x.x
+漏洞靶场：搭建中
 
 ##### 2.2.1.1 新建与使用组件实例(链接)
 
