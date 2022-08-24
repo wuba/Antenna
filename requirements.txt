@@ -1,0 +1,14 @@
+Django==3.2.9
+django-cors-headers==3.10.0
+django-extensions==3.1.5
+djangorestframework==3.12.4
+drf-writable-nested==0.6.3
+django-filter==21.1
+mysqlclient==2.1.0
+dnslib==0.9.19
+PyMySQL==1.0.2
+null==0.6.1
+djangorestframework-bulk==0.2.1
+simplejson==3.17.6
+six==1.16.0
+requests==2.27.1
