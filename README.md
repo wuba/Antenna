@@ -88,7 +88,7 @@ platform_ip:1.1.1.1
 
 ##### 2.1.1.1 邮箱授权码设置及QQ邮箱授权码申请教程
 
-`https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256`
+[QQ邮箱授权码申请教程](https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256)
 
 #### 2.1.2 协议设置
 
