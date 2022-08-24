@@ -28,7 +28,7 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 
 一个域名
 
-域名解析及DNS配置 ,可参考下文 [2.1.2.1 域名配置及阿里云dns服务修改教程](#https://github.com/wuba/Antenna/blob/main/README.md#2121-%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE%E5%8F%8A%E9%98%BF%E9%87%8C%E4%BA%91dns%E6%9C%8D%E5%8A%A1%E4%BF%AE%E6%94%B9%E6%95%99%E7%A8%8B)
+域名解析及DNS配置 ,可参考下文 [2.1.2.1 域名配置及阿里云dns服务修改教程](https://github.com/wuba/Antenna/blob/main/README.md#2121-%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE%E5%8F%8A%E9%98%BF%E9%87%8C%E4%BA%91dns%E6%9C%8D%E5%8A%A1%E4%BF%AE%E6%94%B9%E6%95%99%E7%A8%8B)
 
 ### 1.1 源码部署
 
