@@ -1,4 +1,5 @@
 from modules.config.models import Config
+from bin.database_config import PLATFORM_DOMAIN, PLATFORM_IP
 
 
 def get_bool(key):
@@ -6,6 +7,8 @@ def get_bool(key):
         return True
     elif key.lower() == 'false':
         return False
+
+
 try:
     config_record = Config.objects.all()
     # 平台域名
@@ -13,7 +16,7 @@ try:
     # 做 dns 记录的域名,可以和平台域名用作同一个
     DNS_DOMAIN = config_record.get(name="DNS_DOMAIN").value
     # 监听DNS端口
-    # DNS_PORT = int(config_record.get(name="DNS_PORT").value)
+    DNS_PORT = 53
     # NS域名
     NS1_DOMAIN = config_record.get(name="NS1_DOMAIN").value
     NS2_DOMAIN = config_record.get(name="NS2_DOMAIN").value
@@ -39,12 +42,12 @@ try:
 
 except Exception as e:
     print(e)
-    PLATFORM_DOMAIN = "test.com"
-    DNS_DOMAIN = "test.com"
-    DNS_PORT = 25
-    NS1_DOMAIN = "ns1.test.com"
-    NS2_DOMAIN = "ns2.test.com"
-    SERVER_IP = '0.0.0.0'
+    PLATFORM_DOMAIN = PLATFORM_DOMAIN
+    DNS_DOMAIN = PLATFORM_DOMAIN
+    DNS_PORT = 53
+    NS1_DOMAIN = f"ns1.{PLATFORM_DOMAIN}"
+    NS2_DOMAIN = f"ns2.{PLATFORM_DOMAIN}"
+    SERVER_IP = PLATFORM_IP
     JNDI_PORT = 2345
     INVITE_TO_REGISTER = 1
     OPEN_REGISTER = 1

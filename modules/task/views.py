@@ -1,4 +1,4 @@
-from pipes import Template
+from modules.template.models import Template
 
 from django_filters.rest_framework import DjangoFilterBackend
 from modules.task.constants import TASK_STATUS, TASK_TMP

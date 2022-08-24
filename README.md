@@ -23,9 +23,9 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 
 一台公网服务器
 
-一个域名)
+一个域名
 
-域名解析及DNS配置 ,可参考下文[域名配置及阿里云dns服务修改教程](#2.1.2.1 域名配置及阿里云dns服务修改教程)
+域名解析及DNS配置 ,可参考下文 [2.1.2.1 域名配置及阿里云dns服务修改教程](#2.1.2.1 域名配置及阿里云dns服务修改教程)
 
 ### 1.1 源码部署
 
@@ -45,7 +45,7 @@ chmod +x ./*
 ./install.sh
 ```
 
-脚本运行按照提示填写连接数据库配置与域名信息
+脚本运行按照提示填写连接数据库配置与域名信息,如此时域名还未配置解析，paltform_domain也填写为服务器的公网ip，否则会影响系统接口的访问
 ![img.png](imgs/img_plat.png)
 填写示例
 
@@ -54,8 +54,8 @@ mysql ip: 127.0.0.1
 mysql port: 3306
 mysql username: root
 mysql password: 123456
-plateform_domain: test.com
-palteform_ip:1.1.1.1
+platform_domain: test.com
+paltform_ip:1.1.1.1
 ```
 
 系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com
