@@ -28,7 +28,7 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 
 一个域名
 
-域名解析及DNS配置 ,可参考下文 [2.1.2.1 域名配置及阿里云dns服务修改教程](#d#2121-%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE%E5%8F%8A%E9%98%BF%E9%87%8C%E4%BA%91dns%E6%9C%8D%E5%8A%A1%E4%BF%AE%E6%94%B9%E6%95%99%E7%A8%8B)
+域名解析及DNS配置 ,可参考下文 [2.1.2.1 域名配置及阿里云dns服务修改教程](#https://github.com/wuba/Antenna/blob/main/README.md#2121-%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE%E5%8F%8A%E9%98%BF%E9%87%8C%E4%BA%91dns%E6%9C%8D%E5%8A%A1%E4%BF%AE%E6%94%B9%E6%95%99%E7%A8%8B)
 
 ### 1.1 源码部署
 
@@ -49,7 +49,7 @@ chmod +x ./*
 ```
 
 脚本运行按照提示填写连接数据库配置与域名信息,如此时域名还未配置解析，platform_domain也填写为服务器的公网ip，否则会影响系统接口的访问
-![img.png](./imgs/img_plat.png)
+![img.png](https://github.com/wuba/Antenna/imgs/img_plat.png)
 填写示例
 
 ```angular2html
@@ -63,7 +63,7 @@ platform_ip:1.1.1.1
 
 系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com
 访问之前输入域名系统的8000端口，可访问系统后台并访问
-![img.png](imgs/img_start.png)
+![img.png](https://github.com/wuba/Antenna/imgs/img_start.png)
 
 ### 1.2 Docker部署
 
@@ -108,19 +108,19 @@ platform_ip:1.1.1.1
 这里已购买test.com，antenna系统所在服务器公网地址为1.1.1.1为例
 
 点击操作栏中的管理
-![img_6.png](imgs/img_6.png)
+![img_6.png](https://github.com/wuba/Antenna/imgs/img_6.png)
 进入管理界面后点击左侧导航栏DNS管理-自定义DNS HOST
 
-![img.png](imgs/img_7.png)
+![img.png](https://github.com/wuba/Antenna/imgs/img_7.png)
 
 点击创建DNS服务器，然后创建ns1.test.com和ns2.test.com，其ip地址设置为antenna系统所在服务器公网地址
-![img_9.png](imgs/img_9.png)
+![img_9.png](https://github.com/wuba/Antenna/imgs/img_9.png)
 创建后点击同步再进入左侧导航栏DNS管理-DNS修改，点击修改DNS服务器按钮，将test.com的dns服务器修改为刚才设置的ns1.test.com与ns2.test.com
-![img_10.png](imgs/img_10.png)
+![img_10.png](https://github.com/wuba/Antenna/imgs/img_10.png)
 点击同步后回到Antenna系统保存协议相关设置
-![img_8.png](imgs/img_8.png)
+![img_8.png](https://github.com/wuba/Antenna/imgs/img_8.png)
 然后进入域名列表解析配置，进行配置ns1与ns2的A记录配置
-![img.png](imgs/img_666.png)
+![img.png](https://github.com/wuba/Antenna/imgs/img_666.png)
 
 注意！！！服务器防火墙需开启上述配置端口的进出规则，DNS默认使用53端口也需对外开放！！！
 
