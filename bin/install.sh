@@ -20,7 +20,7 @@ read -p "mysql username:" MYSQL_USERNAME
 # shellcheck disable=SC2162
 read -p "mysql password:" MYSQL_PASSWORD
 read -p "platform domain:" PLATFORM_DOMAIN
-read -p "platform domain:" PLATFORM_IP
+read -p "platform ip:" PLATFORM_IP
 cd "$project_path/bin/"
 echo "MYSQL_HOST = '$MYSQL_HOST'" >./database_config.py
 # shellcheck disable=SC2129
@@ -34,7 +34,7 @@ echo "http://$PLATFORM_DOMAIN" >./reqUrl.txt
 # shellcheck disable=SC2164
 echo "######创建数据库antenna#####"
 mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "DROP DATABASE antenna;"
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "CREATE DATABASE antenna;"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "CREATE DATABASE antenna  CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';"
 echo "######创建数据库成功!#######"
 cd "$project_path"
 python3 ./manage.py makemigrations
