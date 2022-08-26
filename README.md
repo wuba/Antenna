@@ -55,6 +55,7 @@ PLATFORM_IP=192.168.3.200
 python3 manage.py makemigrations
 python3 manage.py migrate       
 python3 manage.py runserver 0.0.0.0:80 --noreload
+
 ```
 系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com
 访问之前输入域名系统的80端口，可访问系统后台并访问
