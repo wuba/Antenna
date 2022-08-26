@@ -13,20 +13,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
+from django.conf import settings
+from django.shortcuts import redirect
+from django.views.static import serve
 from django.contrib import admin
 from django.urls import path, include, re_path
 
 import modules.message.views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/auth/', include('modules.account.urls')),
-    path('api/v1/templates/', include('modules.template.urls')),
-    path('api/v1/tasks/', include('modules.task.urls')),
-    path('api/v1/messages/', include('modules.message.urls')),
-    path('api/v1/openapi/', include('modules.api.urls')),
-    path('api/v1/configs/',include('modules.config.urls')),
-    re_path('.*', modules.message.views.HttplogView.as_view())
+    path("admin/", admin.site.urls),
+    path("api/v1/auth/", include("modules.account.urls")),
+    path("api/v1/templates/", include("modules.template.urls")),
+    path("api/v1/tasks/", include("modules.task.urls")),
+    path("api/v1/messages/", include("modules.message.urls")),
+    path("api/v1/openapi/", include("modules.api.urls")),
+    path("api/v1/configs/", include("modules.config.urls")),
+    re_path(
+        r"^(?P<path>.*)$", serve, {"document_root": settings.BASE_DIR / "static"}
+    ),
+    re_path(".*", modules.message.views.HttplogView.as_view()),
 ]
-

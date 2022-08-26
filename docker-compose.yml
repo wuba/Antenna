@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+
+  db:
+    image: mysql:8.0.30
+    container_name: antenna-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: Antenna@58.com
+      MYSQL_DATABASE: antenna
+    networks:
+      - antenna
+    restart: always
+
+  antenna:
+    build: ./
+    image: antenna:latest
+    depends_on:
+      - db
+    container_name: antenna
+    volumes:
+      - ./:/antenna
+    ports:
+      - "80:80"
+      - "2345:2345"
+      - "53:53/udp"
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: Antenna@58.com
+      PLATFORM_DOMAIN: 127.0.0.1
+      PLATFORM_IP: 127.0.0.1
+    networks:
+      - antenna
+    restart: always
+
+networks:
+  antenna:
+    driver: bridge

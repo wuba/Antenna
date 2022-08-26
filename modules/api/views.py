@@ -17,7 +17,13 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
     def get_queryset(self):
         return ApiKey.objects.filter(user=self.request.user)
 
-    @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated, ])
+    @action(
+        methods=["GET"],
+        detail=False,
+        permission_classes=[
+            IsAuthenticated,
+        ],
+    )
     def refresh(self, request, *args, **kwargs):
         """
         刷新apikey
@@ -26,7 +32,13 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
         ApiKey.objects.filter(user=self.request.user).update(key=new_apikey)
         return Response({"key": new_apikey}, status=status.HTTP_200_OK)
 
-    @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated, ])
+    @action(
+        methods=["GET"],
+        detail=False,
+        permission_classes=[
+            IsAuthenticated,
+        ],
+    )
     def url_list(self, request, *args, **kwargs):
         """
         获取api列表
@@ -36,7 +48,11 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
             {
                 "url": f"http://{PLATFORM_DOMAIN}/api/v1/messages/manage/api/?apikey={key}&uri=&task__name=&message_type=&page=&page_size=",
                 "method": "GET",
-                "detail": {"uri": "访问的url路径", "task__name": "任务名",
-                           "message_type": "消息类型，1为HTTP，2为DNS，3为LDAP，4为RMI"}}
+                "detail": {
+                    "uri": "访问的url路径",
+                    "task__name": "任务名",
+                    "message_type": "消息类型，1为HTTP，2为DNS，3为LDAP，4为RMI",
+                },
+            }
         ]
         return Response({"urllist": url_list}, status=status.HTTP_200_OK)

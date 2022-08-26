@@ -1,11 +1,11 @@
 from modules.config.models import Config
-from bin.database_config import PLATFORM_DOMAIN, PLATFORM_IP
+from antenna.settings import PLATFORM_DOMAIN, PLATFORM_IP
 
 
 def get_bool(key):
-    if key.lower() == 'true':
+    if key.lower() == "true" or key.lower() == "1":
         return True
-    elif key.lower() == 'false':
+    elif key.lower() == "false" or key.lower() == "0":
         return False
 
 
@@ -27,7 +27,9 @@ try:
     # 开放注册
     OPEN_REGISTER = int(get_bool(config_record.get(name="OPEN_REGISTER").value))
     # 邀请注册
-    INVITE_TO_REGISTER = int(get_bool(config_record.get(name="INVITE_TO_REGISTER").value))
+    INVITE_TO_REGISTER = int(
+        get_bool(config_record.get(name="INVITE_TO_REGISTER").value)
+    )
     # 开放邮箱通知
     OPEN_EMAIL = int(get_bool(config_record.get(name="OPEN_EMAIL").value))
     # 邮箱服务器地址
