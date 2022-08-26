@@ -3,7 +3,9 @@ services:
   antenna:
     image: jongsx/antenna
     ports:
-      - 8080:80
+      - 80:80
+      - 8000:8000
+      - 2345:2345
     depends_on:
       - mysql
     links:

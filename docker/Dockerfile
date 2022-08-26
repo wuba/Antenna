@@ -24,6 +24,6 @@ RUN apt-get install -y mysql-client
 
 COPY ./entrypoint.sh /opt/entrypoint.sh
 
-EXPOSE 80
+EXPOSE 80 8000 2345
 
 CMD [ "/bin/bash", "/opt/entrypoint.sh" ]
