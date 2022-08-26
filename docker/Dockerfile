@@ -18,7 +18,9 @@ RUN git clone https://github.com/wuba/Antenna.git ${ANTENNA_HOME}
 
 RUN cd ${ANTENNA_HOME} \
     && apt-get install -y python3-pip \
-    && pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+    && python3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip\
+    && pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    && pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple cryptography
 
 RUN apt-get install -y mysql-client
 

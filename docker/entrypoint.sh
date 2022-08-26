@@ -43,5 +43,5 @@ echo '######前端成功启动######'
 
 echo '######启动后端######'
 cd "${ANTENNA_HOME}"
-nohup python3 ./manage.py runserver 0.0.0.0:80 --noreload
+python3 ./manage.py runserver 0.0.0.0:80
 echo '######后端成功启动######'
