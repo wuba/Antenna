@@ -38,6 +38,7 @@ git clone https://github.com/WUBA/Antenna.git
 ```
 
 填写.env.example文件配置信息,修改完将.env.example文件名改为.env
+
 填写示例
 ```angular2html
 MYSQL_HOST=127.0.0.1
