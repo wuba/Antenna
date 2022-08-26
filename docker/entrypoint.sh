@@ -20,15 +20,15 @@ echo "migrate success!"
 echo "######生成个人api_key######"
 KEY=$(echo $RANDOM | md5sum | head -c 32)
 
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p $MYSQL_PASSWORD -e "INSERT INTO antenna.api_key (id, \`key\`, update_time, user_id) VALUES (1, '$KEY', '2022-08-09 20:12:29.151182', 1);"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "INSERT INTO antenna.api_key (id, \`key\`, update_time, user_id) VALUES (1, '$KEY', '2022-08-09 20:12:29.151182', 1);"
 
 echo '######导入初始数据######'
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p $MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (1, 'PLATFORM_DOMAIN', 0, '$PLATFORM_DOMAIN', '2022-01-13 14:20:33', '2022-01-13 14:20:34');"
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p $MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (2, 'DNS_DOMAIN', 1, '$PLATFORM_DOMAIN', '2022-01-13 14:22:40', '2022-01-13 14:22:45');"
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p $MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (4, 'NS1_DOMAIN', 1, 'ns1.$PLATFORM_DOMAIN', '2022-01-13 14:23:10', '2022-01-13 14:23:12');"
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p $MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (5, 'NS2_DOMAIN', 1, 'ns2.$PLATFORM_DOMAIN', '2022-01-13 14:23:42', '2022-01-13 14:23:44');"
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p $MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (6, 'SERVER_IP', 1, '$PLATFORM_IP', '2022-01-13 14:25:06', '2022-01-13 14:25:08');"
-mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p $MYSQL_PASSWORD antenna < "${ANTENNA_HOME}/bin/config.sql"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (1, 'PLATFORM_DOMAIN', 0, '$PLATFORM_DOMAIN', '2022-01-13 14:20:33', '2022-01-13 14:20:34');"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (2, 'DNS_DOMAIN', 1, '$PLATFORM_DOMAIN', '2022-01-13 14:22:40', '2022-01-13 14:22:45');"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (4, 'NS1_DOMAIN', 1, 'ns1.$PLATFORM_DOMAIN', '2022-01-13 14:23:10', '2022-01-13 14:23:12');"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (5, 'NS2_DOMAIN', 1, 'ns2.$PLATFORM_DOMAIN', '2022-01-13 14:23:42', '2022-01-13 14:23:44');"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD -e "INSERT INTO antenna.config (id, name, type, value, create_time, update_time) VALUES (6, 'SERVER_IP', 1, '$PLATFORM_IP', '2022-01-13 14:25:06', '2022-01-13 14:25:08');"
+mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USERNAME -p$MYSQL_PASSWORD antenna < "${ANTENNA_HOME}/bin/config.sql"
 
 echo '######启动前端######'
 cd "${ANTENNA_HOME}/templates/"
