@@ -1,17 +1,25 @@
 version: '3'
 services:
-  unomi:
+  antenna:
     image: jongsx/antenna
     ports:
-      - 80:80
+      - 8080:80
     depends_on:
-      - db
+      - mysql
     links:
-      - db
-  db:
+      - mysql
+    environment:
+      - MYSQL_HOST=mysql
+  mysql:
     image: mysql
     restart: always
-    command: --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    command: [
+      '--default-authentication-plugin=mysql_native_password',
+      '--character-set-server=utf8',
+      '--collation-server=utf8_unicode_ci'
+    ]
+    ports:
+      - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: passwd
       MYSQL_DATABASE: antenna
