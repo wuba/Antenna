@@ -37,15 +37,14 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 git clone https://github.com/WUBA/Antenna.git
 ```
 
-填写.env文件配置信息
-![img.png](imgs/img_plat.png)
+填写.env.example文件配置信息,修改完将.env.example文件名改为.env
 填写示例
 ```angular2html
 MYSQL_HOST=127.0.0.1
 MYSQL_PORT=3306
 MYSQL_USERNAME=root
 MYSQL_PASSWORD=Antenna@58.com
-PLATFORM_DOMAIN=192.168.3.200
+PLATFORM_DOMAIN=test.com
 PLATFORM_IP=192.168.3.200
 ```
 
@@ -57,7 +56,8 @@ python3 manage.py migrate
 python3 manage.py runserver 0.0.0.0:80 --noreload
 ```
 系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com
-访问之前输入域名系统的80端口，可访问系统后台并访问
+访问
+`htpp://test.com/index.html`，可访问系统后台并访问
 ![img.png](imgs/img_start.png)
 
 ### 1.2 Docker部署
@@ -73,7 +73,12 @@ git clone https://github.com/WUBA/Antenna.git
 ```
 docker-compose up -d
 ```
-访问对应8000端口，可访问系统后台并访问
+访问用户自定义docker-compose.yml文件中映射的端口，`http://test.com/index.html` 可访问系统后台
+
+tips:关于用户系统执行命令后镜像显示53端口被占用问题，可执行命令禁用systemd-resolved
+```angular2html
+systemctl stop systemd-resolved
+```
 
 ## 2. 使用教程
 
@@ -139,9 +144,9 @@ docker-compose up -d
 Antenna 初始开放HTTP、DNS、RMI、LDAP 四个监听组件以及XSS、XXE、HTTP_CUSTOM(SSRF/JSONP)等多个漏洞场景利用组件，
 其组件最终以链接等方式进行生成。平台通过任务的形式对拥有各种能力的链接进行区分,新用户默认创建初始任务与支持的所有监听组件实例
 
-演示平台：[演示平台](http://jiemuzu.cn:8000)
+演示平台(暂时关闭)：[演示平台](http://jiemuzu.cn)
 
-漏洞靶场：[漏洞靶场](http://jiemuzu.cn:8088)
+漏洞靶场(暂时关闭)：[漏洞靶场](http://jiemuzu.cn)
 
 ##### 2.2.1.1 新建与使用组件实例(链接)
 
