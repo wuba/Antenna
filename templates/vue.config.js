@@ -1,6 +1,3 @@
-const webpack = require('webpack')
-const fs = require('fs')
-const reqUrl = fs.readFileSync('./reqUrl.txt')
 const vueConfig = {
     productionSourceMap: false,
     css: {
@@ -13,20 +10,13 @@ const vueConfig = {
             },
         },
     },
-    configureWebpack: (config) => {
-        config.plugins.push(
-            new webpack.DefinePlugin({
-                reqUrl: JSON.stringify(reqUrl.toString()),
-            })
-        )
-    },
     lintOnSave: false, //关闭eslintre语法检查
     devServer: {
         open: true,
         disableHostCheck: true,
         proxy: {
             '^/api': {
-                target: 'http://10.176.237.165:8000', //后端地址
+                target: 'http://127.0.0.1:8000', //后端地址
                 ws: true, //是否代理websockets
                 changeOrigin: true,
             },

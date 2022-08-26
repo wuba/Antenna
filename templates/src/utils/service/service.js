@@ -97,7 +97,7 @@ export default {
         return axios.del(`/api/v1/tasks/configs/delete_config/?id=${id}`)
     },
     tmp_delete_config(id) {
-        return axios.del(`/api/v1/tasks/tmp/delete_config/?id=${id}`)
+        return axios.del(`/api/v1/tasks/delete_config/?id=${id}`)
     },
     getTasksConfigsAdd(data) {
         return axios.post('/api/v1/tasks/configs/', data)
@@ -109,7 +109,7 @@ export default {
         return axios.post('/api/v1/tasks/configs/update_config/', data)
     },
     tmp_update_config(data) {
-        return axios.post('/api/v1/tasks/tmp/update_config/', data)
+        return axios.post('/api/v1/tasks/update_config/', data)
     },
     getCreatTask(data) {
         return axios.post('/api/v1/tasks/manage/create_task/', data)
