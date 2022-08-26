@@ -37,33 +37,43 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 git clone https://github.com/WUBA/Antenna.git
 ```
 
-进入项目运行install 脚本
-
-```
-cd ./Antenna/bin 
-chmod +x ./*
-./install.sh
-```
-
-脚本运行按照提示填写连接数据库配置与域名信息,如此时域名还未配置解析，platform_domain也填写为服务器的公网ip，否则会影响系统接口的访问
+填写.env文件配置信息
 ![img.png](imgs/img_plat.png)
 填写示例
-
 ```angular2html
-mysql ip: 127.0.0.1
-mysql port: 3306
-mysql username: root
-mysql password: 123456
-platform_domain: test.com
-platform_ip:1.1.1.1
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_USERNAME=root
+MYSQL_PASSWORD=Antenna@58.com
+PLATFORM_DOMAIN=192.168.3.200
+PLATFORM_IP=192.168.3.200
 ```
 
+运行命令
+
+```
+python3 manage.py makemigrations
+python3 manage.py migrate       
+python3 manage.py runserver 0.0.0.0:80 --noreload
+```
 系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com
-访问之前输入域名系统的8000端口，可访问系统后台并访问
+访问之前输入域名系统的80端口，可访问系统后台并访问
 ![img.png](imgs/img_start.png)
 
 ### 1.2 Docker部署
-编写中
+下载源码
+
+```
+git clone https://github.com/WUBA/Antenna.git
+```
+
+
+只需要修改docker-compose.yaml中PALTFROM_DOMAIN和PLATFORM_IP两个变量，mysql配置根据实际情况配置
+运行：
+```
+docker-compose up -d
+```
+访问对应8000端口，可访问系统后台并访问
 
 ## 2. 使用教程
 
