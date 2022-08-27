@@ -218,4 +218,4 @@ class HttplogView(APIView):
             return HttpResponse('', content_type='text/html;charset=utf-8')
 
         else:
-            return render(request, 'index.html')
+            return render(request, '../static/index.html')

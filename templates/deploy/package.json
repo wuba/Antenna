@@ -1,9 +1,0 @@
-{
-    "description": "58 Antenna web server",
-    "scripts": {
-        "arthur-start": "pm2 start ./server.js --name cloud"
-    },
-    "dependencies": {
-        "express": "^4.17.1"
-    }
-}

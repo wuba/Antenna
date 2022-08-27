@@ -29,9 +29,9 @@ urlpatterns = [
     path("api/v1/messages/", include("modules.message.urls")),
     path("api/v1/openapi/", include("modules.api.urls")),
     path("api/v1/configs/", include("modules.config.urls")),
-    re_path(".*", modules.message.views.HttplogView.as_view()),
     re_path(
         r"^(?P<path>.*)$", serve, {"document_root": settings.BASE_DIR / "static"}
     ),
+    re_path(".*", modules.message.views.HttplogView.as_view()),
 
 ]

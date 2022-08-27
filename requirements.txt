@@ -14,4 +14,4 @@ six==1.16.0
 requests==2.27.1
 python-dotenv==0.20.0
 cryptography==37.0.4
-wait-for-it==2.2.1
+wait-for-it==2.1.1
