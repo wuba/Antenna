@@ -11,7 +11,7 @@
 ## Antenna简介
 
 Antenna是58同城安全团队打造的一款辅助安全从业人员辅助验证网络中多种漏洞是否存在以及可利用性的工具。其基于带外应用安全测试(
-OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形式进行集合，通过与目标进行out-bind的数据通信方式进行辅助检测。
+OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形式进行集合，通过与目标进行Out-of-bind的数据通信方式进行辅助检测。
 
 ## Antenna的目标
 
@@ -38,6 +38,7 @@ git clone https://github.com/WUBA/Antenna.git
 ```
 
 填写.env.example文件配置信息,修改完将.env.example文件名改为.env
+tips:数据库需创建名为antenna的database
 
 填写示例
 ```angular2html
@@ -49,6 +50,7 @@ PLATFORM_DOMAIN=test.com
 PLATFORM_IP=192.168.3.200
 ```
 
+
 运行命令
 
 ```
@@ -56,9 +58,8 @@ python3 manage.py makemigrations
 python3 manage.py migrate       
 python3 manage.py runserver 0.0.0.0:80 --noreload
 ```
-系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com
-访问
-`htpp://test.com/index.html`，可访问系统后台并访问
+系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com访问
+`htpp://test.com`，可访问系统后台
 ![img.png](imgs/img_start.png)
 
 ### 1.2 Docker部署
@@ -74,7 +75,7 @@ git clone https://github.com/WUBA/Antenna.git
 ```
 docker-compose up -d
 ```
-访问用户自定义docker-compose.yml文件中映射的端口，`http://test.com/index.html` 可访问系统后台
+访问用户自定义docker-compose.yml文件中映射的端口，`http://test.com` 可访问系统后台
 
 tips:关于用户系统执行命令后镜像显示53端口被占用问题，可执行命令禁用systemd-resolved
 ```angular2html

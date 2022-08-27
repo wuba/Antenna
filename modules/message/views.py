@@ -2,6 +2,8 @@ import base64
 import datetime
 
 from django.http import HttpResponse
+from django.shortcuts import render
+
 from django_filters.rest_framework import DjangoFilterBackend
 
 from modules.api.models import ApiKey
@@ -213,4 +215,7 @@ class HttplogView(APIView):
                                        template_id=task_config_item.id)
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
-        return HttpResponse('', content_type='text/html;charset=utf-8')
+            return HttpResponse('', content_type='text/html;charset=utf-8')
+
+        else:
+            return render(request, 'index.html')
