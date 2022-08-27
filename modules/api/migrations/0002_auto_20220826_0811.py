@@ -15,7 +15,7 @@ def create_apikey(apps, schema_editor):
         email="antenna@58.com",
         is_staff=1,
         is_active=1,
-        lastlogin=None,
+        last_login=None,
     )
     ApiKey = apps.get_model("api", "ApiKey")
     # from modules.config.models import Config
