@@ -206,9 +206,7 @@ class HttplogView(APIView):
                     return HttpResponse('', content_type='text/html;charset=utf-8')
         # http 请求日志
         elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
-            print(1)
-            task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key,
-                                                             task__status=1).first()
+            task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key, task__status=1).first()
             if task_config_item:
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=header,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,
@@ -217,6 +215,5 @@ class HttplogView(APIView):
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
             return HttpResponse('', content_type='text/html;charset=utf-8')
-
         else:
             return render(request, 'index.html')
