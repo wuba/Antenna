@@ -33,6 +33,7 @@ def get_host_ip():
         s.connect((settings.DNS_SERVER, 80))
         ip = s.getsockname()[0]
     except Exception as e:
+        print(e)
         ip = ""
     finally:
         s.close()
@@ -168,16 +169,14 @@ def is_base64(content):
     if len(content) % 4 != 0:
         return content
     for i in content:
-        if ('a' <= i <= 'z') or ('A' <= i <= 'Z') or ('0' <= i <= '9') or i == '+' or i == '/' or i == '=':
-            pass
-        else:
+        if not ('a' <= i <= 'z') or ('A' <= i <= 'Z') or ('0' <= i <= '9') or i == '+' or i == '/' or i == '=':
             return content
     return str(base64.b64decode(content), 'utf-8')
 
 
 def restart():
     try:
-        shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/run.sh")
+        shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/restart.sh")
         print(f"开始重启 {shell_path}")
         os.system(f"sh {shell_path}")
     except Exception as e:
@@ -196,8 +195,7 @@ def send_message(url, remote_addr, uri, header, message_type, content, task_id):
         message_url = task_record.callback_url
         message_headers = json.loads(task_record.callback_url_headers)
         if message_url and message_headers:
-            response = requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
+            requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
             print("发送请求")
     except Exception as e:
         print(e)
-        pass
