@@ -189,7 +189,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         result = FIRST_LOGIN.TRUE
         user_id = self.request.user.id
         user_record = User.objects.get(id=user_id)
-        if not user_record.last_login:
+        if not user_record.last_login or user_record.last_login == "2022-01-01 00:00:00":
             result = FIRST_LOGIN.FALSE
             user_record.last_login = datetime.now()
             user_record.save()

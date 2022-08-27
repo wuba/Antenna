@@ -15,7 +15,14 @@ def create_apikey(apps, schema_editor):
         email="antenna@58.com",
         is_staff=1,
         is_active=1,
+        last_login='2022-01-01 00:00:00'
     )
+
+
+
+
+
+
     ApiKey = apps.get_model("api", "ApiKey")
     # from modules.config.models import Config
     from utils.helper import create_salt
@@ -35,3 +42,4 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(create_apikey),
     ]
+
