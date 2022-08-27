@@ -58,8 +58,8 @@ python3 manage.py makemigrations
 python3 manage.py migrate       
 python3 manage.py runserver 0.0.0.0:80 --noreload
 ```
-系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com访问
-`htpp://test.com`，可访问系统后台
+系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com访问`http://test.com/index.html`，
+可访问系统后台
 ![img.png](imgs/img_start.png)
 
 ### 1.2 Docker部署
@@ -71,12 +71,13 @@ git clone https://github.com/WUBA/Antenna.git
 
 
 只需要修改docker-compose.yaml中PALTFROM_DOMAIN和PLATFORM_IP两个变量，mysql配置根据实际情况配置
+
 运行：
 ```
 docker-compose up -d
 ```
-访问用户自定义docker-compose.yml文件中映射的端口，`http://test.com` 可访问系统后台
-
+访问用户自定义docker-compose.yml文件中映射的端口，`http://test.com/index.html` 可访问系统后台
+tips1：代码更新后别忘了删除重新本地antenna:latest的镜像 再docker-compose
 tips:关于用户系统执行命令后镜像显示53端口被占用问题，可执行命令禁用systemd-resolved
 ```angular2html
 systemctl stop systemd-resolved
