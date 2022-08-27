@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.static import serve
 from django.contrib import admin
 from django.urls import path, include, re_path
@@ -29,9 +29,8 @@ urlpatterns = [
     path("api/v1/messages/", include("modules.message.urls")),
     path("api/v1/openapi/", include("modules.api.urls")),
     path("api/v1/configs/", include("modules.config.urls")),
+    re_path(".*", modules.message.views.HttplogView.as_view()),
     re_path(
         r"^(?P<path>.*)$", serve, {"document_root": settings.BASE_DIR / "static"}
     ),
-    re_path(".*", modules.message.views.HttplogView.as_view()),
-
 ]

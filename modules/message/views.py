@@ -206,6 +206,7 @@ class HttplogView(APIView):
                     return HttpResponse('', content_type='text/html;charset=utf-8')
         # http 请求日志
         elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
+            print(1)
             task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key,
                                                              task__status=1).first()
             if task_config_item:
@@ -218,4 +219,4 @@ class HttplogView(APIView):
             return HttpResponse('', content_type='text/html;charset=utf-8')
 
         else:
-            return render(request, '../static/index.html')
+            return render(request, 'index.html')
