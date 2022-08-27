@@ -8,4 +8,4 @@
 .readthedocs.yml
 .travis.yml
 venv
-templates
+frontend

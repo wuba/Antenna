@@ -18,7 +18,7 @@ from django.shortcuts import redirect
 from django.views.static import serve
 from django.contrib import admin
 from django.urls import path, include, re_path
-
+from django.shortcuts import render
 import modules.message.views
 
 urlpatterns = [
@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/v1/messages/", include("modules.message.urls")),
     path("api/v1/openapi/", include("modules.api.urls")),
     path("api/v1/configs/", include("modules.config.urls")),
+    re_path(r'^$', lambda req:render(req, 'index.html'), name='index'),
     re_path(
         r"^(?P<path>.*)$", serve, {"document_root": settings.BASE_DIR / "static"}
     ),
