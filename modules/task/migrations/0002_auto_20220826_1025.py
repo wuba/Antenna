@@ -28,7 +28,7 @@ INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, templa
 INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (3, '{}', 1, 3, 2, 2);
 INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (4, '{}', 1, 4, 3, 3);
 INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (5, '{}', 1, 5, 4, 4);
-INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (6, '{}', 1, 5, 5, 4);
+INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (6, '{}', 1, 5, 4, 4);
 INSERT INTO antenna.task_config_item (id, value, task_id, task_config_id, template_id, template_config_item_id) VALUES (7, '{"path": "/etc/passwd"}', 1, 6, 6, 11);
 """
         ),

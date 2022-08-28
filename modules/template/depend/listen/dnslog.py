@@ -44,8 +44,6 @@ class MysqlLogger():
     def log_request(self, handler, request):
         domain = request.q.qname.__str__().lower()
         print('domain=======>', domain)
-        # type1 = QTYPE[request.q.qtype]
-        # print(type1)
         if domain.endswith(DNS_DOMAIN + '.'):
             udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
             print('udomain=======>', udomain)

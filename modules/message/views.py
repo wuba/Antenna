@@ -1,5 +1,6 @@
 import base64
 import datetime
+import os
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -188,6 +189,7 @@ class HttplogView(APIView):
         url = host + '/' + path
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
         header = request.META.get('HTTP_USER_AGENT', '')  # 请求头
+        print(request.META)
         # 利用组件返回response
         if len(path) == 4:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
@@ -203,7 +205,6 @@ class HttplogView(APIView):
                                            template_id=task_config_item.id)
                     send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                                  message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
-                    return HttpResponse('', content_type='text/html;charset=utf-8')
         # http 请求日志
         elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key, task__status=1).first()
@@ -214,6 +215,8 @@ class HttplogView(APIView):
                                        template_id=task_config_item.id)
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
-            return HttpResponse('', content_type='text/html;charset=utf-8')
-        else:
+        #登录地址
+        elif path == os.environ.get('LOGIN_PATH').strip('/'):
             return render(request, 'index.html')
+
+        return HttpResponse('', content_type='text/html;charset=utf-8')

@@ -33,6 +33,7 @@ services:
       MYSQL_PASSWORD: Antenna@58.com
       PLATFORM_DOMAIN: 127.0.0.1
       PLATFORM_IP: 127.0.0.1
+      LOGIN_PATH: ''
     networks:
       - antenna
     restart: always
