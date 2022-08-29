@@ -11,6 +11,8 @@ for id in $ID; do
   kill -9 $id
 done
 echo "[+] $i scan process have been stopped!"
-sh ./run.sh
+CURRENT_DIR=$(cd `dirname $0`; pwd)
+echo $CURRENT_DIR
+ash  $CURRENT_DIR/run.sh
 
 echo "[+]  process have been started!"
