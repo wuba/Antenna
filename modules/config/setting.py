@@ -43,7 +43,6 @@ try:
 
 
 except Exception as e:
-    print(e)
     PLATFORM_DOMAIN = PLATFORM_DOMAIN
     DNS_DOMAIN = PLATFORM_DOMAIN
     DNS_PORT = 53

