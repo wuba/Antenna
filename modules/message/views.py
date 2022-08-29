@@ -189,7 +189,6 @@ class HttplogView(APIView):
         url = host + '/' + path
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
         header = request.META.get('HTTP_USER_AGENT', '')  # 请求头
-        print(request.META)
         # 利用组件返回response
         if len(path) == 4:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
