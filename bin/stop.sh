@@ -1,13 +1,15 @@
-#!/bin/bash
-# shellcheck disable=SC2009
-pid=$(ps -ef | grep python3 | grep manage | awk '{print $2}')
-if [ "$pid" ]; then
-  kill $pid
-  pid=$(ps -ef | grep python3 | grep manage | awk '{print $2}')
-  echo "$pid"
-  if [ ! $pid ]; then
-    echo "#####Django服务成功关闭#####"
-  else
-    echo "#####Django服务关闭失败#####"
-  fi
+NAME="manage.py runserver"
+if [ ! -n "$NAME" ]; then
+  echo "[-] no arguments"
+  exit
 fi
+
+ID=$(ps -ef | grep "$NAME" | grep -v "$0" | grep -v "grep" | awk '{print $2}')
+i=0
+echo $ID
+for id in $ID; do
+  i=$(($i + 1))
+  kill -9 $id
+done
+echo "服务已停止"
+echo "[+] python3 have been stopped!"
