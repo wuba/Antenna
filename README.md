@@ -17,6 +17,12 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 
 我们绝不仅仅只是将Antenna做成一款只能监听DNS、HTTP等协议来简单判断无回显类型漏洞的工具，我们的目标是尝试在良好使用体验的基础上支持高度灵活的自定义组件能力，满足用户通过Antenna探索并实现各种应用安全漏洞场景的辅助检测。尽可能得实现通过Antenna这款产品降低各种安全漏洞场景的检测成本。
 
+## 相关网站
+博客(已开放)：[Antenna 博客](http://blog.antenna.cool/docs/intro)
+
+演示平台(暂时关闭)：[演示平台](http://jiemuzu.cn)
+
+漏洞靶场(暂时关闭)：[漏洞靶场](http://jiemuzu.cn)
 ## 1. 部署教程
 
 部署前所需
@@ -147,9 +153,7 @@ systemctl stop systemd-resolved
 Antenna 初始开放HTTP、DNS、RMI、LDAP 四个监听组件以及XSS、XXE、HTTP_CUSTOM(SSRF/JSONP)等多个漏洞场景利用组件，
 其组件最终以链接等方式进行生成。平台通过任务的形式对拥有各种能力的链接进行区分,新用户默认创建初始任务与支持的所有监听组件实例
 
-演示平台(暂时关闭)：[演示平台](http://jiemuzu.cn)
 
-漏洞靶场(暂时关闭)：[漏洞靶场](http://jiemuzu.cn)
 
 ##### 2.2.1.1 新建与使用组件实例(链接)
 
@@ -204,7 +208,7 @@ Antenna 提供对外API供用户主动查询平台接收到的消息
 
 ### 3.1 自定义利用组件编写
 
-[如何编写Antenna组件](./docs/develop_template.md)
+[如何编写Antenna组件](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template_demo)
 
 ## 4. 联系我们
 
