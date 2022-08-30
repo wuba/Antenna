@@ -12,7 +12,6 @@ for id in $ID; do
 done
 echo "[+] $i scan process have been stopped!"
 CURRENT_DIR=$(cd `dirname $0`; pwd)
-echo $CURRENT_DIR
-$CURRENT_DIR/run.sh
+python3 $CURRENT_DIR/../manage.py runserver 0.0.0.0:80
 
 echo "[+]  process have been started!"

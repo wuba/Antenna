@@ -8,4 +8,4 @@ echo "make migrations success!"
 python3 manage.py migrate
 echo "migrate success!"
 
-python3 manage.py runserver 0.0.0.0:80 --noreload
+python3 manage.py runserver 0.0.0.0:80

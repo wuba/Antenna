@@ -153,12 +153,14 @@ def send_mail(to, message):
         mail['To'] = username_recv
         if port == 25 or port == 587:
             smtp = smtplib.SMTP(mailserver, port=port)
+            smtp.starttls()
         elif port == 465:
             smtp = smtplib.SMTP_SSL(mailserver, port=port)  # QQ邮箱的服务器和端口号
         smtp.login(username_send, password)  # 登录邮箱
         smtp.sendmail(username_send, username_recv, mail.as_string())  # 参数分别是发送者，接收者，第三个是把上面的发送邮件的内容变成字符串
         smtp.quit()  # 发送完毕后退出smtp
         return True
+
     except Exception as e:
         print(e)
         return False

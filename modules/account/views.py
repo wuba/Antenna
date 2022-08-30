@@ -2,7 +2,6 @@ from datetime import datetime
 
 from django.contrib import auth
 from django.contrib.auth.models import update_last_login
-from django.core.mail import send_mail
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
