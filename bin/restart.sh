@@ -13,6 +13,6 @@ done
 echo "[+] $i scan process have been stopped!"
 CURRENT_DIR=$(cd `dirname $0`; pwd)
 echo $CURRENT_DIR
-ash  $CURRENT_DIR/run.sh
+$CURRENT_DIR/run.sh
 
 echo "[+]  process have been started!"

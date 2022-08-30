@@ -141,23 +141,27 @@ def send_mail(to, message):
     """
     发送邮件
     """
-    mailserver = EMAIL_HOST  # 邮箱服务器地址
-    port = EMAIL_PORT
-    username_send = EMAIL_HOST_USER  # 邮箱用户名
-    password = EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
-    username_recv = "".join(to)  # 收件人，多个收件人用逗号隔开
-    mail = MIMEText(message)
-    mail['Subject'] = 'Antenna平台邮件'
-    mail['From'] = username_send
-    mail['To'] = username_recv
-    if port == 25:
-        smtp = smtplib.SMTP(mailserver, port=port)
-    else:
-        smtp = smtplib.SMTP_SSL(mailserver, port=port)  # QQ邮箱的服务器和端口号
-    smtp.login(username_send, password)  # 登录邮箱
-    smtp.sendmail(username_send, username_recv, mail.as_string())  # 参数分别是发送者，接收者，第三个是把上面的发送邮件的内容变成字符串
-    smtp.quit()  # 发送完毕后退出smtp
-    return True
+    try:
+        mailserver = EMAIL_HOST  # 邮箱服务器地址
+        port = int(EMAIL_PORT)
+        username_send = EMAIL_HOST_USER  # 邮箱用户名
+        password = EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
+        username_recv = "".join(to)  # 收件人，多个收件人用逗号隔开
+        mail = MIMEText(message)
+        mail['Subject'] = 'Antenna平台邮件'
+        mail['From'] = username_send
+        mail['To'] = username_recv
+        if port == 25 or port == 587:
+            smtp = smtplib.SMTP(mailserver, port=port)
+        elif port == 465:
+            smtp = smtplib.SMTP_SSL(mailserver, port=port)  # QQ邮箱的服务器和端口号
+        smtp.login(username_send, password)  # 登录邮箱
+        smtp.sendmail(username_send, username_recv, mail.as_string())  # 参数分别是发送者，接收者，第三个是把上面的发送邮件的内容变成字符串
+        smtp.quit()  # 发送完毕后退出smtp
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
 
 def is_base64(content):

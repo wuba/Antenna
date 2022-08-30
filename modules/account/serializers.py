@@ -47,7 +47,6 @@ class TestEmailSerializer(serializers.Serializer):
         if OLD_EMAIL_HOST != attrs["EMAIL_HOST"] or OLD_EMAIL_PORT != attrs["EMAIL_PORT"] or OLD_EMAIL_HOST_USER != \
                 attrs["EMAIL_HOST_USER"] or OLD_EMAIL_HOST_PASSWORD != attrs["EMAIL_HOST_PASSWORD"]:
             raise serializers.ValidationError('平台配置未保存，请保存后再进行测试')
-        del attrs['verify_code']
         return attrs
 
 
