@@ -50,7 +50,7 @@ USER antenna
 
 演示平台(暂时关闭)：[演示平台](http://jiemuzu.cn)
 
-漏洞靶场(暂时关闭)：[漏洞靶场](http://jiemuzu.cn)
+漏洞靶场(暂时关闭,已制作成docker-compose放入docker目录)：[漏洞靶场](http://jiemuzu.cn)
 ## 1. 部署教程
 
 部署前所需
@@ -152,6 +152,8 @@ systemctl stop systemd-resolved
 | 复用监听端口    | 系统复用RMI\LDAP\MYSQL\FTP请求监听端口 |
 
 ##### 2.1.2.1 域名配置及阿里云dns服务修改教程
+
+tips:隐匿性部署教程:[隐匿性部署教程](http://blog.antenna.cool/blog/%20%20Secrecy)
 
 打开阿里云，首先购买域名(购买流程不过多叙述） 购买域名后进入阿里云控制台-域名-域名列表
 
