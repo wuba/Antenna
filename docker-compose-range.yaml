@@ -1,0 +1,6 @@
+version: '2'
+services:
+  web:
+    image: lcttty/antenna-range:0.0.1
+    ports:
+      - "8088:8088"
