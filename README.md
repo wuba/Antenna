@@ -238,12 +238,12 @@ Antenna 提供对外API供用户主动查询平台接收到的消息
 
 [如何编写Antenna组件](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template_demo)
 
-## Stargazers over time
+## 4. Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/wuba/Antenna.svg)](https://starchart.cc/wuba/Antenna)
 
 
-## 4. 联系我们
+## 5. 联系我们
 
 如果对Antenna有任何建设性意见或 BUG 反馈，欢迎大家提 issue,进交流群 作者也会线下约饭进行奖励🐶
 
