@@ -4,7 +4,7 @@ import os
 
 from django.http import HttpResponse
 from django.shortcuts import render
-
+import re
 from django_filters.rest_framework import DjangoFilterBackend
 
 from modules.api.models import ApiKey
@@ -188,7 +188,9 @@ class HttplogView(APIView):
         domain_key = host.split('.')[0]
         url = host + '/' + path
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
-        header = request.META.get('HTTP_USER_AGENT', '')  # 请求头
+        regex = re.compile('^HTTP_')
+        header = dict((regex.sub('', header), value) for (header, value) in self.request.META.items() if
+                       header.startswith('HTTP_'))
         # 利用组件返回response
         if len(path) == 4:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
