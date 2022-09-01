@@ -38,11 +38,11 @@ services:
       # 平台配置
       PLATFORM_DOMAIN: test.com
       LOGIN_PATH: 'abc' #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
-      PLATFORM_ROOT_USER: jihongjun@58.com
+      PLATFORM_ROOT_USER: antenna@58.com
 
       # DNS配置
       DNS_DOMAIN: test.cn
-      NS1_DOMAIN: ns1.test.cnji
+      NS1_DOMAIN: ns1.test.cn
       NS2_DOMAIN: ns2.test.cn
       SERVER_IP: 127.0.0.1
 
