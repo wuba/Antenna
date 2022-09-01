@@ -2,9 +2,7 @@
 # _*_ coding: utf-8 _*_
 from django.db import migrations
 
-
 class Migration(migrations.Migration):
-
     dependencies = [
         ("template", "0001_initial"),
     ]

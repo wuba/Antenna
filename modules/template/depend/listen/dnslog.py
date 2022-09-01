@@ -7,7 +7,6 @@ import tempfile
 import django
 from dnslib import QTYPE, RCODE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
-
 from modules.message.constants import MESSAGE_TYPES
 from utils.helper import send_message
 
@@ -78,6 +77,7 @@ class ZoneResolver(BaseResolver):
             Stores RRs as a list of (label,type,rr) tuples
             If 'glob' is True use glob match against zone file
         """
+        print(RR)
         self.zone = [(rr.rname, QTYPE[rr.rtype], rr)
                      for rr in RR.fromZone(zone)]
         self.glob = glob
@@ -122,25 +122,22 @@ class ZoneResolver(BaseResolver):
 
 
 def main():
-    try:
-        zone = '''
-        *.{dnsdomain}.       IN      NS      {ns1domain}.
-        *.{dnsdomain}.       IN      NS      {ns2domain}.
-        *.{dnsdomain}.       IN      A       {serverip}
-        {dnsdomain}.         IN      A       {serverip}
-        '''.format(
-            dnsdomain=DNS_DOMAIN,
-            ns1domain=NS1_DOMAIN,
-            ns2domain=NS2_DOMAIN,
-            serverip=SERVER_IP)
-        resolver = ZoneResolver(zone, True)
-        print("当前DNS解析表:\r\n"+zone)
-        logger = MysqlLogger()
-        print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
-        udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
-        udp_server.start()
-    except Exception as e:
-        print("DNS报错", e)
+    zone = '''
+*.{dnsdomain}.       IN      NS      {ns1domain}.
+*.{dnsdomain}.       IN      NS      {ns2domain}.
+*.{dnsdomain}.       IN      A       {serverip}
+{dnsdomain}.         IN      A       {serverip}
+'''.format(
+        dnsdomain=DNS_DOMAIN,
+        ns1domain=NS1_DOMAIN,
+        ns2domain=NS2_DOMAIN,
+        serverip=SERVER_IP)
+    print("当前DNS解析表:\r\n" + zone)
+    resolver = ZoneResolver(zone, True)
+    logger = MysqlLogger()
+    print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
+    udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
+    udp_server.start()
 
 
 class DnsTemplate(BaseTemplate):
