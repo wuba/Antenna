@@ -1,6 +1,6 @@
 import os
 import sys
-from abc import ABC
+
 
 import django
 
@@ -12,7 +12,7 @@ django.setup()
 from modules.template.depend.base import BaseTemplate
 
 
-class HttpTemplate(BaseTemplate, ABC):
+class HttpTemplate(BaseTemplate):
     info = [{
         "template_info": {
             "name": "HTTP",  # 组件名
