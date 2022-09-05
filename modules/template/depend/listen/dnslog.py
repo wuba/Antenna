@@ -56,9 +56,9 @@ class MysqlLogger():
                     domain = domain.strip(".")
                     Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
                                            remote_addr=handler.client_address[0],
-                                           task_id=task_config_item.task_id, template_id=8)
+                                           task_id=task_config_item.task_id, template_id=task_config_item.template_id)
                     send_message(url=domain, remote_addr=handler.client_address[0], uri='', header='',
-                                 message_type=MESSAGE_TYPES.HTTP, content='', task_id=task_config_item.task_id)
+                                 message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
 
     def log_send(self, handler, data):
         pass

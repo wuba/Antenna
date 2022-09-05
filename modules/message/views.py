@@ -190,9 +190,11 @@ class HttplogView(APIView):
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
         regex = re.compile('^HTTP_')
         header = dict((regex.sub('', header), value) for (header, value) in self.request.META.items() if
-                       header.startswith('HTTP_'))
+                      header.startswith('HTTP_'))
         # 利用组件返回response
-        if len(path) == 4:
+        if path == os.environ.get('LOGIN_PATH'):
+            return render(request, '../static/index.html')
+        elif len(path) == 4:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
                                                              task__status=1).first()  # 查看是否是开启状态任务下的链接
             if task_config_item:
@@ -203,7 +205,7 @@ class HttplogView(APIView):
                     Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=header,
                                            message_type=MESSAGE_TYPES.HTTP, content=message,
                                            task_id=task_config_item.task_id,
-                                           template_id=task_config_item.id)
+                                           template_id=task_config_item.template_id)
                     send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                                  message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
         # http 请求日志
@@ -213,11 +215,9 @@ class HttplogView(APIView):
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=header,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,
                                        task_id=task_config_item.task_id,
-                                       template_id=task_config_item.id)
+                                       template_id=task_config_item.template_id)
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
-        #登录地址
-        elif path == os.environ.get('LOGIN_PATH').strip('/'):
-            return render(request, 'index.html')
+        # 登录地址
 
         return HttpResponse('', content_type='text/html;charset=utf-8')
