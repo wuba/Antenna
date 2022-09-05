@@ -4,7 +4,7 @@ import multiprocessing
 import os
 import sys
 
-from modules.template.depend.listen import dnslog, jndi
+from modules.template.depend.listen import dnslog, jndi, ftplog
 
 try:
     from django.core.management import execute_from_command_line
@@ -26,8 +26,11 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2 and sys.argv[1] == 'runserver':
         p = multiprocessing.Process(target=dnslog.main)
         p2 = multiprocessing.Process(target=jndi.main)
+        p3 = multiprocessing.Process(target=ftplog.main)
         p.daemon = True
         p2.daemon = True
+        p3.daemon = True
         p.start()
         p2.start()
+        p3.start()
     execute_from_command_line(sys.argv)

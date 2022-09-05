@@ -6,4 +6,5 @@ MESSAGE_TYPES = Enumeration([
     (2, "DNS", "dns"),
     (3, "LDAP", "ldap"),
     (4, "RMI", "rmi"),
+    (5, "FTP", "ftp"),
 ])

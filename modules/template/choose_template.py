@@ -2,7 +2,7 @@ from django.http import HttpResponse
 
 from modules.template.depend.base import BaseTemplate
 from modules.template.depend.payload import *
-from modules.template.depend.listen import http, jndi, dnslog
+from modules.template.depend.listen import httplog, jndi, dnslog, ftplog
 from modules.template.models import Template, TemplateConfigItem
 
 
@@ -33,5 +33,6 @@ def load_template(user_id):
             item = info["item_info"]
             for i in item:
                 i["template_id"] = template_object.id
+                TemplateConfigItem.objects.filter(id=i["template_id"]).delete()
                 TemplateConfigItem.objects.update_or_create(defaults=i, name=i.get("name", ""),
                                                             template__user_id=user_id)
