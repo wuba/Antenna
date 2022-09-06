@@ -214,7 +214,7 @@ class HttplogView(APIView):
                                        template_id=task_config_item.id)
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
-        #登录地址
+        # 登录地址
         elif path == os.environ.get('LOGIN_PATH').strip('/'):
             return render(request, 'index.html')
 

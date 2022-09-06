@@ -33,6 +33,5 @@ def load_template(user_id):
             item = info["item_info"]
             for i in item:
                 i["template_id"] = template_object.id
-                TemplateConfigItem.objects.filter(id=i["template_id"]).delete()
                 TemplateConfigItem.objects.update_or_create(defaults=i, name=i.get("name", ""),
                                                             template__user_id=user_id)
