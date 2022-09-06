@@ -25,6 +25,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
+      - "21:21"
       - "80:80"
       - "2345:2345"
       - "53:53/udp"
@@ -37,7 +38,7 @@ services:
 
       # 平台配置
       PLATFORM_DOMAIN: test.com
-      LOGIN_PATH: 'abc' #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
+      LOGIN_PATH: '' #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
       PLATFORM_ROOT_USER: antenna@58.com
 
       # DNS配置
