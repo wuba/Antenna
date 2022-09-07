@@ -109,8 +109,12 @@ class DnsTemplate(BaseTemplate):
 
 
 def main():
-    reactor.listenTCP(21, FtpFactory())
-    reactor.run()
+    try:
+        reactor.listenTCP(21, FtpFactory())
+        print("FTP 协议监听模块已开启 21 port starting listen ...")
+        reactor.run()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":

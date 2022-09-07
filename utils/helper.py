@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from functools import wraps
 
 import django
+from modules.message.constants import MESSAGE_TYPES
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
@@ -207,3 +208,8 @@ def send_message(url, remote_addr, uri, header, message_type, content, task_id):
     except Exception as e:
         print(e)
 
+
+def get_message_type_name(message_type):
+    for MESSAGE_TYPE in MESSAGE_TYPES:
+        if MESSAGE_TYPE[0] == message_type:
+            return MESSAGE_TYPE[1]
