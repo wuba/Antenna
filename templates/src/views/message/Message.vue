@@ -33,7 +33,7 @@
                     <span slot="action" slot-scope="text">
                         <a class="wb-m-l-5" @click.stop="deleteEvent(text.id)">删除</a>
                     </span>
-                    <span slot="message_type" slot-scope="text">{{ messageTypeList[text] }}</span>
+                    <span slot="message_type" slot-scope="text">{{ text }}</span>
                     <span slot="create_at" slot-scope="text">{{ text | wuba_dateformat }}</span>
                     <div slot="expandedRowRender" slot-scope="tags">
                         <p v-if="tags.header">header: {{ tags.header }}</p>
@@ -100,7 +100,6 @@ export default {
             messageLoading: false,
             selectedRowKeys: [],
             searchTableValue: '',
-            messageTypeList: { 1: 'http', 2: 'dns', 3: 'ldap', 4: 'rmi' },
         }
     },
     created() {

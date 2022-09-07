@@ -54,7 +54,7 @@
                 :expandedRowKeys.sync="expandedRowKeys"
                 :pagination="false"
             >
-                <span slot="message_type" slot-scope="text">{{ messageTypeList[text] }}</span>
+                <span slot="message_type" slot-scope="text">{{ text }}</span>
                 <span slot="create_at" slot-scope="text">{{ text | wuba_dateformat }}</span>
                 <div slot="expandedRowRender" slot-scope="tags">
                     <p v-if="tags.header">header: {{ tags.header }}</p>
@@ -120,7 +120,6 @@ export default {
                 },
             ],
             data: [],
-            messageTypeList: { 1: 'http', 2: 'dns', 3: 'ldap', 4: 'rmi' },
             messageLoading: false,
             expandedRowKeys: [],
             lineOptions: {
