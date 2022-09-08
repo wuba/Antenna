@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { notification } from 'ant-design-vue'
 import router from '@/router/index'
-const url = JSON.parse(window.reqUrl) ? JSON.parse(window.reqUrl) : '/'
+const url = reqUrl ? reqUrl : '/'
 // create an axios instance
 const service = axios.create({
     baseURL: url,
