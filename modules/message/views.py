@@ -33,7 +33,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
     serializer_class = MessageSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filter_class = MessageFilter
-    filter_fields = ('message_type', 'template__name', 'task')
+    filter_fields = ('message_type', 'template__name', 'task', 'content')
     search_fields = ('create_time', 'task__name')
     permission_classes = [IsAuthenticated]
 
@@ -49,7 +49,6 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
             serializer = self.get_serializer(page, many=True)
             for i in serializer.data:
                 i["message_type"] = get_message_type_name(i["message_type"])
-                print(serializer.data)
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         for i in serializer.data:

@@ -1,8 +1,8 @@
 version: '3'
 
 services:
-
   db:
+    privileged: true
     image: mysql:8.0.30
     container_name: antenna-mysql
     ports:
@@ -38,7 +38,8 @@ services:
 
       # 平台配置
       PLATFORM_DOMAIN: test.com
-      LOGIN_PATH: ''  #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
+      #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
+      LOGIN_PATH: ''
       PLATFORM_ROOT_USER: antenna@58.com
 
       # DNS配置
