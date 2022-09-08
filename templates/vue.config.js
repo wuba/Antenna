@@ -1,5 +1,6 @@
 const webpack = require('webpack')
 const reqUrl = process.env.SERVER_URL ? process.env.SERVER_URL : ''
+console.log('reqUrl`111111111111', reqUrl)
 const vueConfig = {
     productionSourceMap: false,
     css: {
