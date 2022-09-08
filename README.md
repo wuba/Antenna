@@ -254,11 +254,11 @@ Antenna 提供对外API供用户主动查询平台接收到的消息
 
 [![Stargazers over time](https://starchart.cc/wuba/Antenna.svg)](https://starchart.cc/wuba/Antenna)
 
+## 404星链计划
+![](https://github.com/knownsec/404StarLink-Project/raw/master/logo.png)
+ANTENNA 项目 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)
 
 ## 5. 联系我们
-<img src lazysrc="https://github.com/knownsec/404StarLink-Project/raw/master/logo.png" width="30%">
-
-ANTENNA 项目 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)
 
 如果对Antenna有任何建设性意见或 BUG 反馈，欢迎大家提 issue,进交流群 作者也会线下约饭进行奖励🐶
 
