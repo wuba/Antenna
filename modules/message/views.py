@@ -4,7 +4,7 @@ import os
 
 from django.http import HttpResponse
 from django.shortcuts import render
-
+import re
 from django_filters.rest_framework import DjangoFilterBackend
 
 from modules.api.models import ApiKey
@@ -22,7 +22,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from django.db.models import Avg, Max, Min, Count, Sum, Q
-from utils.helper import get_payload, send_message, get_message_type_name
+from utils.helper import get_payload, send_message
 from modules.task.constants import TASK_TMP
 from modules.config.setting import PLATFORM_DOMAIN
 from utils.helper import is_base64
@@ -33,27 +33,13 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
     serializer_class = MessageSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filter_class = MessageFilter
-    filter_fields = ('message_type', 'template__name', 'task', 'content')
+    filter_fields = ('message_type', 'template__name', 'task')
     search_fields = ('create_time', 'task__name')
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user_id = self.request.user.id
         return Message.objects.filter(task__user__id=user_id).order_by("-id")
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            for i in serializer.data:
-                i["message_type"] = get_message_type_name(i["message_type"])
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        for i in serializer.data:
-            i["message_type"] = get_message_type_name(i["message_type"])
-        return Response(serializer.data)
 
     @action(methods=['delete'], detail=False, permission_classes=[IsAuthenticated])
     def multiple_delete(self, request, *args, **kwargs):
@@ -113,7 +99,6 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         message_list = []
         for i in last_message_list:
             i["task_name"] = Task.objects.get(id=i["task_id"]).name
-            i["message_type"] = get_message_type_name(i["message_type"])
             message_list.append(i)
         return message_list
 
@@ -142,7 +127,6 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
     def dashboard(self, request, *args, **kwargs):
         """
         首页内容view
-
         """
         user_id = self.request.user.id
         # 基本数据计算
@@ -203,11 +187,13 @@ class HttplogView(APIView):
         domain_key = host.split('.')[0]
         url = host + '/' + path
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
-        header = request.META.get('HTTP_USER_AGENT', '')  # 请求头
+        regex = re.compile('^HTTP_')
+        header = dict((regex.sub('', header), value) for (header, value) in self.request.META.items() if
+                      header.startswith('HTTP_'))
         # 利用组件返回response
         if path == os.environ.get('LOGIN_PATH'):
             return render(request, '../static/index.html')
-        if len(path) == 4:
+        elif len(path) == 4:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
                                                              task__status=1).first()  # 查看是否是开启状态任务下的链接
             if task_config_item:
@@ -218,7 +204,7 @@ class HttplogView(APIView):
                     Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=header,
                                            message_type=MESSAGE_TYPES.HTTP, content=message,
                                            task_id=task_config_item.task_id,
-                                           template_id=task_config_item.id)
+                                           template_id=task_config_item.template_id)
                     send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                                  message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
         # http 请求日志
@@ -228,10 +214,9 @@ class HttplogView(APIView):
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=header,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,
                                        task_id=task_config_item.task_id,
-                                       template_id=task_config_item.id)
+                                       template_id=task_config_item.template_id)
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
         # 登录地址
-
 
         return HttpResponse('', content_type='text/html;charset=utf-8')

@@ -7,6 +7,7 @@ import tempfile
 import django
 from dnslib import QTYPE, RCODE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
+
 from modules.message.constants import MESSAGE_TYPES
 from utils.helper import send_message
 
@@ -55,9 +56,9 @@ class MysqlLogger():
                     domain = domain.strip(".")
                     Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
                                            remote_addr=handler.client_address[0],
-                                           task_id=task_config_item.task_id, template_id=8)
+                                           task_id=task_config_item.task_id, template_id=task_config_item.template_id)
                     send_message(url=domain, remote_addr=handler.client_address[0], uri='', header='',
-                                 message_type=MESSAGE_TYPES.HTTP, content='', task_id=task_config_item.task_id)
+                                 message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
 
     def log_send(self, handler, data):
         pass
@@ -131,13 +132,11 @@ def main():
         ns1domain=NS1_DOMAIN,
         ns2domain=NS2_DOMAIN,
         serverip=SERVER_IP)
-    print("当前DNS解析表:\r\n" + zone)
     resolver = ZoneResolver(zone, True)
     logger = MysqlLogger()
     print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
     udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
     udp_server.start()
-
 
 
 class DnsTemplate(BaseTemplate):
