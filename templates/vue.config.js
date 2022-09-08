@@ -1,5 +1,5 @@
-// const webpack = require('webpack')
-// const reqUrl = process.env.PLATFORM_DOMAIN ? `http://${process.env.PLATFORM_DOMAIN}` : '/'
+const webpack = require('webpack')
+const reqUrl = process.env.SERVER_URL ? process.env.SERVER_URL : ''
 const vueConfig = {
     productionSourceMap: false,
     css: {
@@ -13,13 +13,13 @@ const vueConfig = {
         },
     },
 
-    // configureWebpack: (config) => {
-    //     config.plugins.push(
-    //         new webpack.DefinePlugin({
-    //             reqUrl: JSON.stringify(reqUrl.toString()),
-    //         })
-    //     )
-    // },
+    configureWebpack: (config) => {
+        config.plugins.push(
+            new webpack.DefinePlugin({
+                reqUrl: JSON.stringify(reqUrl.toString()),
+            })
+        )
+    },
     lintOnSave: false, //关闭eslintre语法检查
     devServer: {
         open: true,

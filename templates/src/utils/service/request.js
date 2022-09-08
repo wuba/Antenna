@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { notification } from 'ant-design-vue'
 import router from '@/router/index'
-const reqUrl = process?.env?.PLATFORM_DOMAIN ? `http://${process.env.PLATFORM_DOMAIN}` : null
+const url = JSON.parse(window.reqUrl) ? JSON.parse(window.reqUrl) : '/'
 // create an axios instance
 const service = axios.create({
-    baseURL: reqUrl ? reqUrl : '/',
+    baseURL: url,
     // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
     //baseURL: '/api', // url = base url + request url
     // withCredentials: true, // send cookies when cross-domain requests
