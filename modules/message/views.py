@@ -205,6 +205,8 @@ class HttplogView(APIView):
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
         header = request.META.get('HTTP_USER_AGENT', '')  # 请求头
         # 利用组件返回response
+        if path == os.environ.get('LOGIN_PATH'):
+            return render(request, '../static/index.html')
         if len(path) == 4:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
                                                              task__status=1).first()  # 查看是否是开启状态任务下的链接
@@ -230,7 +232,6 @@ class HttplogView(APIView):
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
         # 登录地址
-        elif path == os.environ.get('LOGIN_PATH').strip('/'):
-            return render(request, 'index.html')
+
 
         return HttpResponse('', content_type='text/html;charset=utf-8')

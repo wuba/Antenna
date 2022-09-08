@@ -121,25 +121,23 @@ class ZoneResolver(BaseResolver):
 
 
 def main():
-    try:
-        zone = '''
+    zone = '''
 *.{dnsdomain}.       IN      NS      {ns1domain}.
 *.{dnsdomain}.       IN      NS      {ns2domain}.
 *.{dnsdomain}.       IN      A       {serverip}
 {dnsdomain}.         IN      A       {serverip}
 '''.format(
-            dnsdomain=DNS_DOMAIN,
-            ns1domain=NS1_DOMAIN,
-            ns2domain=NS2_DOMAIN,
-            serverip=SERVER_IP)
-        print("当前DNS解析表:\r\n" + zone)
-        resolver = ZoneResolver(zone, True)
-        logger = MysqlLogger()
-        print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
-        udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
-        udp_server.start()
-    except Exception as e:
-        print(e)
+        dnsdomain=DNS_DOMAIN,
+        ns1domain=NS1_DOMAIN,
+        ns2domain=NS2_DOMAIN,
+        serverip=SERVER_IP)
+    print("当前DNS解析表:\r\n" + zone)
+    resolver = ZoneResolver(zone, True)
+    logger = MysqlLogger()
+    print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
+    udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
+    udp_server.start()
+
 
 
 class DnsTemplate(BaseTemplate):
