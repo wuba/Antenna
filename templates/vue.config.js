@@ -16,7 +16,7 @@ const vueConfig = {
     configureWebpack: (config) => {
         config.plugins.push(
             new webpack.DefinePlugin({
-                reqUrl: JSON.stringify(reqUrl.toString()),
+                reqUrl: JSON.stringify(reqUrl),
             })
         )
     },
