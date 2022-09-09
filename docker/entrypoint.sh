@@ -2,7 +2,8 @@
 
 project_path="$(pwd)"
 
-~/.local/bin/wait-for-it -s "$MYSQL_HOST:$MYSQL_PORT"
+wait-for-it -s "$MYSQL_HOST:$MYSQL_PORT"
+python3 -m pip install -r requirements.txt
 python3 manage.py makemigrations
 echo "make migrations success!"
 python3 manage.py migrate

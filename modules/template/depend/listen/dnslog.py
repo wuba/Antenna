@@ -42,7 +42,7 @@ class MysqlLogger():
         pass
 
     def log_request(self, handler, request):
-        domain = request.q.qname.__str__().lower()
+        domain = request.q.qname.__str__()
         print('domain=======>', domain)
         if domain.endswith(DNS_DOMAIN + '.'):
             udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
@@ -50,7 +50,7 @@ class MysqlLogger():
             if udomain:
                 print("udomain.group(1))======>", udomain.group(1))
                 domain_key = udomain.group(1)
-                task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key,
+                task_config_item = TaskConfigItem.objects.filter(task_config__key__icontains=domain_key,
                                                                  task__status=1).first()
                 if task_config_item and task_config_item.template.name == "DNS":
                     domain = domain.strip(".")
@@ -150,7 +150,7 @@ class DnsTemplate(BaseTemplate):
             "desc": "",  # 组件介绍
             "desc_url": "",  # 组件使用说明链接
             "choice_type": 0,  # 组件选择类型0是单选，1是多选
-            "payload": "{key}.{domain}",  # 组件利用实例
+            "payload": "{key}.{dns_domain}",  # 组件利用实例
             "file_name": "dnslog.py",
 
         },

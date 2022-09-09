@@ -5,11 +5,6 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/re
       && apk --no-cache add mariadb-connector-c-dev libc-dev \
         git libffi-dev libxml2-dev libxslt-dev libressl-dev gcc
 
-RUN addgroup --system antenna \
-    && adduser --system --ingroup antenna antenna
-
-USER antenna
-
 ADD . /antenna
 WORKDIR /antenna
 

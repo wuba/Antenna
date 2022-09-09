@@ -2,7 +2,7 @@ from django.http import HttpResponse
 
 from modules.template.depend.base import BaseTemplate
 from modules.template.depend.payload import *
-from modules.template.depend.listen import http, jndi, dnslog
+from modules.template.depend.listen import httplog, jndi, dnslog, ftplog
 from modules.template.models import Template, TemplateConfigItem
 
 

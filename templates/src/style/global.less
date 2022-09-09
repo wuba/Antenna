@@ -1,0 +1,256 @@
+@import '~ant-design-vue/es/style/themes/default.less';
+
+html,
+body,
+#app, #root {
+  height: 100%;
+  background-color: #fff;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.ant-page-header.has-breadcrumb {
+  padding: 16px 0;
+}
+
+.ant-drawer-body .footBtn {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  width: 100%;
+  border-top: 1px solid rgb(233, 233, 233);
+  padding: 10px 16px;
+  background: rgb(255, 255, 255);
+  text-align: right;
+  z-index: 1;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+.loop(@counter) when (@counter > 0) {
+  .wb-p-@{counter} {
+    padding: (1px * @counter);
+  }
+  .wb-p-t-@{counter} {
+    padding-top: (1px * @counter);
+  }
+  .wb-p-r-@{counter} {
+    padding-right: (1px * @counter);
+  }
+  .wb-p-b-@{counter} {
+    padding-bottom: (1px * @counter);
+  }
+  .wb-p-a-@{counter} {
+    padding: (1px * @counter);;
+  }
+  .wb-p-l-@{counter} {
+    padding-left: (1px * @counter);
+  }
+  .wb-m-@{counter} {
+    margin: (1px * @counter);
+  }
+  .wb-m-t-@{counter} {
+    margin-top: (1px * @counter);
+  }
+  .wb-m-r-@{counter} {
+    margin-right: (1px * @counter);
+  }
+  .wb-m-b-@{counter} {
+    margin-bottom: (1px * @counter);
+  }
+  .wb-m-l-@{counter} {
+    margin-left: (1px * @counter);
+  }
+  .wb-fz-@{counter} {
+    font-size: (1px * @counter);
+  }
+  .loop((@counter - 1));    // 递归调用自身
+}
+
+.loop(100);
+
+
+.wb-breadcrumb {
+  padding: 16px 0;
+  .ant-page-header {
+    padding: 8px 0 0 0 ;
+  }
+}
+
+
+.div_card {
+  box-shadow: 0 2px 7px 0 rgba(0,0,0, .1);
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 14px;
+  font-variant: tabular-nums;
+  line-height: 1.5;
+  list-style: none;
+  font-feature-settings: 'tnum';
+  position: relative;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.3s;
+  .title {
+    height: 32px;
+    color: rgb(66, 183, 238);
+    line-height: 32px;
+    margin-bottom: 10px;
+    &:after {
+      visibility: hidden;
+      display: block;
+      font-size: 0;
+      content: " ";
+      clear: both;
+      height: 0;
+    }
+    .left {
+      float: left;
+      position: relative;
+      padding-left: 10px;
+      &:before {
+        position: absolute;
+        display: block;
+        content: "";
+        height: 20px;
+        width: 4px;
+        background-color: rgb(66, 183, 238);
+        left: 0;
+        top: 6px;
+        border-radius: 30px;
+      }
+    }
+    .right {
+      float: right;
+    }
+  }
+  .content {}
+  .font12 {
+    font-size: 12px;
+  }
+  .right {
+    float: right;
+  }
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+.Textright {
+  text-align: right;
+}
+
+.Textleft {
+  text-align: left;
+}
+
+.Textcenter {
+  text-align: center;
+}
+
+.displayN {
+  display: none;
+}
+
+// .colorWeak {
+//   filter: invert(80%);
+// }
+
+// .ant-layout.layout-basic {
+//   height: 100vh;
+//   min-height: 100vh;
+// }
+
+// canvas {
+//   display: block;
+// }
+
+
+// // 数据列表 样式
+// .table-alert {
+//   margin-bottom: 16px;
+// }
+// // 数据列表 操作
+// .table-operator {
+//   margin-bottom: 18px;
+
+//   button {
+//     margin-right: 8px;
+//   }
+// }
+// // 数据列表 搜索条件
+// .table-page-search-wrapper {
+
+//   .ant-form-inline {
+//     .ant-form-item {
+//       display: flex;
+//       margin-bottom: 24px;
+//       margin-right: 0;
+
+//       .ant-form-item-control-wrapper {
+//         flex: 1 1;
+//         display: inline-block;
+//         vertical-align: middle;
+//       }
+
+//       > .ant-form-item-label {
+//         line-height: 32px;
+//         padding-right: 8px;
+//         width: auto;
+//       }
+//       .ant-form-item-control {
+//         height: 32px;
+//         line-height: 32px;
+//       }
+//     }
+//   }
+
+//   .table-page-search-submitButtons {
+//     display: block;
+//     margin-bottom: 24px;
+//     white-space: nowrap;
+//   }
+// }
+
+// @media (max-width: @screen-xs) {
+//   .ant-table {
+//     width: 100%;
+//     overflow-x: auto;
+//     &-thead > tr,
+//     &-tbody > tr {
+//       > th,
+//       > td {
+//         white-space: pre;
+//         > span {
+//           display: block;
+//         }
+//       }
+//     }
+//   }
+// }

