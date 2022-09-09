@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  antenna_client:
+    build: ./
+    image: antenna_client
+    container_name: antenna_client
+    volumes:
+      - ./:/antenna
+    ports:
+      - "80:8000"
+    environment:
+      # SERVER接口地址
+      SERVER_URL: "http://58antenna.com"
+    networks:
+      - antenna_client
+    restart: always
+
+networks:
+  antenna_client:
+    driver: bridge
