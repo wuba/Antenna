@@ -42,14 +42,14 @@ class MysqlLogger():
         pass
 
     def log_request(self, handler, request):
-        domain = request.q.qname.__str__().lower()
+        domain = request.q.qname.__str__()
         print('domain=======>', domain)
         if domain.endswith(DNS_DOMAIN + '.'):
             udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
             print('udomain=======>', udomain)
             if udomain:
                 print("udomain.group(1))======>", udomain.group(1))
-                domain_key = udomain.group(1)
+                domain_key = udomain.group(1).lower()
                 task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key,
                                                                  task__status=1).first()
                 if task_config_item and task_config_item.template.name == "DNS":
