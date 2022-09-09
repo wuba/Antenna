@@ -133,6 +133,7 @@ def main():
         ns2domain=NS2_DOMAIN,
         serverip=SERVER_IP)
     resolver = ZoneResolver(zone, True)
+    print("当前DNS解析表:\r\n" + zone)
     logger = MysqlLogger()
     print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
     udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)

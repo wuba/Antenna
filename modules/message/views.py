@@ -189,7 +189,7 @@ class HttplogView(APIView):
         url = host + '/' + path
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
         regex = re.compile('^HTTP_')
-        header = dict((regex.sub('', header), value) for (header, value) in self.request.META.items() if
+        headers = dict((regex.sub('', header), value) for (header, value) in self.request.META.items() if
                       header.startswith('HTTP_'))
         # 利用组件返回response
         if path == os.environ.get('LOGIN_PATH'):
@@ -202,21 +202,21 @@ class HttplogView(APIView):
                     template_response = match_template(task_config_item)
                     return template_response
                 else:
-                    Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=header,
+                    Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
                                            message_type=MESSAGE_TYPES.HTTP, content=message,
                                            task_id=task_config_item.task_id,
                                            template_id=task_config_item.template_id)
-                    send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
+                    send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
                                  message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
         # http 请求日志
         elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
             task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key, task__status=1).first()
             if task_config_item:
-                Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=header,
+                Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,
                                        task_id=task_config_item.task_id,
                                        template_id=task_config_item.template_id)
-                send_message(url=url, remote_addr=remote_addr, uri=path, header=header,
+                send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
         # 登录地址
 
