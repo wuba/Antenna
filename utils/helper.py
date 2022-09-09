@@ -24,7 +24,7 @@ import requests
 from django_filters.filters import Filter
 from modules.task.models import Task, TaskConfig
 from modules.config.setting import JNDI_PORT, PLATFORM_DOMAIN, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, \
-    EMAIL_HOST_PASSWORD
+    EMAIL_HOST_PASSWORD, DNS_DOMAIN
 
 
 def get_host_ip():
@@ -135,7 +135,9 @@ def get_payload(key, payload):
     获取地址
     """
 
-    return payload.replace("{domain}", PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}", str(JNDI_PORT))
+    return payload.replace("{domain}", PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}",
+                                                                                      str(JNDI_PORT)).replace(
+        "{dns_domain}", DNS_DOMAIN)
 
 
 def send_mail(to, message):

@@ -150,7 +150,7 @@ class DnsTemplate(BaseTemplate):
             "desc": "",  # 组件介绍
             "desc_url": "",  # 组件使用说明链接
             "choice_type": 0,  # 组件选择类型0是单选，1是多选
-            "payload": "{key}.{domain}",  # 组件利用实例
+            "payload": "{key}.{dns_domain}",  # 组件利用实例
             "file_name": "dnslog.py",
 
         },
