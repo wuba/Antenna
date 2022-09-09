@@ -96,7 +96,7 @@ def generate_code(number):
     """
     while True:
         random_code = ''.join(random.sample(string.ascii_letters + string.digits, number))
-        if not TaskConfig.objects.filter(key=random_code).exists():
+        if not TaskConfig.objects.filter(key__icontains=random_code).exists():
             break
 
     return random_code
