@@ -49,7 +49,7 @@ class MysqlLogger():
             print('udomain=======>', udomain)
             if udomain:
                 print("udomain.group(1))======>", udomain.group(1))
-                domain_key = udomain.group(1).lower()
+                domain_key = udomain.group(1)
                 task_config_item = TaskConfigItem.objects.filter(task_config__key__icontains=domain_key,
                                                                  task__status=1).first()
                 if task_config_item and task_config_item.template.name == "DNS":
