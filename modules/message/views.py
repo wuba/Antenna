@@ -190,7 +190,7 @@ class HttplogView(APIView):
         remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
         regex = re.compile('^HTTP_')
         headers = dict((regex.sub('', header), value) for (header, value) in self.request.META.items() if
-                      header.startswith('HTTP_'))
+                       header.startswith('HTTP_'))
         # 利用组件返回response
         if path == os.environ.get('LOGIN_PATH'):
             return render(request, '../static/index.html')
