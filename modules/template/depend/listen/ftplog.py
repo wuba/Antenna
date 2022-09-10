@@ -85,7 +85,7 @@ class FtpFactory(Factory):
         return Ftp()
 
 
-class DnsTemplate(BaseTemplate):
+class FtpTemplate(BaseTemplate):
     info = [{
         "template_info": {
             "name": "FTP",  # 组件名

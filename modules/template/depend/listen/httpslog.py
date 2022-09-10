@@ -6,6 +6,8 @@ import re
 from twisted.internet import ssl, reactor
 from twisted.internet.protocol import Factory, Protocol
 
+from modules.template.depend.base import BaseTemplate
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
@@ -59,6 +61,27 @@ Connection: Closed
                          message_type=MESSAGE_TYPES.HTTPS, content=self.content,
                          task_id=task_config_item.task_id)
 
+class HttpsTemplate(BaseTemplate):
+    info = [{
+        "template_info": {
+            "name": "HTTPS",  # 组件名
+            "title": "HTTPS协议监听组件",  # 组件展示标题名
+            "author": "bios000",  # 组件作者
+            "type": 1,  # 组件类型，1是监听0是利用
+            "desc": "",  # 组件介绍
+            "desc_url": "",  # 组件使用说明链接
+            "choice_type": 0,  # 组件选择类型0是单选，1是多选
+            "payload": "https://{key}{domain}",
+            "file_name": "httpslog.py",
+        },
+        "item_info": [{
+            "name": "https_log",
+            "config": [],
+
+        }]}]
+
+    def __init__(self):
+        super().__init__()
 
 def main():
     try:
