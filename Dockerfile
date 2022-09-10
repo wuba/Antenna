@@ -11,6 +11,6 @@ WORKDIR /antenna
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple \
     && pip install -r /antenna/requirements.txt
 
-EXPOSE 53 2345 80
+EXPOSE 53 2345 80 21 443
 
 ENTRYPOINT ["docker/entrypoint.sh"]
