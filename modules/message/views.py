@@ -33,7 +33,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
     serializer_class = MessageSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filter_class = MessageFilter
-    filter_fields = ('message_type', 'template__name', 'task', 'content','domain')
+    filter_fields = ('message_type', 'template__name', 'task', 'content', 'domain')
     search_fields = ('create_time', 'task__name')
     permission_classes = [IsAuthenticated]
 
@@ -228,7 +228,8 @@ class HttplogView(APIView):
 
         # http 请求日志
         elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
-            task_config_item = TaskConfigItem.objects.filter(task_config__key__icontains=domain_key, task__status=1).first()
+            task_config_item = TaskConfigItem.objects.filter(task_config__key__icontains=domain_key,
+                                                             task__status=1).first()
             if task_config_item:
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,
