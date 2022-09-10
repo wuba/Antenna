@@ -71,7 +71,7 @@ class HttpsTemplate(BaseTemplate):
             "desc": "",  # 组件介绍
             "desc_url": "",  # 组件使用说明链接
             "choice_type": 0,  # 组件选择类型0是单选，1是多选
-            "payload": "https://{key}{domain}",
+            "payload": "https://{key}.{domain}",
             "file_name": "httpslog.py",
         },
         "item_info": [{
