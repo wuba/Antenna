@@ -45,7 +45,15 @@
             </div>
         </div>
         <div class="container" style="margin-top: 10px">
-            <h4 class="title">最新消息</h4>
+            <h4 class="title">
+                最新消息
+                <a-icon
+                    type="reload"
+                    :class="[state ? 'g' : '']"
+                    style="color: blue; cursor: pointer"
+                    @click="initData"
+                />
+            </h4>
             <a-table
                 :columns="columns"
                 :data-source="data"
@@ -157,6 +165,7 @@ export default {
             },
             dataContent: [],
             count: 0,
+            state: false,
         }
     },
     components: {
@@ -170,6 +179,8 @@ export default {
 
     methods: {
         initData() {
+            this.state = true
+
             Service.getDashboard().then((res) => {
                 if (res.code === 1) {
                     let { data } = res
@@ -190,6 +201,9 @@ export default {
                     for (let i = 0; i < dashboardLength; i++) {
                         this.dataContent[i] = data.dashboard_url.slice(i * 10, i * 10 + 10)
                     }
+                    setTimeout(() => {
+                        this.state = false
+                    }, 1000)
                 } else {
                     this.$message.error(res.message)
                 }
@@ -206,6 +220,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.g {
+    transform: rotate(360deg);
+    transition: all 1s;
+}
 .container {
     border-radius: 8px;
     padding: 20px;
