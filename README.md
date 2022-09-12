@@ -17,27 +17,41 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 
 我们绝不仅仅只是将Antenna做成一款只能监听DNS、HTTP等协议来简单判断无回显类型漏洞的工具，我们的目标是尝试在良好使用体验的基础上支持高度灵活的自定义组件能力，满足用户通过Antenna探索并实现各种应用安全漏洞场景的辅助检测。尽可能得实现通过Antenna这款产品降低各种安全漏洞场景的检测成本。
 
-## TODO
+## 相关网站
 
-1、与lijiejie项目做能力打通 [https://github.com/lijiejie/EasyPen](https://github.com/lijiejie/EasyPen)
+博客(已开放)：[Antenna 博客](http://blog.antenna.cool/docs/intro)
 
-2、补充各种组件使用文档
+演示平台(暂时关闭)：[演示平台](http://jiemuzu.cn)
 
-3、中秋节V1.0项目上线
+漏洞靶场(已支持docker部署,docker-compose文件在项目docker目录中)：[lcttty/antenna-range:0.0.1](https://github.com/wuba/Antenna/blob/main/docker/docker-compose-range.yaml)
+
+## Antenna_Inside计划
+
+在我们开发Antenna时，就希望能够支持现有市场上流行的漏洞扫描工具漏洞结果回调与主动查询
+,所以我们推出了CallBack与OpenAPI。为了让我们的这两个模块能够更加灵活与优雅。我们决定发起
+Antenna_Inside计划，如果您是使用扫描工具的用户或者作者请联系我们，我们会无条件支持您的项目与
+需求，帮助Antenna更方便的与漏洞扫描流程打通。如果您有推荐打通的项目，也可以在issue中提出来
+
+已加入Antenna_Inside项目与进度
+
+| 项目名称       | 项目地址                                                                       | 项目进度 |
+|------------|----------------------------------------------------------------------------|------|
+| EasyPen    | [https://github.com/lijiejie/EasyPen](https://github.com/lijiejie/EasyPen) | 正在对接 |
+
 
 ## 近期使用疑问解答
 
-#### 1、现在的系统功能为什么感觉不完整？
-回答：当前的开源项目为用户体验版，正式版本V1.0将与中秋节和大家见面，到时将新增常用协议监听以及更灵活的消息接口，各位师傅可以稍微期待一下
+#### 1、关于docker部署发现平台配置保存后不能及时更新的问题
 
-#### 2、关于docker部署发现平台配置保存后不能及时更新的问题
 回答：更新完配置需在宿主机重新运行命令 **docker-compose restart** 后配置才能更新
 不需要重启mysql容器
 
-#### 3、关于各类组件的使用说明以及能否再详细的进行说明自定义组件开发教程
+#### 2、关于各类组件的使用说明以及能否再详细的进行说明自定义组件开发教程
+
 回答：文章将在Antenna博客不定时更新，基础文章已有，后续详细的也会有的，作者在加班加点的写，绝不会让各位师傅等太久
 
-#### 4、运行docker-compose命令后镜像构建时间过长
+#### 3、运行docker-compose命令后镜像构建时间过长
+
 回答：可能是您的服务器在境外，可将Dockerfile中替换镜像源的命令注释掉
 
 #### 4、镜像部署总是遇到各种权限不允许的错误
@@ -50,216 +64,55 @@ RUN addgroup --system antenna \
 
 USER antenna
 ```
+
 #### 5、其他问题
 
 如果您遇到了其他问题可查阅项目issue进行寻找相关解决方案，如果发现并没有其他人遇到和您相关的问题，请新建issue，
 作者会及时回答您的疑问
 
-## 相关网站
-博客(已开放)：[Antenna 博客](http://blog.antenna.cool/docs/intro)
 
-演示平台(暂时关闭)：[演示平台](http://jiemuzu.cn)
+## 相关教程链接
+### 最新公告
 
-漏洞靶场(暂时关闭,已制作成docker-compose放入docker目录)：[漏洞靶场](http://jiemuzu.cn)
-## 1. 部署教程
+v1.0版本发布公告及使用要点:[Antenna V1.0 发布公告](http://blog.antenna.cool/blog/v1.0)
 
-部署前所需
+### 关于部署
+基础部署教程:[安装部署](http://blog.antenna.cool/docs/intro)
 
-一台公网服务器
+隐匿部署教程：[关于Antenna的隐匿性部署](http://blog.antenna.cool/blog/%20%20Secrecy)
 
-一个域名
+前后端分离部署 [Antenna的前后端分离部署](http://blog.antenna.cool/blog/client_server)
 
-域名解析及DNS配置 ,可参考下文 [2.1.2.1 域名配置及阿里云dns服务修改教程](#2121-%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE%E5%8F%8A%E9%98%BF%E9%87%8C%E4%BA%91dns%E6%9C%8D%E5%8A%A1%E4%BF%AE%E6%94%B9%E6%95%99%E7%A8%8B)
+### 关于配置
 
-### 1.1 源码部署
+域名配置及DNS相关配置:[域名配置及阿里云dns服务修改教程](#2121-%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE%E5%8F%8A%E9%98%BF%E9%87%8C%E4%BA%91dns%E6%9C%8D%E5%8A%A1%E4%BF%AE%E6%94%B9%E6%95%99%E7%A8%8B)
 
-源码部署服务器系统推荐使用centos，如需部署其他服务器系统需修改项目中install.sh 中部分安装命令
+开通邮箱通知以及邮箱授权码申请教程:[QQ邮箱授权码申请教程](https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256)
 
-下载源码
+### 关于任务
 
-```
-git clone https://github.com/WUBA/Antenna.git
-```
+任务基础使用教程:[如何简单的使用任务](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E4%BB%BB%E5%8A%A1/task)
 
-填写.env.example文件配置信息,修改完将.env.example文件名改为.env
-tips:数据库需创建名为antenna的database
+### 关于组件
 
-填写示例
-```angular2html
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3306
-MYSQL_USERNAME=root
-MYSQL_PASSWORD=Antenna@58.com
-PLATFORM_DOMAIN=test.com
-PLATFORM_IP=192.168.3.200
-```
+组件基础使用教程:[Antenna的灵魂-组件Template](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template)
 
+xss 组件使用教程:[xssu组件使用教程](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/xss)
 
-运行命令
-
-```
-python3 manage.py makemigrations
-python3 manage.py migrate       
-python3 manage.py runserver 0.0.0.0:80 --noreload
-```
-系统会自动创建初始管理员账户antenna@58.com 密码：antenna@58.com访问`http://test.com`，
-可访问系统后台
-![img.png](imgs/img_start.png)
-
-### 1.2 Docker部署
-下载源码
-
-```
-git clone https://github.com/WUBA/Antenna.git
-```
-
-
-只需要修改docker-compose.yaml中PALTFROM_DOMAIN和PLATFORM_IP两个变量，mysql配置根据实际情况配置
-
-运行：
-```
-docker-compose up -d
-```
-访问用户自定义docker-compose.yml文件中映射的端口，`http://test.com` 可访问系统后台
-tips1：代码更新后别忘了删除重新本地antenna:latest的镜像 再docker-compose
-tips:关于用户系统执行命令后镜像显示53端口被占用问题，可执行命令禁用systemd-resolved
-```angular2html
-systemctl stop systemd-resolved
-```
-
-## 2. 使用教程
-
-### 2.1 Antenna初始配置教程
-
-#### 2.1.1 平台设置
-
-管理员账户可进入系统设置-平台管理页面对平台进行配置
-平台配置说明
-
-| 配置名称     | 说明                               |
-|----------|----------------------------------|
-| 开放注册     | 开启后平台允许用户注册使用，该功能需完成邮箱相关配置       |
-| 仅允许邀请注册  | 开启后平台只允许拥有邀请码用户注册使用，该功能需完成邮箱相关配置 |
-| 开启邮件通知   | 开启后平台接收到消息后都会邮件通知用户，该功能需完成邮箱相关配置 |
-| SMTP 服务器 | 邮箱服务器                            |
-| 端口       | 邮箱服务器端口，QQ邮箱为465                 |
-| 账号       | 发送邮件的邮箱账号                        |
-| 密码/授权码   | 邮件账号授权码                          |
-
-##### 2.1.1.1 邮箱授权码设置及QQ邮箱授权码申请教程
-
-[QQ邮箱授权码申请教程](https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256)
-
-#### 2.1.2 协议设置
-
-协议配置说明
-
-| 配置名称      | 说明                           |
-|-----------|------------------------------|
-| DNS记录域名   | DNS请求域名                      |
-| 解析ip      | 使用系统服务器公网ip                  |
-| NS1\NS2域名 | DNS解析服务器域名                   |
-| 复用监听端口    | 系统复用RMI\LDAP\MYSQL\FTP请求监听端口 |
-
-##### 2.1.2.1 域名配置及阿里云dns服务修改教程
-
-tips:隐匿性部署教程:[隐匿性部署教程](http://blog.antenna.cool/blog/%20%20Secrecy)
-
-打开阿里云，首先购买域名(购买流程不过多叙述） 购买域名后进入阿里云控制台-域名-域名列表
-
-这里已购买test.com，antenna系统所在服务器公网地址为1.1.1.1为例
-
-点击操作栏中的管理
-![img_6.png](imgs/img_6.png)
-进入管理界面后点击左侧导航栏DNS管理-自定义DNS HOST
-
-![img.png](imgs/img_7.png)
-
-点击创建DNS服务器，然后创建ns1.test.com和ns2.test.com，其ip地址设置为antenna系统所在服务器公网地址
-![img_9.png](imgs/img_9.png)
-创建后点击同步再进入左侧导航栏DNS管理-DNS修改，点击修改DNS服务器按钮，将test.com的dns服务器修改为刚才设置的ns1.test.com与ns2.test.com
-![img_10.png](imgs/img_10.png)
-点击同步后回到Antenna系统保存协议相关设置
-![img_8.png](imgs/img_8.png)
-然后进入域名列表解析配置，进行配置ns1与ns2的A记录配置
-![img.png](imgs/img_666.png)
-
-注意！！！服务器防火墙需开启上述配置端口的进出规则，DNS默认使用53端口也需对外开放！！！
-
-### 2.2 Antenna产品基础使用教程
-
-#### 2.2.1 消息监听与漏洞利用组件
-
-Antenna 初始开放HTTP、DNS、RMI、LDAP 四个监听组件以及XSS、XXE、HTTP_CUSTOM(SSRF/JSONP)等多个漏洞场景利用组件，
-其组件最终以链接等方式进行生成。平台通过任务的形式对拥有各种能力的链接进行区分,新用户默认创建初始任务与支持的所有监听组件实例
-
-
-
-##### 2.2.1.1 新建与使用组件实例(链接)
-
-以创建XSS漏洞场景利用链接为例，首先点击初始任务查看任务详情，然后点击新建开始选择漏洞场景类型
-![img.png](imgs/img.png)
-选择XSS组件，平台初始支持get_cookie(获取cookie)与get_page_sources(获取源码)两种利用方式，可进行多选并点击确定
-![img_1.png](imgs/img_1.png)
-![img_2.png](imgs/img_2.png)
-
-点击确定后便会生成支持获取cookie与源码xss漏洞的利用payload
-![img_3.png](imgs/img_3.png)
-
-打开官方靶场尝试利用xss生成链接
-![img_4.png](imgs/img_4.png)
-查看消息列表，已经获取到漏洞页面的请求cookie与源码
-![img_5.png](imgs/img_5.png)
-
-### 2.2.2 Antenna 消息处理教程
-
-系统接收到来自组件的请求后，用户不能及时获取相关信息结果，Antenna系统提供三种方式获取请求消息
-
-#### 2.2.2.1 Open API
-
-Antenna 提供对外API供用户主动查询平台接收到的消息
-点击系统左侧导航栏-OpenAPI 查看个人用户APIKEY
-查询消息接口
-`http://{platform_domain}/api/v1/messages/manage/api/?apilkey={apikey}&uri=&task__name=&message_type=&page=&page_size=`
-
-支持参数列表
-
-| 参数名          | 含义                             |
-|--------------|--------------------------------|
-| task__name   | 消息所属任务名                        |
-| message_type | 消息类型 1是http,2是dns,3是ldap,4是rmi |
-| uri          | 消息请求路径                         |
-| page         | 消息页数                           |
-| page_size    | 消息每页数量                         |
-
-#### 2.2.2.2 自定义消息接口使用
-
-平台除了设置消息邮件通知以外，支持接收到消息后，向自定义接口发送消息数据，方便自动化工具回调接口处理请求消息
-点击任务查看任务详情，打开任务高级配置
-![img_12.png](imgs/img_12.png)
-
-填写接受消息的接口 例如
-`http://test.com/get_message`
-如接口需要Authorization等认证方式可写在接口header中，例如
-`{"Authorization": "admin"}`
-平台接收到该任务的消息后会向test.com/get_message发送接收到的请求消息数据
-
-## 3. Antenna组件开发教程
-
-### 3.1 自定义利用组件编写
-
-[如何编写Antenna组件](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template_demo)
-
-## 4. Stargazers over time
-
-[![Stargazers over time](https://starchart.cc/wuba/Antenna.svg)](https://starchart.cc/wuba/Antenna)
+组件开发教程:[如何编写Antenna组件](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template_demo)
 
 ## 404星链计划
+
 ![](https://github.com/knownsec/404StarLink-Project/raw/master/logo.png)
 
 ANTENNA 项目 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)
 
-## 5. 联系我们
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/wuba/Antenna.svg)](https://starchart.cc/wuba/Antenna)
+
+##  联系我们
 
 如果对Antenna有任何建设性意见或 BUG 反馈，欢迎大家提 issue,进交流群 作者也会线下约饭进行奖励🐶
 
