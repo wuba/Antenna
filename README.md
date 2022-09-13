@@ -85,7 +85,9 @@ v1.0版本发布公告及使用要点:[Antenna V1.0 发布公告](http://blog.an
 
 ### 关于配置
 
-域名配置及DNS相关配置:[域名配置及阿里云dns服务修改教程](#2121-%E5%9F%9F%E5%90%8D%E9%85%8D%E7%BD%AE%E5%8F%8A%E9%98%BF%E9%87%8C%E4%BA%91dns%E6%9C%8D%E5%8A%A1%E4%BF%AE%E6%94%B9%E6%95%99%E7%A8%8B)
+基础配置教程:[基础配置教程](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E9%85%8D%E7%BD%AE/config)
+
+域名配置及DNS相关配置:[域名配置及阿里云dns服务修改教程](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E9%85%8D%E7%BD%AE/DNS)
 
 开通邮箱通知以及邮箱授权码申请教程:[QQ邮箱授权码申请教程](https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256)
 
@@ -97,9 +99,12 @@ v1.0版本发布公告及使用要点:[Antenna V1.0 发布公告](http://blog.an
 
 组件基础使用教程:[Antenna的灵魂-组件Template](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template)
 
-xss 组件使用教程:[xssu组件使用教程](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/xss)
+xss 组件使用教程:[xss组件使用教程](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/xss)
 
 组件开发教程:[如何编写Antenna组件](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template_demo)
+
+### 关于OPEN_API与CallBack
+
 
 ## 404星链计划
 
