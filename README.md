@@ -105,7 +105,7 @@ xss 组件使用教程:[xss组件使用教程](http://blog.antenna.cool/docs/%E5
 
 ### 关于OPEN_API与CallBack
 
-OPEN_API与CallBack使用教程[关于OPEN_API与CallBack](http://blog.antenna.cool/docs/api_back)
+OPEN_API与CallBack使用教程:[关于OPEN_API与CallBack](http://blog.antenna.cool/docs/api_back)
 ## 404星链计划
 
 ![](https://github.com/knownsec/404StarLink-Project/raw/master/logo.png)
