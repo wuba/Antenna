@@ -1,3 +1,4 @@
+from modules.api.models import ApiKey
 from modules.template.models import Template
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -287,3 +288,24 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
             TaskConfigItem.objects.filter(task_config__task__user=self.request.user.id, task_id=task_id))
         serializer = self.get_serializer(queryset, many=True)
         return self.get_result_data(serializer.data)
+
+    @action(methods=["GET"], detail=False, permission_classes=[AllowAny, ])
+    def api(self, request, *args, **kwargs):
+        """
+        提供api查询获取当前可用payload
+        """
+        apikey = self.request.query_params.get('apikey', '')
+        key = ApiKey.objects.filter(key=apikey).first()
+        if not key:
+            return Response({"code": 0, "message": "apikey错误"}, status=status.HTTP_400_BAD_REQUEST)
+        task_config_item_record = TaskConfigItem.objects.filter(task__user=key.user_id, task__status=1,
+                                                                task__show_dashboard=1)
+        payload_list = []
+        if task_config_item_record:
+            for task_config_item in task_config_item_record:
+                payload = task_config_item.template.payload
+                key = task_config_item.task_config.key
+                payload = get_payload(key, payload)
+                if payload not in payload_list:
+                    payload_list.append(payload)
+        return Response(data={"payload": payload_list}, status=status.HTTP_200_OK)
