@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+          charset="UTF-8">
+    <link rel="stylesheet" href="css/layui.css"/>
+    <title>Antenna</title>
+    <script src="js/jquery-3.6.1.min.js"></script>
+    <script src="js/options.js"></script>
+    <style>
+        * {
+            font-family: 'Open Sans';
+        }
+
+        .header-text {
+            margin: 10px;
+            margin-left: 0;
+        }
+
+        .layui-btn-container .layui-btn {
+            margin-bottom: 2px;
+        }
+
+        .pull-left {
+            float: left;
+        }
+
+        .pull-right {
+            float: right;
+        }
+
+        .layui-btn-container .layui-form-checkbox {
+            width: 100%;
+            margin-bottom: 2px;
+        }
+
+        .layui-btn-container .layui-form-checkbox span {
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+<div class="layui-container" style="width: 200px;">
+    <form class="layui-form" action="" lay-filter="form_pop">
+        <div class="layui-row">
+            <span class="pull-left header-text">消息监听</span>
+            <div class="pull-right">
+                <input type="checkbox" id="status" name="status" lay-skin="switch" lay-text="开启|关闭"
+                       lay-filter="switchStatus"/>
+            </div>
+            <hr/>
+            <div id="profile_list_tips">
+                消息开关未开启，需先设置项目配置后再先打开开关。
+            </div>
+            <div class="layui-btn-container">
+                <div id="profile_list" style="display: none;">
+                    <input type="checkbox" name="" lay-skin="lock" title="加载中..." lay-filter="switchProfile"/>
+                </div>
+                <hr/>
+                <button class="layui-btn layui-btn-default layui-btn-fluid" id="btn_result">
+                    <i class="layui-icon">&#xe615;</i> 消息详情
+                </button>
+                <button class="layui-btn layui-btn-primary layui-btn-fluid " id="btn_option"
+                        style="background-color: #fbfbfb; color: #000;">
+                    <i class="layui-icon">&#xe614;</i> 插件配置
+                </button>
+                <a href="http://github.com/wuba/Antenna"
+                   class="layui-btn layui-btn-primary layui-btn-fluid"
+                   style="background-color: #fbfbfb; color: #000;"><i class="layui-icon">&#xe607;</i> 关于插件</a>
+                <hr/>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+<script src="layui.all.js"></script>
+<script src="js/popup.js"></script>
+<script src="js/init.js"></script>
+</html>

@@ -1,0 +1,29 @@
+{
+  "manifest_version": 2,
+  "name": "Antenna",
+  "version": "1.0",
+  "description": "Antenna 插件",
+  "icons": {
+    "128": "img/logo.png",
+    "48": "img/logo.png",
+    "16": "img/logo.png"
+  },
+  "options_page": "options.html",
+  "browser_action": {
+    "default_icon": "img/logo.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "storage",
+    "notifications",
+    "contextMenus",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "scripts": [
+      "js/eventPage.js"
+    ],
+    "persistent": false
+  }
+}
