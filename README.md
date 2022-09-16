@@ -74,6 +74,8 @@ USER antenna
 ## 相关教程链接
 ### 最新公告
 
+Antenna 最新chrome扩展 chrome-tools(试用版)发布[Antenna-tools 使用教程](http://blog.antenna.cool/blog/antenna_plugin)
+
 v1.0版本发布公告及使用要点:[Antenna V1.0 发布公告](http://blog.antenna.cool/blog/v1.0)
 
 ### 关于部署
