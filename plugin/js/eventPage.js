@@ -143,8 +143,7 @@ var get_message = () => {
 }
 
 
-
-
+var a = null;
 chrome.storage.sync.get("message_type", function (budge) {
     if (budge.message_type === 1) {
         a = window.setInterval(get_message, 4000)
@@ -154,7 +153,7 @@ chrome.storage.sync.get("message_type", function (budge) {
     }
 })
 
-var a = null;
+
 chrome.storage.onChanged.addListener(function (changes, storageName) {
     if (changes.message_type.newValue === 1) {
         a = window.setInterval(get_message, 4000)
