@@ -93,6 +93,7 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
         {
         "id":[1,2,3,4,5,]
         "status":1
+
         }
         """
         task_list = request.data.get("id", "")
