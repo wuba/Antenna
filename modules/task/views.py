@@ -96,9 +96,8 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
         }
         """
         task_list = request.data.get("id", "")
-        task_status = bool(request.data.get("status", ""))
-
-        if not task_list or task_status not in list(TASK_STATUS):
+        task_status = int(request.data.get("status", ""))
+        if not task_list or task_status not in [0, 1]:
             return Response({"code": 0, "message": "传递参数值格式错误"}, status=status.HTTP_200_OK)
         Task.objects.filter(user_id=self.request.user.id, id__in=task_list).update(status=task_status)
         return Response(data=request.data, status=status.HTTP_200_OK)

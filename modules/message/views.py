@@ -228,7 +228,7 @@ class HttplogView(APIView):
 
         # http 请求日志
         elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
-            task_config_item = TaskConfigItem.objects.filter(task_config__key__icontains=domain_key,
+            task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                              task__status=1).first()
             if task_config_item:
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
