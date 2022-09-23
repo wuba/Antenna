@@ -24,11 +24,14 @@ services:
       - ./:/antenna
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - type: bind
+        source: ./conf/antenna.ini
+        target: /etc/supervisor.d/antenna.ini
     ports:
       - "21:21"
       - "80:80"
       - "2345:2345"
-      - "53:53/udp"
+      - "2333:53/udp"
       - "443:443"
     environment:
       # 平台数据库配置，与上mysql配置保持一致
@@ -37,8 +40,10 @@ services:
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: Antenna@58.com
 
+
       # 平台配置
       PLATFORM_DOMAIN: test.com
+      PLATFORM_ENVIROMENT: docker
       #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
       LOGIN_PATH: ''
       PLATFORM_ROOT_USER: antenna@58.com

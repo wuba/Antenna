@@ -18,6 +18,7 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
+enviroment = os.environ.get('PLATFORM_ENVIROMENT')
 
 from django.conf import settings
 import requests
@@ -186,9 +187,16 @@ def is_base64(content):
 
 def restart():
     try:
-        shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/restart.sh")
-        print(f"开始重启 {shell_path}")
-        os.system(f"sh {shell_path}")
+        if enviroment == 'code':
+            shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/restart.sh")
+            print(f"开始重启 {shell_path}")
+            os.system(f"sh {shell_path}")
+        elif enviroment == 'docker':
+            shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/docker_restart.sh")
+            print(f"开始重启 {shell_path}")
+            os.system(f"ash {shell_path}")
+        else:
+            pass
     except Exception as e:
         print(e)
 

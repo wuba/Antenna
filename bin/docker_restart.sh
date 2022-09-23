@@ -1,0 +1,2 @@
+supervisorctl restart antenna-server
+
