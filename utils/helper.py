@@ -6,6 +6,7 @@ import random
 import smtplib
 import socket
 import string
+import subprocess
 import sys
 import time
 from email.mime.text import MIMEText
@@ -194,7 +195,7 @@ def restart():
         elif enviroment == 'docker':
             shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/docker_restart.sh")
             print(f"开始重启 {shell_path}")
-            os.system(f"ash {shell_path}")
+            subprocess.Popen(['/bin/sh', shell_path], start_new_session=True)
         else:
             pass
     except Exception as e:
