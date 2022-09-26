@@ -9,6 +9,7 @@ sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
+
 from modules.template.depend.base import BaseTemplate
 
 
