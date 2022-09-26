@@ -1,8 +1,10 @@
 import os
 import sys
 
-
 import django
+import re
+from twisted.internet import reactor
+from twisted.internet.protocol import Factory, Protocol
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
@@ -10,9 +12,13 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
 from modules.template.depend.base import BaseTemplate
+from modules.message.constants import MESSAGE_TYPES
+from modules.message.models import Message
+from modules.task.models import TaskConfigItem
+from utils.helper import send_message
 
 
-class HttpTemplate(BaseTemplate):
+class HTTP(Protocol):
     info = [{
         "template_info": {
             "name": "HTTP",  # 组件名
@@ -36,9 +42,49 @@ class HttpTemplate(BaseTemplate):
         self.ip = ""
         self.domain = ""
 
+    def dataReceived(self, data):
+        content = str(data, encoding="utf-8")
+        self.domain = re.findall(r'Host: (.*?)\r\n', content)[0]
+        self.key = self.domain.split('.')[0]
+        self.content = content
+        print(content)
+        self.uri = re.findall(r'/(.*?) HTTP', content)[0]
+        echo_message = b"""HTTP/1.0 200 OK
+Server: 127.0.0.1
+Content-Length: 25
+Content-Type: text/plain
+Connection: Closed
+"""
+        self.transport.write(echo_message)
+        self.transport.loseConnection()
+
+    def connectionMade(self):
+        self.remote_addr = self.transport.getPeer().host
+
+    def connectionLost(self, reason):
+        task_config_item = TaskConfigItem.objects.filter(task_config__key=self.key,
+                                                         task__status=1).first()
+        if task_config_item and task_config_item.template.name == "HTTP":
+            Message.objects.create(domain=self.domain + '/' + self.uri, message_type=MESSAGE_TYPES.HTTPS,
+                                   remote_addr=self.remote_addr,
+                                   task_id=task_config_item.task_id,
+                                   uri=self.uri,
+                                   template_id=task_config_item.template_id,
+                                   content=self.content)
+            send_message(url=self.domain + '/' + self.uri, remote_addr=self.remote_addr, uri=self.uri, header='',
+                         message_type=MESSAGE_TYPES.HTTPS, content=self.content,
+                         task_id=task_config_item.task_id)
+
 
 def main():
-    pass
+    try:
+        factory = Factory()
+        factory.protocol = HTTP
+        print("HTTP 协议监听模块已开启 80 port starting listen ...")
+        reactor.listenTCP(80, factory, )
+        reactor.run()
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':
