@@ -15,8 +15,8 @@ services:
     restart: always
 
   antenna:
-    build: ./
-    image: antenna:latest
+#    build: ./
+    image: jihongjun/antenna:latest
     depends_on:
       - db
     container_name: antenna
