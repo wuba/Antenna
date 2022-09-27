@@ -15,30 +15,19 @@ from modules.template.depend.base import BaseTemplate
 from modules.message.constants import MESSAGE_TYPES
 from modules.message.models import Message
 from modules.task.models import TaskConfigItem
+from modules.template import choose_template
 from utils.helper import send_message
 
 
 class HTTP(Protocol):
-    info = [{
-        "template_info": {
-            "name": "HTTP",  # 组件名
-            "title": "HTTP协议监听组件",  # 组件展示标题名
-            "author": "bios000",  # 组件作者
-            "type": 1,  # 组件类型，1是监听0是利用
-            "desc": "",  # 组件介绍
-            "desc_url": "",  # 组件使用说明链接
-            "choice_type": 0,  # 组件选择类型0是单选，1是多选
-            "payload": "http://{key}.{domain}/",
-            "file_name": "http.py",
-        },
-        "item_info": [{
-            "name": "http_log",
-            "config": [],
-
-        }]}]
 
     def __init__(self):
         super().__init__()
+        self.html = None
+        self.remote_addr = None
+        self.uri = None
+        self.content = None
+        self.key = None
         self.ip = ""
         self.domain = ""
 
@@ -61,6 +50,22 @@ Connection: Closed
     def connectionMade(self):
         self.remote_addr = self.transport.getPeer().host
 
+    def is_payload(self, path):
+        task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
+                                                         task__status=1).first()  # 查看是否是开启状态任务下的链接
+        if task_config_item:
+            if task_config_item.template.type == 0 and not self.message:  # 如果消息为空并且是利用组件
+                template_response = choose_template.match_template(task_config_item)
+                return template_response
+                pass
+            else:
+                Message.objects.create(domain=self.domain, remote_addr=self.remote_addr, uri=path, header="",
+                                       message_type=MESSAGE_TYPES.HTTP, content=self.html,
+                                       task_id=task_config_item.task_id,
+                                       template_id=task_config_item.template_id)
+                send_message(url=self.domain, remote_addr=self.remote_addr, uri=path, header="",
+                             message_type=MESSAGE_TYPES.HTTP, content=self.html, task_id=task_config_item.task_id)
+
     def connectionLost(self, reason):
         task_config_item = TaskConfigItem.objects.filter(task_config__key=self.key,
                                                          task__status=1).first()
@@ -74,6 +79,29 @@ Connection: Closed
             send_message(url=self.domain + '/' + self.uri, remote_addr=self.remote_addr, uri=self.uri, header='',
                          message_type=MESSAGE_TYPES.HTTPS, content=self.content,
                          task_id=task_config_item.task_id)
+
+
+class HttpTemplate(BaseTemplate):
+    info = [{
+        "template_info": {
+            "name": "HTTP",  # 组件名
+            "title": "HTTP协议监听组件",  # 组件展示标题名
+            "author": "bios000",  # 组件作者
+            "type": 1,  # 组件类型，1是监听0是利用
+            "desc": "",  # 组件介绍
+            "desc_url": "",  # 组件使用说明链接
+            "choice_type": 0,  # 组件选择类型0是单选，1是多选
+            "payload": "http://{key}.{domain}/",
+            "file_name": "http.py",
+        },
+        "item_info": [{
+            "name": "http_log",
+            "config": [],
+
+        }]}]
+
+    def __init__(self):
+        super().__init__()
 
 
 def main():

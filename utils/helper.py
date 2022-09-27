@@ -179,9 +179,7 @@ def is_base64(content):
     if len(content) % 4 != 0:
         return content
     for i in content:
-        if ('a' <= i <= 'z') or ('A' <= i <= 'Z') or ('0' <= i <= '9') or i == '+' or i == '/' or i == '=':
-            pass
-        else:
+        if not ('a' <= i <= 'z') or ('A' <= i <= 'Z') or ('0' <= i <= '9') or i == '+' or i == '/' or i == '=':
             return content
     return str(base64.b64decode(content), 'utf-8')
 
@@ -202,14 +200,14 @@ def restart():
         print(e)
 
 
-def send_message(url, remote_addr, uri, header, message_type, content, task_id):
+def send_message(url, remote_addr, uri, header, message_type, content, task_id, raw=""):
     """
     发送消息到接口
     """
     try:
         data = {
             "domain": url, "remote_addr": remote_addr, "uri": uri, "header": header,
-            "message_type": message_type, "content": content}
+            "message_type": message_type, "content": content, "raw": raw}
         task_record = Task.objects.get(id=task_id)
         message_url = task_record.callback_url
         message_headers = json.loads(task_record.callback_url_headers)
@@ -224,3 +222,28 @@ def get_message_type_name(message_type):
     for MESSAGE_TYPE in MESSAGE_TYPES:
         if MESSAGE_TYPE[0] == message_type:
             return MESSAGE_TYPE[1]
+
+
+def reconstruct_request(request):
+    """
+    拼接http报文
+    """
+    headers = ''
+    for header, value in request.META.items():
+        if not header.startswith('HTTP'):
+            continue
+        header = '-'.join([h.capitalize() for h in header[5:].lower().split('_')])
+        headers += '{}: {}\n'.format(header, value)
+
+    return (
+        '{method} HTTP/1.1\n'
+        'Content-Length: {content_length}\n'
+        'Content-Type: {content_type}\n'
+        '{headers}\n\n'
+        '{body}'
+    ).format(
+        method=request.method,
+        content_length=request.META['CONTENT_LENGTH'],
+        content_type=request.META['CONTENT_TYPE'],
+        headers=headers,
+        body=str(request.body, encoding="utf-8"))

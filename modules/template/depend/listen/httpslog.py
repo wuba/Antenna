@@ -6,8 +6,6 @@ import re
 from twisted.internet import ssl, reactor
 from twisted.internet.protocol import Factory, Protocol
 
-
-
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
@@ -58,10 +56,11 @@ Connection: Closed
                                    task_id=task_config_item.task_id,
                                    uri=self.uri,
                                    template_id=task_config_item.template_id,
-                                   content=self.content)
+                                   content="", html=self.content)
             send_message(url=self.domain + '/' + self.uri, remote_addr=self.remote_addr, uri=self.uri, header='',
                          message_type=MESSAGE_TYPES.HTTPS, content=self.content,
                          task_id=task_config_item.task_id)
+
 
 class HttpsTemplate(BaseTemplate):
     info = [{
@@ -84,6 +83,7 @@ class HttpsTemplate(BaseTemplate):
 
     def __init__(self):
         super().__init__()
+
 
 def main():
     try:

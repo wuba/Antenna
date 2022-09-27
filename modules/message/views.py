@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import re
 from django_filters.rest_framework import DjangoFilterBackend
-
 from modules.api.models import ApiKey
 from modules.message.models import Message
 from modules.message.serializers import MessageFilter, MessageSerializer
@@ -19,10 +18,9 @@ from rest_framework import filters, mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from django.db.models import Avg, Max, Min, Count, Sum, Q
-from utils.helper import get_payload, send_message, get_message_type_name
+from utils.helper import get_payload, send_message, get_message_type_name, reconstruct_request
 from modules.task.constants import TASK_TMP
 from modules.config.setting import PLATFORM_DOMAIN
 from utils.helper import is_base64
@@ -192,51 +190,51 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         return Response(serializer.data)
 
 
-class HttplogView(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        """
-        http请求记录获取
-        """
-        path = request.path.strip("/")  # 获取路径  /xxxx
-        message = is_base64(request.query_params.get('message', ''))  # 获取的参数message
-        host = request.get_host()  # 项目域名
-        domain_key = host.split('.')[0]
-        url = host + '/' + path
-        remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
-        regex = re.compile('^HTTP_')
-        headers = dict((regex.sub('', header), value) for (header, value) in self.request.META.items() if
-                       header.startswith('HTTP_'))
-        # 利用组件返回response
-        if path == os.environ.get('LOGIN_PATH'):
-            return render(request, '../static/index.html')
-        elif len(path) == 4:
-            task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
-                                                             task__status=1).first()  # 查看是否是开启状态任务下的链接
-            if task_config_item:
-                if task_config_item.template.type == 0 and not message:  # 如果消息为空并且是利用组件
-                    template_response = match_template(task_config_item)
-                    return template_response
-                else:
-                    Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
-                                           message_type=MESSAGE_TYPES.HTTP, content=message,
-                                           task_id=task_config_item.task_id,
-                                           template_id=task_config_item.template_id)
-                    send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
-                                 message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
-
-        # http 请求日志
-        elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
-            task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
-                                                             task__status=1).first()
-            if task_config_item:
+def index(request):
+    """
+    antenna的请求处理
+    """
+    path = request.path.strip("/")  # 获取路径  /xxxx
+    raw_response = reconstruct_request(request)  # 原始报文
+    if request.method == 'GET':
+        message = is_base64(request.GET.get('message', ''))  # 获取的参数message
+    elif request.method == 'POST':
+        message = request.data.get('message', '')
+    host = request.get_host()  # 项目域名
+    domain_key = host.split('.')[0]
+    url = host + '/' + path
+    remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
+    regex = re.compile('^HTTP_')
+    headers = dict((regex.sub('', header), value) for (header, value) in request.META.items() if
+                   header.startswith('HTTP_'))
+    # 利用组件返回response
+    if path == os.environ.get('LOGIN_PATH'):
+        return render(request, '../static/index.html')
+    elif len(path) == 4:
+        task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
+                                                         task__status=1).first()  # 查看是否是开启状态任务下的链接
+        if task_config_item:
+            if task_config_item.template.type == 0 and not message:  # 如果消息为空并且是利用组件
+                template_response = match_template(task_config_item)
+                return template_response
+            else:
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,
                                        task_id=task_config_item.task_id,
                                        template_id=task_config_item.template_id)
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
-        # 登录地址
 
-        return HttpResponse('', content_type='text/html;charset=utf-8')
+    # http 请求日志
+    elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
+        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
+                                                         task__status=1).first()
+        if task_config_item:
+            Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
+                                   message_type=MESSAGE_TYPES.HTTP, content=message,
+                                   task_id=task_config_item.task_id,
+                                   template_id=task_config_item.template_id, html=raw_response)
+            send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
+                         message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
+                         raw=raw_response)
+    return HttpResponse('', content_type='text/html;charset=utf-8')
