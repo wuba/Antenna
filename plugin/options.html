@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Antenna配置</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <script src="js/jquery-3.6.1.min.js"></script>
+    <script src="js/options.js"></script>
+    <script src="layui.all.js"></script>
+    <link rel="stylesheet" href="css/layui.css">
+    <style>
+        * {
+            font-family: "Open Sans";
+        }
+
+        .layui-nav .layui-nav-item > span {
+            display: block;
+            padding: 0 20px;
+            color: #fff;
+            color: rgba(255, 255, 255, .7);
+            transition: all .3s;
+            -webkit-transition: all .3s;
+            cursor: default;
+            -webkit-user-select: none;
+        }
+
+        .logo a {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .logo img {
+            display: inline-block;
+            height: 40px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .profileDiv {
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+        em:empty::after {
+            content: "空";
+        }
+    </style>
+</head>
+<body>
+<ul class="layui-nav layui-nav-tree layui-nav-side" lay-shrink="all" lay-filter="">
+    <li class="layui-nav-item"><a href="">Antenna配置</a></li>
+    <!-- 设定layui-this来指向当前页面,即绿色滑块移动到该分类下方 -->
+    <li class="layui-nav-item layui-this"><a href="">个人配置</a></li>
+    <span class="layui-nav-bar" style="top: 322.5px; height: 0px; opacity: 0;"></span></ul>
+<div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 15px;">请填写个人APIKEY以及SERVER地址</div>
+    <form class="layui-form" action="">
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">APIKEY</label>
+            <div class="layui-input-block">
+                <input type="text" id="apikey" required lay-verify="required" placeholder="请输入个人32位APIKEY"
+                       autocomplete="off" class="layui-input" style="width:800px" value="">
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">SERVER地址</label>
+            <div class="layui-input-inline">
+                <input type="text" id="server" required lay-verify="required" placeholder="示例:http://test.com"
+                       autocomplete="off" class="layui-input" style="width:800px" value="">
+            </div>
+        </div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo" id="save">保存</button>
+            <button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+        </div>
+    </form>
+</div>
+
+<div class="layui-footer">
+    <!-- 底部固定区域 -->
+    底部固定区域
+</div>
+</div>
+</body>
+</html>

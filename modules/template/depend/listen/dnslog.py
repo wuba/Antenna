@@ -43,14 +43,14 @@ class MysqlLogger():
 
     def log_request(self, handler, request):
         domain = request.q.qname.__str__()
-        print('domain=======>', domain)
+        # print('domain=======>', domain)
         if domain.endswith(DNS_DOMAIN + '.'):
             udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
-            print('udomain=======>', udomain)
+            # print('udomain=======>', udomain)
             if udomain:
-                print("udomain.group(1))======>", udomain.group(1))
+                # print("udomain.group(1))======>", udomain.group(1))
                 domain_key = udomain.group(1)
-                task_config_item = TaskConfigItem.objects.filter(task_config__key__icontains=domain_key,
+                task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                                  task__status=1).first()
                 if task_config_item and task_config_item.template.name == "DNS":
                     domain = domain.strip(".")
@@ -117,27 +117,30 @@ class ZoneResolver(BaseResolver):
                             reply.add_ar(a_rr)
         if not reply.rr:
             reply.header.rcode = RCODE.NXDOMAIN
-        print('reply======>', reply)
+        # print('reply======>', reply)
         return reply
 
 
 def main():
-    zone = '''
+    try:
+        zone = '''
 *.{dnsdomain}.       IN      NS      {ns1domain}.
 *.{dnsdomain}.       IN      NS      {ns2domain}.
 *.{dnsdomain}.       IN      A       {serverip}
 {dnsdomain}.         IN      A       {serverip}
 '''.format(
-        dnsdomain=DNS_DOMAIN,
-        ns1domain=NS1_DOMAIN,
-        ns2domain=NS2_DOMAIN,
-        serverip=SERVER_IP)
-    resolver = ZoneResolver(zone, True)
-    print("当前DNS解析表:\r\n" + zone)
-    logger = MysqlLogger()
-    print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
-    udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
-    udp_server.start()
+            dnsdomain=DNS_DOMAIN,
+            ns1domain=NS1_DOMAIN,
+            ns2domain=NS2_DOMAIN,
+            serverip=SERVER_IP)
+        resolver = ZoneResolver(zone, True)
+        print("当前DNS解析表:\r\n" + zone)
+        logger = MysqlLogger()
+        # print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
+        udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
+        udp_server.start()
+    except Exception as e:
+        print(e)
 
 
 class DnsTemplate(BaseTemplate):

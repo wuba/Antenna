@@ -33,7 +33,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
     serializer_class = MessageSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filter_class = MessageFilter
-    filter_fields = ('message_type', 'template__name', 'task', 'content','domain')
+    filter_fields = ('message_type', 'template__name', 'task', 'content', 'domain')
     search_fields = ('create_time', 'task__name')
     permission_classes = [IsAuthenticated]
 
@@ -183,7 +183,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         key = ApiKey.objects.filter(key=apikey).first()
         if not key:
             return Response({"code": 0, "message": "apikey错误"}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = self.filter_queryset(Message.objects.filter(task__user=key.user_id))
+        queryset = self.filter_queryset(Message.objects.filter(task__user=key.user_id)).order_by("-id")
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -228,7 +228,8 @@ class HttplogView(APIView):
 
         # http 请求日志
         elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
-            task_config_item = TaskConfigItem.objects.filter(task_config__key__icontains=domain_key, task__status=1).first()
+            task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
+                                                             task__status=1).first()
             if task_config_item:
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,

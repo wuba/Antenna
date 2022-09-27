@@ -6,13 +6,14 @@ import re
 from twisted.internet import ssl, reactor
 from twisted.internet.protocol import Factory, Protocol
 
-from modules.template.depend.base import BaseTemplate
+
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
+from modules.template.depend.base import BaseTemplate
 from modules.message.constants import MESSAGE_TYPES
 from modules.message.models import Message
 from modules.task.models import TaskConfigItem
@@ -33,6 +34,7 @@ class HTTPS(Protocol):
         self.domain = re.findall(r'Host: (.*?)\r\n', content)[0]
         self.key = self.domain.split('.')[0]
         self.content = content
+        print(content)
         self.uri = re.findall(r'/(.*?) HTTP', content)[0]
         echo_message = b"""HTTP/1.0 200 OK
 Server: 127.0.0.1

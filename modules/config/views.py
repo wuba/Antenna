@@ -19,8 +19,10 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
     def get_paginated_response(self, data):
         _data = {}
         for i in data:
-            if i['value'] == "1" or i['value'] == "0":
-                i['value'] = bool(int(i['value']))
+            if i['value'] == "1" or i['value'].lower() == "true":
+                i['value'] = True
+            elif i['value'] == "0" or i['value'].lower() == "false":
+                i['value'] = False
             _data[i["name"]] = i['value']
         return Response(_data, status=status.HTTP_200_OK)
 
