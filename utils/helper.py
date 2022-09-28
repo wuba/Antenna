@@ -194,8 +194,6 @@ def restart():
             shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/docker_restart.sh")
             print(f"开始重启 {shell_path}")
             subprocess.Popen(['/bin/sh', shell_path], start_new_session=True)
-        else:
-            pass
     except Exception as e:
         print(e)
 
@@ -247,3 +245,21 @@ def reconstruct_request(request):
         content_type=request.META['CONTENT_TYPE'],
         headers=headers,
         body=str(request.body, encoding="utf-8"))
+
+
+def get_param_message(request):
+    """
+    获取请求的参数以及message参数
+    """
+    if request.method == 'GET':
+        param_list = dict(request.GET)
+        message = is_base64(request.GET.get('message', ''))  # 获取的参数message
+    elif request.method == 'POST':
+        param_list = dict(request.POST)
+        message = request.POST.get('message', '')
+    else:
+        json_str = request.body  # 属性获取最原始的请求体数据
+        param_list = json.loads(json_str)
+        message = param_list.get('message', '')
+
+    return param_list, message

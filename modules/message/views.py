@@ -1,4 +1,3 @@
-import base64
 import datetime
 import os
 
@@ -20,7 +19,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from django.db.models import Avg, Max, Min, Count, Sum, Q
-from utils.helper import get_payload, send_message, get_message_type_name, reconstruct_request
+from utils.helper import get_payload, send_message, get_message_type_name, reconstruct_request, get_param_message
 from modules.task.constants import TASK_TMP
 from modules.config.setting import PLATFORM_DOMAIN
 from utils.helper import is_base64
@@ -196,10 +195,8 @@ def index(request):
     """
     path = request.path.strip("/")  # 获取路径  /xxxx
     raw_response = reconstruct_request(request)  # 原始报文
-    if request.method == 'GET':
-        message = is_base64(request.GET.get('message', ''))  # 获取的参数message
-    elif request.method == 'POST':
-        message = request.data.get('message', '')
+    param_list, message_to_base64 = get_param_message(request)
+    message = is_base64(message_to_base64)
     host = request.get_host()  # 项目域名
     domain_key = host.split('.')[0]
     url = host + '/' + path
@@ -215,7 +212,7 @@ def index(request):
                                                          task__status=1).first()  # 查看是否是开启状态任务下的链接
         if task_config_item:
             if task_config_item.template.type == 0 and not message:  # 如果消息为空并且是利用组件
-                template_response = match_template(task_config_item)
+                template_response = match_template(task_config_item, param_list)
                 return template_response
             else:
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,

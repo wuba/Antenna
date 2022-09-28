@@ -30,10 +30,12 @@ class BaseTemplate:
     }]
 
     def __init__(self):
+        self.param_list = None
         self.ip = SERVER_IP
         self.domain = PLATFORM_DOMAIN
 
-    def run(self, key):
+    def run(self, key, param_list):
+        self.param_list = param_list
         task_config_item = TaskConfigItem.objects.filter(task_config__key=key)
         if task_config_item:
             config = [{"name": i.template_config_item.name, "config": i.value, }

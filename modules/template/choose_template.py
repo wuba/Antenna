@@ -6,17 +6,19 @@ from modules.template.depend.listen import httplog, jndi, dnslog, ftplog, httpsl
 from modules.template.models import Template, TemplateConfigItem
 
 
-def match_template(item):
+def match_template(item, param_list=None):
     """
     根据key判断所属模板，根据模板配置返回response
     """
+    if param_list is None:
+        param_list = {}
     key = item.task_config.key
     template_name = item.template.name
     template_response = HttpResponse('', content_type='text/plain;charset=UTF-8')
     for c in BaseTemplate.__subclasses__():
         for info in c.info:
             if str(info["template_info"]["name"]) == str(template_name):
-                template_response = c().run(key)
+                template_response = c().run(key, param_list)
                 break
     return template_response
 
