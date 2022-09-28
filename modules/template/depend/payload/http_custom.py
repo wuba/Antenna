@@ -15,7 +15,6 @@ class HttpCustomTemplate(BaseTemplate):
             "desc": "",  # 组件介绍
             "desc_url": "",  # 组件使用说明链接
             "choice_type": 0,  # 组件选择类型0是单选，1是多选
-            "url_type": 2,  # 组件生成链接格式类型
             "payload": "http://{domain}/{key}",
             "file_name": "http_custom.py"
         },
@@ -33,7 +32,6 @@ class HttpCustomTemplate(BaseTemplate):
 
     def __init__(self):
         super().__init__()
-        self.key = None
 
     def custom_http_html(self, item):
         """

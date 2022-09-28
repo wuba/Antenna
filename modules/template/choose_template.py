@@ -30,10 +30,15 @@ def load_template(user_id):
     for c in BaseTemplate.__subclasses__():
         for info in c.info:
             template = info["template_info"]
-            template_object, create = Template.objects.update_or_create(defaults=template,
-                                                                        name=template.get("name", ""), user_id=user_id)
+            print(template)
+            try:
+                template_object, create = Template.objects.update_or_create(defaults=template,
+                                                                            name=template.get("name", ""), user_id=user_id)
+            except Exception as e:
+                print(e)
             item = info["item_info"]
             for i in item:
+                print(i)
                 i["template_id"] = template_object.id
                 TemplateConfigItem.objects.update_or_create(defaults=i, name=i.get("name", ""),
                                                             template__user_id=user_id)
