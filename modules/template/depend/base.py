@@ -1,9 +1,10 @@
 from abc import abstractmethod
-
+from django.http import HttpResponse, HttpResponseRedirect
+from rest_framework.response import Response
 from modules.config.models import Config
 from modules.config.setting import SERVER_IP, PLATFORM_DOMAIN
 from modules.task.models import TaskConfigItem
-
+import requests
 
 class BaseTemplate:
     info = [{
@@ -30,10 +31,13 @@ class BaseTemplate:
     }]
 
     def __init__(self):
+        self.param_list = None
         self.ip = SERVER_IP
         self.domain = PLATFORM_DOMAIN
+        self.key = None
 
-    def run(self, key):
+    def run(self, key, param_list):
+        self.param_list = param_list
         task_config_item = TaskConfigItem.objects.filter(task_config__key=key)
         if task_config_item:
             config = [{"name": i.template_config_item.name, "config": i.value, }
