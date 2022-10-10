@@ -72,6 +72,11 @@ class TemplateViewSet(ModelViewSet):
                 config = list(template_item["config"])
                 TemplateConfigItem.objects.create(name=item_name, config=config, template_id=template_record.id)
 
+            # 将组件文件移动到正式目录
+            current_directory = os.path.dirname(os.path.abspath(__file__))
+            index_path = f'{current_directory}/depend/tmp/{file_name}'
+            new_path = f'{current_directory}/depend/payload/'
+            os.system(f'mv {index_path} {new_path}')
             return Response({"template_id": template_record.id}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
@@ -81,7 +86,7 @@ class TemplateViewSet(ModelViewSet):
         """
         展示组件信息
         {
-        "template_Info"}
+        "template_Info":
         {
         "name":"xss",
         "title":"xss利用组件",
@@ -89,6 +94,7 @@ class TemplateViewSet(ModelViewSet):
         choice_type:1,
         is_private:1,
         "url_type":1
+        },
         "template_item_info":[
                 {
                 "item_name":"xss_config_item",
@@ -113,10 +119,8 @@ class TemplateViewSet(ModelViewSet):
             choice_type = template_record.choice_type
             payload = template_record.payload
             is_private = template_record.is_private
-            item_info = []
             item_record = TemplateConfigItem.objects.filter(template_id=template_id)
-            for item in item_record:
-                item_info.append({"item_name": item.name, "config": item.config})
+            item_info = [{"item_name": item.name, "config": item.config} for item in item_record]
             return Response(
                 {"name": name, "title": title, "desc": description, "is_private": is_private,
                  "choice_type": choice_type,
@@ -124,9 +128,70 @@ class TemplateViewSet(ModelViewSet):
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
 
+    @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated])
+    def view_template_code(self, request, *args, **kwargs):
+        """
+        获取组件的代码
+        """
+        try:
+            user_id = self.request.user.id
+            template_id = request.query_params.get('template_id')
+            template_obj = Template.objects.get(template_id=template_id, user_id=user_id)
+            if not template_obj.exists():
+                return Response({"code": 0, "message": f"不存在该组件"}, status=status.HTTP_200_OK)
+            filename = template_obj.file_name
+            template_type = template_obj.type
+            base_path = str(os.path.abspath(os.path.dirname(__file__)))
+            # 读取文件内容
+            if template_type == TEMPLATE_TYPES.PAYLOAD:
+                file_path = base_path + f"/depend/payload/{filename}"
+            else:
+                file_path = base_path + f"/depend/listen/{filename}"
+            file_object = open(file_path, 'r')
+            try:
+                code = file_object.read()  # 结果为str类型
+            finally:
+                file_object.close()
+            return Response({"code": code}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
+
+    @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated])
+    def update_template_code(self, request, *args, **kwargs):
+        """
+        修改组件文件代码
+        {
+        "template_id":1,
+        "code":"aaaaa"}
+        """
+        try:
+            user_id = self.request.user.id
+            data = request.data
+            template_id = data.get('template_id', 0)
+            code = data.get('code', '')
+            template_obj = Template.objects.get(template_id=template_id, user_id=user_id)
+            if not template_obj.exists():
+                return Response({"code": 0, "message": f"不存在该组件"}, status=status.HTTP_200_OK)
+            filename = template_obj.file_name
+            template_type = template_obj.type
+            base_path = str(os.path.abspath(os.path.dirname(__file__)))
+            # 读取文件内容
+            if template_type == TEMPLATE_TYPES.PAYLOAD:
+                file_path = base_path + f"/depend/payload/{filename}"
+            else:
+                file_path = base_path + f"/depend/listen/{filename}"
+            file_object = open(file_path, 'w')
+            try:
+                code = file_object.write(code)  # 结果为str类型
+            finally:
+                file_object.flush()
+                file_object.close()
+            return Response({"code": code}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
+
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated])
     def update_template(self, request, *args, **kwargs):
-
         """
         修改组件信息
         {
@@ -187,7 +252,7 @@ class TemplateViewSet(ModelViewSet):
             return Response({"code": 0, "message": f"上传空文件!"}, status=status.HTTP_200_OK)
         else:
             filename = f'{generate_code(10)}.py'
-        base_path = str(os.path.abspath(os.path.dirname(__file__))) + f"/depend/payload/{filename}"
+        base_path = str(os.path.abspath(os.path.dirname(__file__))) + f"/depend/tmp/{filename}"
         destination = open(base_path, 'wb')  # 保存组件文件
         for chunk in code.chunks():  # 分块写入文件
             destination.write(chunk)
@@ -214,8 +279,11 @@ class TemplateViewSet(ModelViewSet):
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
 
-    @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated])
+    @action(methods=["GET"], detail=False, permission_classes=[IsAdminUser])
     def initial_template(self, request, *args, **kwargs):
+        """
+        初始化组件
+        """
         try:
             load_template(user_id=self.request.user.id)
             return Response({"code": 1, "message": "加载组件成功"}, status=status.HTTP_200_OK)

@@ -1,8 +1,6 @@
-import json
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
-from modules.template.constants import PRIVATE_TYPES, CHOICE_TYPES
 from modules.template.models import Template, TemplateConfigItem
 
 
@@ -60,7 +58,7 @@ class UpdateTemplateInfoSerializer(serializers.Serializer):
 
 class DeleteTmplateSerializer(serializers.Serializer):
     """
-    删除缓存任务序列化器
+    删除组件序列化器
     """
     template_id = serializers.IntegerField(required=True, help_text="删除缓存任务")
 
