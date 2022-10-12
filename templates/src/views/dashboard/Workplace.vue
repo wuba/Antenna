@@ -28,7 +28,7 @@
                 <div class="tabsContain">
                     <a-tabs default-active-key="1" @change="tabChange" v-show="dataContent.length > 1">
                         <a-tab-pane v-for="(item, index) in dataContent" :key="index">
-                            <template slot="tab">第{{ index }}页</template>
+                            <template slot="tab">第{{ index + 1 }}页</template>
                         </a-tab-pane>
                     </a-tabs>
                 </div>
@@ -37,7 +37,12 @@
                         {{ item[Object.keys(item)[0]] }}
                     </div>
 
-                    <div class="overflow leftbutton">{{ Object.keys(item)[1] }}</div>
+                    <div class="overflow leftbutton">
+                        <a-tooltip>
+                            <template slot="title">{{ Object.keys(item)[1] }}</template>
+                            {{ Object.keys(item)[1] }}
+                        </a-tooltip>
+                    </div>
                     <a-input :value="item[Object.keys(item)[1]]" placeholder="请输入域名" :readOnly="true">
                         <my-copy slot="suffix" :text="item[Object.keys(item)[1]]"></my-copy>
                     </a-input>
@@ -210,7 +215,7 @@ export default {
             })
         },
         tabChange(e) {
-            this.count = Number(e - 1)
+            this.count = Number(e)
         },
         jumpDetail(data) {
             this.$router.push({ path: data.path })
