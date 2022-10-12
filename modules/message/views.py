@@ -30,8 +30,8 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
     serializer_class = MessageSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filter_class = MessageFilter
-    filter_fields = ('message_type', 'template__name', 'task', 'content', 'domain')
-    search_fields = ('create_time', 'task__name')
+    filter_fields = ('message_type', 'template__name', 'task', 'content',)
+    search_fields = ('create_time', 'task__name', 'domain')
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -205,7 +205,7 @@ def index(request):
     headers = dict((regex.sub('', header), value) for (header, value) in request.META.items() if
                    header.startswith('HTTP_'))
     # 利用组件返回response
-    if host == PLATFORM_DOMAIN and path == os.environ.get('LOGIN_PATH'):
+    if host != PLATFORM_DOMAIN and path == os.environ.get('LOGIN_PATH'):
         return render(request, '../static/index.html')
     elif len(path) == 4:
         task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
@@ -230,7 +230,8 @@ def index(request):
             Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
                                    message_type=MESSAGE_TYPES.HTTP, content=message,
                                    task_id=task_config_item.task_id,
-                                   template_id=task_config_item.template_id, html=raw_response)
+                                   template_id=task_config_item.template_id, html=raw_response,
+                                   create_time=datetime.datetime.now())
             send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
                          message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
                          raw=raw_response)
