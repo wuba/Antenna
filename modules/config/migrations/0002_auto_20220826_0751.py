@@ -8,14 +8,19 @@ def create_default_config(apps, schema_editor):
     # version than this migration expects. We use the historical version.
     Config = apps.get_model("config", "Config")
     # from modules.config.models import Config
-    domain = os.getenv("PLATFORM_DOMAIN")
+    platform_domain = os.getenv("PLATFORM_DOMAIN")
+    dns_domain = os.getenv("DNS_DOMAIN")
+    ns1_domain = os.getenv("NS1_DOMAIN")
+    ns2_domain = os.getenv("NS2_DOMAIN")
+    dns_ip = os.getenv("SERVER_IP")
+
     Config.objects.bulk_create(
         [
-            Config(name="PLATFORM_DOMAIN", type=0, value=domain),
-            Config(name="DNS_DOMAIN", type=1, value=domain),
-            Config(name="NS1_DOMAIN", type=1, value=f"ns1.{domain}"),
-            Config(name="NS2_DOMAIN", type=1, value=f"ns2.{domain}"),
-            Config(name="SERVER_IP", type=1, value=os.getenv("PLATFORM_IP")),
+            Config(name="PLATFORM_DOMAIN", type=0, value=platform_domain),
+            Config(name="DNS_DOMAIN", type=1, value=dns_domain),
+            Config(name="NS1_DOMAIN", type=1, value=ns1_domain),
+            Config(name="NS2_DOMAIN", type=1, value=ns2_domain),
+            Config(name="SERVER_IP", type=1, value=dns_ip),
             Config(name="JNDI_PORT", type=1, value="2345"),
             Config(name="OPEN_REGISTER", type=0, value="0"),
             Config(name="INVITE_TO_REGISTER", type=0, value="0"),
@@ -30,7 +35,6 @@ def create_default_config(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("config", "0001_initial"),
     ]

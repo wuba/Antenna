@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("template", "0001_initial"),
     ]
@@ -23,7 +22,14 @@ INSERT INTO antenna.template (id, name, title, `desc`, desc_url, author, type, c
     %xd;
 ]>
 <root>&bbbb;</root>');
-INSERT INTO antenna.template (id, name, title, `desc`, desc_url, author, type, choice_type, file_name, create_time, update_time, is_private, user_id, payload) VALUES (7, 'HTTP', 'HTTP协议监听组件', '', '', 'bios000', 1, 0, 'http.py', '2022-08-10 22:39:44.000586', '2022-08-19 17:59:40.668357', 1, 1, 'http://{key}.{domain}/');
+INSERT INTO antenna.template (id, name, title, `desc`, desc_url, author, type, choice_type, file_name, create_time, update_time, is_private, user_id, payload) VALUES (7, 'HTTP', 'HTTP协议监听组件', '', '', 'bios000', 1, 0, 'http.py', '2022-08-10 22:39:44.000586', '2022-08-19 17:59:40.668357', 1, 1, 'http://{key}.{domain}');
+INSERT INTO antenna.template (id, name, title, `desc`, desc_url, author, type, choice_type, file_name, create_time, update_time, is_private, payload, user_id) VALUES (8, 'FTP', 'FTP协议监听组件', '', '', 'bios000', 1, 0, 'ftplog.py', '2022-09-04 07:29:10.592067', '2022-09-05 22:11:12.907401', 1, 'ftp://{key}:123456@{domain}/antenna', 1);
+INSERT INTO antenna.template (id, name, title, `desc`, desc_url, author, type, choice_type, file_name, create_time, update_time, is_private, payload, user_id) VALUES (9, 'HTTPS', 'HTTPS协议监听组件', '', '', 'bios000', 1, 0, 'httpslog.py', '2022-09-04 07:29:10.592067', '2022-09-05 22:11:12.907401', 1, 'https://{key}.{domain}', 1);
+
+
+
+
+
         """
         ),
         migrations.RunSQL(
@@ -37,6 +43,10 @@ INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES 
 INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES (9, 'http_log', '[]', 7);
 INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES (10, 'jsonp_html', '["url"]', 5);
 INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES (11, 'xxe_read_file', '["path"]', 6);
+INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES (12, 'ftp_log', '[]', 8);
+INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES (13, 'ftp_xxe_read_file', '["path"]', 6);
+INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES (14, 'php_xxe_read_file', '["path"]', 6);
+INSERT INTO antenna.template_config_item (id, name, config, template_id) VALUES (15, 'https_log', '[]', 9);
 """
         ),
     ]

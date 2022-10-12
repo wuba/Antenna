@@ -1,21 +1,17 @@
-#!/bin/bash
-pid=$(ps -ef | grep "manage.py runserver" | awk '{print $2}')
-# shellcheck disable=SC1046
-# shellcheck disable=SC1073
-if [[ $pid ]]; then
-  echo  "$pid"
-  kill -9 $pid || true
-  else
-    echo "#####Django服务不存在#####"
-  echo "#####Django服务已正常关闭#####"
-  echo "#####Django启动服务#####"
-  cd ../
-  nohup python3 manage.py runserver 0.0.0.0:80 &
-  pid=$(ps -ef | grep python3 | grep manage | awk '{print $2}')
-  if [[ ! $pid ]]; then
-    echo "#####Django服务启动失败#####"
-  else
-    echo "#####Django服务启动成功#####"
-  fi
+NAME="manage.py runserver"
+if [ ! -n "$NAME" ]; then
+  echo "[-] no arguments"
+  exit
 fi
 
+ID=$(ps -ef | grep "$NAME" | grep -v "$0" | grep -v "grep" | awk '{print $2}')
+i=0
+for id in $ID; do
+  i=$(($i + 1))
+  kill -9 $id
+done
+echo "[+] $i scan process have been stopped!"
+CURRENT_DIR=$(cd `dirname $0`; pwd)
+python3 $CURRENT_DIR/../manage.py runserver 0.0.0.0:80
+
+echo "[+]  process have been started!"

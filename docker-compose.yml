@@ -1,8 +1,8 @@
-version: '3'
+version: '3.9'
 
 services:
-
   db:
+    privileged: true
     image: mysql:8.0.30
     container_name: antenna-mysql
     ports:
@@ -15,25 +15,41 @@ services:
     restart: always
 
   antenna:
-    build: ./
-    image: antenna:latest
+    # 如果想本地打包镜像可使用该关键字 build: ./
+    image: jihongjun/antenna:latest
+    pull_policy: always
     depends_on:
       - db
     container_name: antenna
     volumes:
       - ./:/antenna
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     ports:
+      - "21:21"
       - "80:80"
       - "2345:2345"
       - "53:53/udp"
+      - "443:443"
     environment:
+      # 平台数据库配置，与上mysql配置保持一致
       MYSQL_HOST: db
       MYSQL_PORT: 3306
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: Antenna@58.com
-      PLATFORM_DOMAIN: 127.0.0.1
-      PLATFORM_IP: 127.0.0.1
+
+      # 平台配置
+      PLATFORM_DOMAIN: test.com
+      #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
       LOGIN_PATH: ''
+      PLATFORM_ROOT_USER: antenna@58.com
+
+      # DNS配置
+      DNS_DOMAIN: test.cn
+      NS1_DOMAIN: ns1.test.cn
+      NS2_DOMAIN: ns2.test.cn
+      SERVER_IP: 127.0.0.1
+
     networks:
       - antenna
     restart: always

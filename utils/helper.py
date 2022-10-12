@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from functools import wraps
 
 import django
+from modules.message.constants import MESSAGE_TYPES
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
@@ -23,7 +24,7 @@ import requests
 from django_filters.filters import Filter
 from modules.task.models import Task, TaskConfig
 from modules.config.setting import JNDI_PORT, PLATFORM_DOMAIN, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, \
-    EMAIL_HOST_PASSWORD
+    EMAIL_HOST_PASSWORD, DNS_DOMAIN
 
 
 def get_host_ip():
@@ -95,7 +96,7 @@ def generate_code(number):
     """
     while True:
         random_code = ''.join(random.sample(string.ascii_letters + string.digits, number))
-        if not TaskConfig.objects.filter(key=random_code).exists():
+        if not TaskConfig.objects.filter(key__icontains=random_code).exists():
             break
 
     return random_code
@@ -134,30 +135,38 @@ def get_payload(key, payload):
     获取地址
     """
 
-    return payload.replace("{domain}", PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}", str(JNDI_PORT))
+    return payload.replace("{domain}", PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}",
+                                                                                      str(JNDI_PORT)).replace(
+        "{dns_domain}", DNS_DOMAIN)
 
 
 def send_mail(to, message):
     """
     发送邮件
     """
-    mailserver = EMAIL_HOST  # 邮箱服务器地址
-    port = EMAIL_PORT
-    username_send = EMAIL_HOST_USER  # 邮箱用户名
-    password = EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
-    username_recv = "".join(to)  # 收件人，多个收件人用逗号隔开
-    mail = MIMEText(message)
-    mail['Subject'] = 'Antenna平台邮件'
-    mail['From'] = username_send
-    mail['To'] = username_recv
-    if port == 25:
-        smtp = smtplib.SMTP(mailserver, port=port)
-    else:
-        smtp = smtplib.SMTP_SSL(mailserver, port=port)  # QQ邮箱的服务器和端口号
-    smtp.login(username_send, password)  # 登录邮箱
-    smtp.sendmail(username_send, username_recv, mail.as_string())  # 参数分别是发送者，接收者，第三个是把上面的发送邮件的内容变成字符串
-    smtp.quit()  # 发送完毕后退出smtp
-    return True
+    try:
+        mailserver = EMAIL_HOST  # 邮箱服务器地址
+        port = int(EMAIL_PORT)
+        username_send = EMAIL_HOST_USER  # 邮箱用户名
+        password = EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
+        username_recv = "".join(to)  # 收件人，多个收件人用逗号隔开
+        mail = MIMEText(message)
+        mail['Subject'] = 'Antenna平台邮件'
+        mail['From'] = username_send
+        mail['To'] = username_recv
+        if port == 25 or port == 587:
+            smtp = smtplib.SMTP(mailserver, port=port)
+            smtp.starttls()
+        elif port == 465:
+            smtp = smtplib.SMTP_SSL(mailserver, port=port)  # QQ邮箱的服务器和端口号
+        smtp.login(username_send, password)  # 登录邮箱
+        smtp.sendmail(username_send, username_recv, mail.as_string())  # 参数分别是发送者，接收者，第三个是把上面的发送邮件的内容变成字符串
+        smtp.quit()  # 发送完毕后退出smtp
+        return True
+
+    except Exception as e:
+        print(e)
+        return False
 
 
 def is_base64(content):
@@ -196,8 +205,13 @@ def send_message(url, remote_addr, uri, header, message_type, content, task_id):
         message_url = task_record.callback_url
         message_headers = json.loads(task_record.callback_url_headers)
         if message_url and message_headers:
-            response = requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
+            requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
             print("发送请求")
     except Exception as e:
         print(e)
-        pass
+
+
+def get_message_type_name(message_type):
+    for MESSAGE_TYPE in MESSAGE_TYPES:
+        if MESSAGE_TYPE[0] == message_type:
+            return MESSAGE_TYPE[1]

@@ -15,3 +15,6 @@ requests==2.27.1
 python-dotenv==0.20.0
 cryptography==37.0.4
 wait-for-it==2.1.1
+Twisted~=22.4.0
+pyOpenSSL==22.0.0
+service_identity ==21.1.0

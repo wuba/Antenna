@@ -40,8 +40,11 @@ class HttpCustomTemplate(BaseTemplate):
         自定义页面返回内容
         """
         value = item["config"]["value"]
-        headers = json.loads(item["config"]["headers"])
-        return HttpResponse(content=value, heades=headers)
+        if item["config"]["headers"]:
+            headers = json.loads(item["config"]["headers"])
+        else:
+            headers = {}
+        return HttpResponse(content=value, headers=headers)
 
     def custom_http_location(self, item):
         """

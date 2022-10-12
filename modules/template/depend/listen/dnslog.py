@@ -42,7 +42,7 @@ class MysqlLogger():
         pass
 
     def log_request(self, handler, request):
-        domain = request.q.qname.__str__().lower()
+        domain = request.q.qname.__str__()
         print('domain=======>', domain)
         if domain.endswith(DNS_DOMAIN + '.'):
             udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
@@ -50,15 +50,15 @@ class MysqlLogger():
             if udomain:
                 print("udomain.group(1))======>", udomain.group(1))
                 domain_key = udomain.group(1)
-                task_config_item = TaskConfigItem.objects.filter(task_config__key=domain_key,
+                task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                                  task__status=1).first()
                 if task_config_item and task_config_item.template.name == "DNS":
                     domain = domain.strip(".")
                     Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
                                            remote_addr=handler.client_address[0],
-                                           task_id=task_config_item.task_id, template_id=8)
+                                           task_id=task_config_item.task_id, template_id=task_config_item.template_id)
                     send_message(url=domain, remote_addr=handler.client_address[0], uri='', header='',
-                                 message_type=MESSAGE_TYPES.HTTP, content='', task_id=task_config_item.task_id)
+                                 message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
 
     def log_send(self, handler, data):
         pass
@@ -133,6 +133,7 @@ def main():
         ns2domain=NS2_DOMAIN,
         serverip=SERVER_IP)
     resolver = ZoneResolver(zone, True)
+    print("当前DNS解析表:\r\n" + zone)
     logger = MysqlLogger()
     print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
     udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
@@ -149,7 +150,7 @@ class DnsTemplate(BaseTemplate):
             "desc": "",  # 组件介绍
             "desc_url": "",  # 组件使用说明链接
             "choice_type": 0,  # 组件选择类型0是单选，1是多选
-            "payload": "{key}.{domain}",  # 组件利用实例
+            "payload": "{key}.{dns_domain}",  # 组件利用实例
             "file_name": "dnslog.py",
 
         },

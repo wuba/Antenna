@@ -1,19 +1,18 @@
 import os
 import sys
-from abc import ABC
+
 
 import django
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
-print(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
 from modules.template.depend.base import BaseTemplate
 
 
-class HttpTemplate(BaseTemplate, ABC):
+class HttpTemplate(BaseTemplate):
     info = [{
         "template_info": {
             "name": "HTTP",  # 组件名
