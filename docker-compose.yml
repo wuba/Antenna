@@ -22,8 +22,8 @@ services:
     container_name: antenna
     volumes:
       - ./:/antenna
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone
+      - /etc/localtime:/etc/localtime
       - type: bind
         source: ./conf/antenna.ini
         target: /etc/supervisor.d/antenna.ini
@@ -39,6 +39,7 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: Antenna@58.com
+
 
 
       # 平台配置

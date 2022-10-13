@@ -5,6 +5,7 @@ from modules.config.models import Config
 from modules.config.setting import SERVER_IP, PLATFORM_DOMAIN
 from modules.task.models import TaskConfigItem
 import requests
+import json
 
 class BaseTemplate:
     info = [{

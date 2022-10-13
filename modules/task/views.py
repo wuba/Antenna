@@ -166,7 +166,6 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
                         "id": task_config_item_id,
                         "value": value}]
                 }
-
                 if template_record.type == 1:
                     listen_data_list.append(_data)
                 else:
@@ -186,11 +185,6 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_result_data(serializer.data)
-
         serializer = self.get_serializer(queryset, many=True)
         return self.get_result_data(serializer.data)
 

@@ -17,6 +17,7 @@ class MessageFilter(django_filters.FilterSet):
     domain_in = django_filters.CharFilter(field_name='domain', method='get_domain_in')
     message_id = django_filters.NumberFilter(field_name='id', method='get_message_id')
     content_contains = django_filters.CharFilter(field_name='content', method='get_content_contains')
+    domain_contains = django_filters.CharFilter(field_name='domain', method='get_domain_contains')
 
     def get_domain_in(self, queryset, name, value):
         a = value.replace("[", "").replace("]", "").split(",")
@@ -29,6 +30,8 @@ class MessageFilter(django_filters.FilterSet):
 
     def get_content_contains(self, queryset, name, value):
         return queryset.filter(content__contains=value)
+    def get_domain_contains(self, queryset, name, value):
+        return queryset.filter(domain__contains=value)
 
     class Meta:
         model = Message

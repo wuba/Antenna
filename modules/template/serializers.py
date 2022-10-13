@@ -1,8 +1,6 @@
-import json
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
-from modules.template.constants import PRIVATE_TYPES, CHOICE_TYPES
 from modules.template.models import Template, TemplateConfigItem
 
 
@@ -18,6 +16,7 @@ class TemplateInfoSerializer(serializers.ModelSerializer):
     desc = serializers.CharField(required=True, help_text="组件介绍")
     choice_type = serializers.IntegerField(required=True, help_text="组件是否支持多选")
     is_private = serializers.IntegerField(required=True, help_text="组件是否公开")
+    code = serializers.CharField(required=True, help_text="代码")
 
     def create(self, validated_data):
         validated_data["template_id"] = self.context["template_id"]
@@ -29,6 +28,10 @@ class TemplateInfoSerializer(serializers.ModelSerializer):
         if not template_item_info:
             raise serializers.ValidationError('组件配置信息为空')
         return template_item_info
+
+    def validate_code(self, code):
+        if not code:
+            raise serializers.ValidationError('代码不能为空')
 
     class Meta:
         model = Template
@@ -44,6 +47,8 @@ class UpdateTemplateInfoSerializer(serializers.Serializer):
     payload = serializers.CharField(required=True, help_text="组件实例格式")
     choice_type = serializers.IntegerField(required=True, help_text="组件是否支持多选")
     is_private = serializers.IntegerField(required=True, help_text="组件是否公开")
+    type = serializers.IntegerField(required=True, help_text="组件类型")
+    code = serializers.CharField(required=True, help_text="组件文件代码")
 
     def validate_template_id(self, template_id):
         template_record = Template.objects.filter(id=template_id, user_id=self.context["user"].id)
@@ -60,7 +65,7 @@ class UpdateTemplateInfoSerializer(serializers.Serializer):
 
 class DeleteTmplateSerializer(serializers.Serializer):
     """
-    删除缓存任务序列化器
+    删除组件序列化器
     """
     template_id = serializers.IntegerField(required=True, help_text="删除缓存任务")
 
