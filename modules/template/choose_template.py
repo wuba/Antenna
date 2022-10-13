@@ -27,7 +27,7 @@ def match_template(item, param_list=None):
         elif not c.info and c.__name__ == str(template_name):
             template_response = c().run(key, param_list)
 
-        return template_response
+    return template_response
 
 
 def view_template_code(filename, template_type):
