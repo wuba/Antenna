@@ -24,6 +24,7 @@ class Template(models.Model):
     is_private = models.IntegerField(choices=PRIVATE_TYPES.enum_list, default=PRIVATE_TYPES.PUBLIC,
                                      help_text='开放类型')
     payload = models.TextField(default="http://{domain}/{key}", help_text='利用代码实例')
+    code = models.TextField(default="this is a test code", help_text="文件代码")
 
     class Meta:
         db_table = 'template'

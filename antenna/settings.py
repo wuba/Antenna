@@ -32,7 +32,7 @@ PLATFORM_IP = os.getenv("PLATFORM_IP")
 SECRET_KEY = "django-insecure-$c$ul+6ti8f1-hkj-rkgjv$)im$c)8e)n-en4wx4lg=g!gu7ay"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "modules.template",
     "modules.api",
     "modules.config",
+
 ]
 
 MIDDLEWARE = [
@@ -62,7 +63,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -72,6 +73,7 @@ ROOT_URLCONF = "antenna.urls"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 ALLOWED_HOSTS = ["*"]
+
 
 TEMPLATES = [
     {
@@ -131,12 +133,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
-
+LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Shanghai'
-
 USE_I18N = True
-
 USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
