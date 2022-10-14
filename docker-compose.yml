@@ -14,7 +14,6 @@ services:
       - antenna
     restart: always
 
-
   antenna:
     build: ./
     image: antenna:latest
