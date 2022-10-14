@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 
 services:
   db:
@@ -15,8 +15,9 @@ services:
     restart: always
 
   antenna:
-    build: ./
-    image: antenna:latest
+    # 如果想本地打包镜像可使用该关键字 build: ./
+    image: jihongjun/antenna:latest
+    pull_policy: always
     depends_on:
       - db
     container_name: antenna
