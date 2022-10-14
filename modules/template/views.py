@@ -224,6 +224,17 @@ class TemplateViewSet(ModelViewSet):
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
 
+    # v1.2.2版本将废弃
+    @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated])
+    def upload_template(self, request, *args, **kwargs):
+        """
+        上传组件文件
+        """
+        code = self.request.FILES.get("code", None)
+        if not code:
+            return Response({"code": 0, "message": f"上传文件为空文件!"}, status=status.HTTP_200_OK)
+        return Response({"code": ""}, status=status.HTTP_200_OK)
+
     @action(methods=["GET"], detail=False, permission_classes=[IsAdminUser])
     def initial_template(self, request, *args, **kwargs):
         """
