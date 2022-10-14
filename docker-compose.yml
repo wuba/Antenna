@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3'
 
 services:
   db:
@@ -15,9 +15,8 @@ services:
     restart: always
 
   antenna:
-    # 如果想本地打包镜像可使用该关键字 build: ./
-    image: jihongjun/antenna:latest
-    pull_policy: always
+    build: ./
+    image: antenna:latest
     depends_on:
       - db
     container_name: antenna
@@ -40,9 +39,6 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: Antenna@58.com
-
-
-
       # 平台配置
       PLATFORM_DOMAIN: test.com
       PLATFORM_ENVIROMENT: docker
