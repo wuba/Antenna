@@ -181,7 +181,6 @@ class TemplateViewSet(ModelViewSet):
             template_id = data["template_id"]
             template_item_info = request.data["template_item_info"]
             del data["template_item_info"]
-            del data["file_name"]
             data["user_id"] = self.request.user.id
             data["auther"] = self.request.user.name
             Template.objects.filter(id=template_id).update(**data)
@@ -224,7 +223,6 @@ class TemplateViewSet(ModelViewSet):
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
 
-    # v1.2.2版本将废弃
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated])
     def upload_template(self, request, *args, **kwargs):
         """
@@ -233,7 +231,7 @@ class TemplateViewSet(ModelViewSet):
         code = self.request.FILES.get("code", None)
         if not code:
             return Response({"code": 0, "message": f"上传文件为空文件!"}, status=status.HTTP_200_OK)
-        return Response({"code": code}, status=status.HTTP_200_OK)
+        return Response({"code": code.read()}, status=status.HTTP_200_OK)
 
     @action(methods=["GET"], detail=False, permission_classes=[IsAdminUser])
     def initial_template(self, request, *args, **kwargs):

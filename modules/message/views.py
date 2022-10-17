@@ -227,12 +227,12 @@ def index(request):
         task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                          task__status=1).first()
         if task_config_item:
-            Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
+            Message.objects.create(domain=host, remote_addr=remote_addr, uri=path, header=headers,
                                    message_type=MESSAGE_TYPES.HTTP, content=message,
                                    task_id=task_config_item.task_id,
                                    template_id=task_config_item.template_id, html=raw_response,
                                    create_time=datetime.datetime.now())
-            send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
+            send_message(url=host, remote_addr=remote_addr, uri=path, header=headers,
                          message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
                          raw=raw_response)
     return HttpResponse('', content_type='text/html;charset=utf-8')
