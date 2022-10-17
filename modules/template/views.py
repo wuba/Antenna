@@ -233,7 +233,7 @@ class TemplateViewSet(ModelViewSet):
         code = self.request.FILES.get("code", None)
         if not code:
             return Response({"code": 0, "message": f"上传文件为空文件!"}, status=status.HTTP_200_OK)
-        return Response({"code": ""}, status=status.HTTP_200_OK)
+        return Response({"code": code}, status=status.HTTP_200_OK)
 
     @action(methods=["GET"], detail=False, permission_classes=[IsAdminUser])
     def initial_template(self, request, *args, **kwargs):
