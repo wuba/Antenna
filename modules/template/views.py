@@ -87,9 +87,8 @@ class TemplateViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             template_item_info = request.data["template_item_info"]
             del data["template_item_info"]
-            del data["file_name"]
             data["user_id"] = self.request.user.id
-            data["auther"] = self.request.user.name
+            data["auther"] = self.request.user.username
             file_name = f'{generate_code(10)}.py'
             data["file_name"] = file_name
             template_record = Template.objects.create(**data)
@@ -182,7 +181,7 @@ class TemplateViewSet(ModelViewSet):
             template_item_info = request.data["template_item_info"]
             del data["template_item_info"]
             data["user_id"] = self.request.user.id
-            data["auther"] = self.request.user.name
+            data["auther"] = self.request.user.username
             Template.objects.filter(id=template_id).update(**data)
             # 删除组件配置
             TemplateConfigItem.objects.filter(template_id=template_id).delete()
