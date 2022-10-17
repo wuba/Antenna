@@ -39,6 +39,7 @@
                         <p v-if="tags.header">header: {{ tags.header }}</p>
                         <p v-if="tags.content">content: {{ tags.content }}</p>
                         <p v-if="tags.uri">uri: {{ tags.uri }}</p>
+                        <p v-if="tags.html" v-html="tags.html"></p>
                     </div>
                 </a-table>
             </div>

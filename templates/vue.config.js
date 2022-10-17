@@ -26,7 +26,7 @@ const vueConfig = {
         disableHostCheck: true,
         proxy: {
             '^/api': {
-                target: 'http://58antenna.cn', //后端地址
+                target: 'http://antenna.58corp.com', //后端地址
                 ws: true, //是否代理websockets
                 changeOrigin: true,
             },
