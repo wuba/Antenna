@@ -13,7 +13,7 @@ class TemplateInfoSerializer(serializers.ModelSerializer):
                                                                              all(), message="标题名已存在")],
                                   help_text="组件标题")
     payload = serializers.CharField(required=True, help_text="组件实例格式")
-    desc = serializers.CharField(required=True, help_text="组件介绍")
+    desc = serializers.CharField(allow_blank=True, default="", help_text="组件介绍")
     choice_type = serializers.IntegerField(required=True, help_text="组件是否支持多选")
     is_private = serializers.IntegerField(required=True, help_text="组件是否公开")
     code = serializers.CharField(required=True, help_text="代码")
@@ -43,7 +43,7 @@ class UpdateTemplateInfoSerializer(serializers.Serializer):
     template_item_info = serializers.JSONField(required=True, help_text="组件配置信息")
     name = serializers.CharField(required=True, help_text="组件名")
     title = serializers.CharField(required=True, help_text="组件标题")
-    desc = serializers.CharField(required=True, help_text="组件介绍")
+    desc = serializers.CharField(allow_blank=True, default="", help_text="组件介绍")
     payload = serializers.CharField(required=True, help_text="组件实例格式")
     choice_type = serializers.IntegerField(required=True, help_text="组件是否支持多选")
     is_private = serializers.IntegerField(required=True, help_text="组件是否公开")
