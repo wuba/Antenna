@@ -32,5 +32,5 @@ urlpatterns = [
     re_path(
         r"^(js/.*|css/.*|img/.*)$", serve, {"document_root": settings.BASE_DIR / "static"}
     ),
-    re_path(".*", modules.message.views.HttplogView.as_view()),
+    re_path(".*", modules.message.views.index, name='index'),
 ]
