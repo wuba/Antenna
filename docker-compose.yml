@@ -14,6 +14,7 @@ services:
       - antenna
     restart: always
 
+
   antenna:
     build: ./
     image: antenna:latest
@@ -39,9 +40,6 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: Antenna@58.com
-
-
-
       # 平台配置
       PLATFORM_DOMAIN: test.com
       PLATFORM_ENVIROMENT: docker

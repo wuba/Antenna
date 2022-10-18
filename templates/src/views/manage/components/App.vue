@@ -12,7 +12,7 @@
                         <a-card-meta>
                             <div slot="title">
                                 {{ item.title }}
-                                <a-tag color="#108ee9" v-if="item.type === 1">利用组件</a-tag>
+                                <a-tag color="#108ee9" v-if="item.type === 0">利用组件</a-tag>
                                 <a-tag color="#f2ab24" v-else>监听组件</a-tag>
                             </div>
                             <a-avatar style="backgroundcolor: #87d068" class="card-avatar" slot="avatar" icon="fire" />
@@ -62,7 +62,7 @@ export default {
             pageSize: 10,
             total: 50,
             visible: false,
-            titles: '新增组建',
+            titles: '新增组件',
             content: '',
         }
     },
@@ -71,13 +71,15 @@ export default {
     },
     methods: {
         showModal() {
+            this.titles = '新增组件'
             this.visible = true
         },
         editComponent(item) {
             Service.template_info({ template: item.id }).then((res) => {
                 if (res.code === 1) {
-                    this.content = { ...item, ...res.data }
                     this.visible = true
+                    this.titles = '编辑组件'
+                    this.content = { ...item, ...res.data }
                 } else {
                     message.error(res.message)
                 }
@@ -94,7 +96,7 @@ export default {
             })
         },
         jump(text) {
-            window.open('https://github.com/wuba/Antenna#readme','_blank')
+            window.open('https://github.com/wuba/Antenna#readme', '_blank')
         },
         initData(params = {}) {
             let data = {

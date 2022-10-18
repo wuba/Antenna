@@ -39,6 +39,8 @@
                         <p v-if="tags.header">header: {{ tags.header }}</p>
                         <p v-if="tags.content">content: {{ tags.content }}</p>
                         <p v-if="tags.uri">uri: {{ tags.uri }}</p>
+                        <a-divider v-show="tags.html" />
+                        <p v-show="tags.html" v-for="(item, key) in tags.html.split('\n')" :key="key">{{ item }}</p>
                     </div>
                 </a-table>
             </div>
