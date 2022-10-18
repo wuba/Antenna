@@ -23,4 +23,4 @@ jobs:
         with:
           push: true
           file: ./Dockerfile
-          tags: ${{ steps.get_version.outputs.VERSION }},jihongjun/antenna:latest
+          tags: jihongjun/antenna:${{ steps.tag.outputs.tag }},jihongjun/antenna:latest
