@@ -42,10 +42,9 @@ class TemplateViewSet(ModelViewSet):
         else:
             file_path = f"/depend/listen/{file_name}"
         file_path = base_path + file_path
-        destination = open(file_path, 'wb')  # 保存组件文件
+        destination = open(file_path, 'w')  # 保存组件文件
         try:
-            for chunk in code.chunks():  # 分块写入文件
-                destination.write(chunk)
+            destination.write(code)
         finally:
             destination.close()
 
@@ -87,9 +86,8 @@ class TemplateViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             template_item_info = request.data["template_item_info"]
             del data["template_item_info"]
-            del data["file_name"]
             data["user_id"] = self.request.user.id
-            data["auther"] = self.request.user.name
+            data["author"] = self.request.user.username
             file_name = f'{generate_code(10)}.py'
             data["file_name"] = file_name
             template_record = Template.objects.create(**data)
@@ -178,12 +176,12 @@ class TemplateViewSet(ModelViewSet):
             data = request.data
             serializer = UpdateTemplateInfoSerializer(data=data, context={'user': request.user})
             serializer.is_valid(raise_exception=True)
-            template_id = data["template_id"]
+            template_id = int(data["template_id"])
             template_item_info = request.data["template_item_info"]
             del data["template_item_info"]
-            del data["file_name"]
+            del data["template_id"]
             data["user_id"] = self.request.user.id
-            data["auther"] = self.request.user.name
+            data["author"] = self.request.user.username
             Template.objects.filter(id=template_id).update(**data)
             # 删除组件配置
             TemplateConfigItem.objects.filter(template_id=template_id).delete()
@@ -192,7 +190,7 @@ class TemplateViewSet(ModelViewSet):
                 config = list(template_item["config"])
                 TemplateConfigItem.objects.create(name=item_name, config=config, template_id=template_id)
             # 修改文件
-            file_name = Template.objects.get(template_id=template_id).file_name
+            file_name = Template.objects.get(id=template_id).file_name
             template_type = data["type"]
             code = data["code"]
             self.write_template_file_path(template_type, file_name, code)
@@ -224,7 +222,6 @@ class TemplateViewSet(ModelViewSet):
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
 
-    # v1.2.2版本将废弃
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated])
     def upload_template(self, request, *args, **kwargs):
         """
@@ -233,7 +230,7 @@ class TemplateViewSet(ModelViewSet):
         code = self.request.FILES.get("code", None)
         if not code:
             return Response({"code": 0, "message": f"上传文件为空文件!"}, status=status.HTTP_200_OK)
-        return Response({"code": ""}, status=status.HTTP_200_OK)
+        return Response({"code": code.read()}, status=status.HTTP_200_OK)
 
     @action(methods=["GET"], detail=False, permission_classes=[IsAdminUser])
     def initial_template(self, request, *args, **kwargs):

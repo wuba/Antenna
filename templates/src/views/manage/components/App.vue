@@ -77,9 +77,9 @@ export default {
         editComponent(item) {
             Service.template_info({ template: item.id }).then((res) => {
                 if (res.code === 1) {
+                    this.visible = true
                     this.titles = '编辑组件'
                     this.content = { ...item, ...res.data }
-                    this.visible = true
                 } else {
                     message.error(res.message)
                 }

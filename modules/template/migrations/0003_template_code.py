@@ -15,4 +15,7 @@ class Migration(migrations.Migration):
             name='code',
             field=models.TextField(default='this is a test code', help_text='文件代码'),
         ),
+        migrations.RunSQL(
+            "update template SET file_name = 'httplog.py' WHERE id = 7;",
+        )
     ]
