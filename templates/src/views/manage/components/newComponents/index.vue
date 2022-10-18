@@ -338,8 +338,10 @@ export default {
                         }
                     })
                     template_item_info.push({ item_name: values[key], config: arr })
+                    delete values[key]
                 }
             })
+            delete values.keys
             values.template_item_info = template_item_info
         },
         callingInter(values) {
