@@ -86,6 +86,7 @@ class TemplateViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             template_item_info = request.data["template_item_info"]
             del data["template_item_info"]
+            del data["template_id"]
             data["user_id"] = self.request.user.id
             data["author"] = self.request.user.username
             file_name = f'{generate_code(10)}.py'
