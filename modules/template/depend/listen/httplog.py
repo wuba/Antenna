@@ -92,7 +92,7 @@ class HttpTemplate(BaseTemplate):
             "desc_url": "",  # 组件使用说明链接
             "choice_type": 0,  # 组件选择类型0是单选，1是多选
             "payload": "http://{key}.{domain}/",
-            "file_name": "http.py",
+            "file_name": "httplog.py",
         },
         "item_info": [{
             "name": "http_log",

@@ -217,10 +217,11 @@ def index(request):
             else:
                 Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
                                        message_type=MESSAGE_TYPES.HTTP, content=message,
-                                       task_id=task_config_item.task_id,
+                                       task_id=task_config_item.task_id, html=raw_response,
                                        template_id=task_config_item.template_id)
                 send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
-                             message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id)
+                             message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
+                             raw=raw_response)
 
     # http 请求日志
     elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
