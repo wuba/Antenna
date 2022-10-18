@@ -32,29 +32,25 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 Antenna_Inside计划，如果您是使用扫描工具的用户或者作者请联系我们，我们会无条件支持您的项目与
 需求，帮助Antenna更方便的与漏洞扫描流程打通。如果您有推荐打通的项目，也可以在issue中提出来
 
-已加入Antenna_Inside项目与进度
+已加入Antenna_Inside项目
 
-| 项目名称       | 项目地址                                                                       | 项目进度 |
-|------------|----------------------------------------------------------------------------|------|
-| EasyPen    | [https://github.com/lijiejie/EasyPen](https://github.com/lijiejie/EasyPen) | 正在对接 |
+| 项目名称       | 项目地址                                                                       |
+|------------|----------------------------------------------------------------------------|
+| EasyPen    | [https://github.com/lijiejie/EasyPen](https://github.com/lijiejie/EasyPen) |
 
 
 ## 近期使用疑问解答
 
-#### 1、关于docker部署发现平台配置保存后不能及时更新的问题
 
-回答：更新完配置需在宿主机重新运行命令 **docker-compose restart** 后配置才能更新
-不需要重启mysql容器
-
-#### 2、关于各类组件的使用说明以及能否再详细的进行说明自定义组件开发教程
+#### 1、关于各类组件的使用说明以及能否再详细的进行说明自定义组件开发教程
 
 回答：文章将在Antenna博客不定时更新，基础文章已有，后续详细的也会有的，作者在加班加点的写，绝不会让各位师傅等太久
 
-#### 3、运行docker-compose命令后镜像构建时间过长
+#### 2、运行docker-compose命令后镜像构建时间过长
 
-回答：可能是您的服务器在境外，可将Dockerfile中替换镜像源的命令注释掉
+回答：可修改docker-compose文件中镜像,系统镜像已打包至dockerhub https://hub.docker.com/r/jihongjun/antenna/tags
 
-#### 4、镜像部署总是遇到各种权限不允许的错误
+#### 3、镜像部署总是遇到各种权限不允许的错误
 
 回答：可将docker下列内容删除
 
@@ -74,9 +70,8 @@ USER antenna
 ## 相关教程链接
 ### 最新公告
 
-Antenna 最新chrome扩展 chrome-tools(试用版)发布[Antenna-tools 使用教程](http://blog.antenna.cool/blog/antenna_plugin)
+Antenna chrome扩展 antenna-tools(试用版)发布[Antenna-tools 使用教程](http://blog.antenna.cool/blog/antenna_plugin)
 
-v1.0版本发布公告及使用要点:[Antenna V1.0 发布公告](http://blog.antenna.cool/blog/v1.0)
 
 ### 关于部署
 基础部署教程:[安装部署](http://blog.antenna.cool/docs/intro)
@@ -105,6 +100,7 @@ xss 组件使用教程:[xss组件使用教程](http://blog.antenna.cool/docs/%E5
 
 组件开发教程:[如何编写Antenna组件](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template_demo)
 
+自定义HTTP组件使用教程[自定义HTTP组件使用教程](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/custom_http)
 ### 关于OPEN_API与CallBack
 
 OPEN_API与CallBack使用教程:[关于OPEN_API与CallBack](http://blog.antenna.cool/docs/api_back)
