@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "_prepare": "vue-cli-service build && rm -rf node_modules && cd deploy && npm i",
+        "_prepare": "vue-cli-service build && rm -rf node_modules && rm -r ../static && mv ./dist/ ../static && cd deploy && npm i",
         "start": "pm2 start ./deploy/server.js --name cloud",
         "stop": "pm2 stop cloud",
         "serve": "vue-cli-service serve",
@@ -23,7 +23,8 @@
         "intro.js": "6.0.0",
         "nprogress": "0.2.0",
         "vue": "2.6.11",
-        "vue-router": "3.2.0"
+        "vue-router": "3.2.0",
+        "vue2-ace-editor": "^0.0.15"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "4.5.0",
