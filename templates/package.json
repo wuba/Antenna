@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "_prepare": "vue-cli-service build && rm -rf node_modules && cd deploy && npm i",
+        "_prepare": "vue-cli-service build && rm -rf node_modules && rm -r ../static && mv ./dist/ ../static && cd deploy && npm i",
         "start": "pm2 start ./deploy/server.js --name cloud",
         "stop": "pm2 stop cloud",
         "serve": "vue-cli-service serve",
