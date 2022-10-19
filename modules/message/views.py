@@ -205,7 +205,7 @@ def index(request):
     headers = dict((regex.sub('', header), value) for (header, value) in request.META.items() if
                    header.startswith('HTTP_'))
     # 利用组件返回response
-    if host == PLATFORM_DOMAIN and path == os.environ.get('LOGIN_PATH'):
+    if path == os.environ.get('LOGIN_PATH'):
         return render(request, '../static/index.html')
     elif len(path) == 4:
         task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
