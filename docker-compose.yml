@@ -46,7 +46,7 @@ services:
       #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
       LOGIN_PATH: ''
       PLATFORM_ROOT_USER: antenna@58.com
-
+      PLATFORM_ROOT_PWD: antenna@58.com
       # DNS配置
       DNS_DOMAIN: test.cn
       NS1_DOMAIN: ns1.test.cn

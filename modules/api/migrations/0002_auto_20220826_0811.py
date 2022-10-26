@@ -3,16 +3,18 @@ import os
 
 from django.db import migrations
 from utils.helper import create_salt
-
+from django.contrib.auth.hashers import make_password
 
 def create_apikey(apps, schema_editor):
     # We can't import the Person model directly as it may be a newer
     # version than this migration expects. We use the historical version.
     User = apps.get_model("auth", "User")
     root_name = os.environ.get('PLATFORM_ROOT_USER')
+    root_pwd = os.environ.get('PLATFORM_ROOT_PWD')
+    sha256_pwd = make_password(root_pwd,None,'pbkdf2_sha256') 
     user = User.objects.create(
         id=1,
-        password="pbkdf2_sha256$260000$xGOtY8UIDmVOhMxxf97MrC$zyrByum510+7GTa/lr1WaVLNh+cbFzJuuxnM81OTYcw=",
+        password=sha256_pwd,
         is_superuser=0,
         username=root_name,
         email=root_name,
