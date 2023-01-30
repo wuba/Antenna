@@ -23,8 +23,6 @@ services:
     container_name: antenna
     volumes:
       - ./:/antenna
-      - /etc/timezone:/etc/timezone
-      - /etc/localtime:/etc/localtime
       - type: bind
         source: ./conf/antenna.ini
         target: /etc/supervisor.d/antenna.ini

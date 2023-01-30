@@ -5,8 +5,11 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/re
   && apk --no-cache add python3 py3-pip python3-dev supervisor \
     mariadb-connector-c-dev libc-dev git libffi-dev libxml2-dev \
     libxslt-dev libressl-dev gcc
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo 'Asia/Shanghai'>/etc/timezone
+
+RUN apk add --no-cache tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone \
+    && apk del tzdata
 
 ADD . /antenna
 WORKDIR /antenna
