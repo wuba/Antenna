@@ -12,7 +12,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
 from modules.template.depend.base import BaseTemplate
-from modules.config.setting import PLATFORM_DOMAIN
+from modules.config import setting
 
 class ProxyWebProtocol(Protocol):
 
@@ -66,7 +66,7 @@ class ProxyProtocol(Protocol):
         # url = part1[7:index3]
         # print('get the url: ', url)
         proxy_factory = ProxyWebFactory(self.request, self)
-        reactor.connectTCP(PLATFORM_DOMAIN, 80, proxy_factory)
+        reactor.connectTCP(setting.PLATFORM_DOMAIN, 80, proxy_factory)
 
     # self.transport.loseConnection()
 

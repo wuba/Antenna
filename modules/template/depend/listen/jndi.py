@@ -12,7 +12,7 @@ sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
-from modules.config.setting import DNS_DOMAIN, JNDI_PORT, SERVER_IP
+from modules.config import setting
 from modules.message.models import Message
 from modules.task.models import Task, TaskConfig
 from modules.template.depend.base import BaseTemplate
@@ -131,7 +131,7 @@ class SocketTemplate(BaseTemplate):
 
 def main():
     jndi_server = SocketTemplate()
-    jndi_server.start("0.0.0.0", JNDI_PORT)
+    jndi_server.start("0.0.0.0", setting.JNDI_PORT)
 
 
 if __name__ == "__main__":

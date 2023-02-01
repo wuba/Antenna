@@ -16,7 +16,7 @@ sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
-from modules.config.setting import DNS_DOMAIN, DNS_PORT, NS1_DOMAIN, NS2_DOMAIN, SERVER_IP
+from modules.config import setting
 from modules.message.models import Message
 from modules.task.models import TaskConfig, TaskConfigItem
 from modules.template.depend.base import BaseTemplate
@@ -44,8 +44,8 @@ class MysqlLogger():
     def log_request(self, handler, request):
         domain = request.q.qname.__str__()
         # print('domain=======>', domain)
-        if domain.endswith(DNS_DOMAIN + '.'):
-            udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
+        if domain.endswith(setting.DNS_DOMAIN + '.'):
+            udomain = re.search(r'\.?([^\.]+)\.%s\.' % setting.DNS_DOMAIN, domain)
             # print('udomain=======>', udomain)
             if udomain:
                 # print("udomain.group(1))======>", udomain.group(1))
@@ -129,10 +129,10 @@ def main():
 *.{dnsdomain}.       IN      A       {serverip}
 {dnsdomain}.         IN      A       {serverip}
 '''.format(
-            dnsdomain=DNS_DOMAIN,
-            ns1domain=NS1_DOMAIN,
-            ns2domain=NS2_DOMAIN,
-            serverip=SERVER_IP)
+            dnsdomain=setting.DNS_DOMAIN,
+            ns1domain=setting.NS1_DOMAIN,
+            ns2domain=setting.NS2_DOMAIN,
+            serverip=setting.SERVER_IP)
         resolver = ZoneResolver(zone, True)
         print("当前DNS解析表:\r\n" + zone)
         logger = MysqlLogger()
