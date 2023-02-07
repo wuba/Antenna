@@ -24,15 +24,15 @@ def main():
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2 and sys.argv[1] == 'runserver':
-        p = multiprocessing.Process(target=dnslog.main)
+        # p = multiprocessing.Process(target=dnslog.main)
         p2 = multiprocessing.Process(target=jndi.main)
         p3 = multiprocessing.Process(target=ftplog.main)
         p4 = multiprocessing.Process(target=httpslog.main)
-        p.daemon = True
+        # p.daemon = True
         p2.daemon = True
         p3.daemon = True
         p4.daemon = True
-        p.start()
+        # p.start()
         p2.start()
         p3.start()
         p4.start()

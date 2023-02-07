@@ -14,6 +14,7 @@
 #    echo "#####Django服务启动成功#####"
 #  fi
 #fi
-
+cp ../conf/antenna.ini /etc/supervisord.d/antenna.ini
+echo "antenna.ini cp success!"
 unlink /run/supervisord.sock
-supervisord -n -c /etc/supervisord.conf
+supervisord -c /etc/supervisord.conf

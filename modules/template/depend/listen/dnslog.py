@@ -8,14 +8,12 @@ import django
 from dnslib import QTYPE, RCODE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
 
-from modules.message.constants import MESSAGE_TYPES
-from utils.helper import send_message
-
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
-
+from utils.helper import send_message
+from modules.message.constants import MESSAGE_TYPES
 from modules.config import setting
 from modules.message.models import Message
 from modules.task.models import TaskConfig, TaskConfigItem
@@ -132,12 +130,12 @@ def main():
             dnsdomain=setting.DNS_DOMAIN,
             ns1domain=setting.NS1_DOMAIN,
             ns2domain=setting.NS2_DOMAIN,
-            serverip=setting.SERVER_IP)
+            serverip=setting.DNS_DOMAIN_IP)
         resolver = ZoneResolver(zone, True)
         print("当前DNS解析表:\r\n" + zone)
         logger = MysqlLogger()
         # print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
-        udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
+        udp_server = DNSServer(resolver, port=setting.DNS_PORT, address="0.0.0.0", logger=logger)
         udp_server.start()
     except Exception as e:
         print(e)

@@ -37,9 +37,22 @@ EMAIL_PORT = int(config_record.get(name="EMAIL_PORT").value)
 EMAIL_HOST_USER = config_record.get(name="EMAIL_HOST").value
 # 邮箱授权码
 EMAIL_HOST_PASSWORD = config_record.get(name="EMAIL_HOST_PASSWORD").value
+# 隐藏后台地址
+LOGIN_PATH = config_record.get(name="LOGIN_PATH").value
+# 消息七天保存
+SAVE_MESSAGE_SEVEN_DAYS = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
+# DNS 端口
+DNS_PORT = int(config_record.get(name="DNS_PORT").value)
+# DNS域名解析IP
+DNS_DOMAIN_IP = config_record.get(name="DNS_DOMAIN_IP").value
+# FTP 端口
+FTP_PORT = int(config_record.get(name="FTP_PORT"))
+# HTTPS 端口
+HTTPS_PORT = int(config_record.get(name="HTTPS_PORT"))
 
 
-def reload_config():
+
+def reload_config(type):
     config_record = Config.objects.all()
     globals()['PLATFORM_DOMAIN'] = config_record.get(name="PLATFORM_DOMAIN").value
     globals()['DNS_DOMAIN'] = config_record.get(name="DNS_DOMAIN").value

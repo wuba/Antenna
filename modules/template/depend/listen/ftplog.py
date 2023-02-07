@@ -16,6 +16,7 @@ from modules.message.models import Message
 from modules.task.models import TaskConfigItem
 from modules.template.depend.base import BaseTemplate
 from utils.helper import send_message
+from modules.config import setting
 
 WELCOME_MSG = b'220 (vsFTPd 2.0.5) '
 GOODBYE_MSG = b'221 Goodbye.'
@@ -110,7 +111,7 @@ class FtpTemplate(BaseTemplate):
 
 def main():
     try:
-        reactor.listenTCP(21, FtpFactory())
+        reactor.listenTCP(setting.FTP_PORT, FtpFactory())
         print("FTP 协议监听模块已开启 21 port starting listen ...")
         reactor.run()
     except Exception as e:

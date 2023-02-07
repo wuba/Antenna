@@ -104,9 +104,9 @@ class HttpsTemplate(BaseTemplate):
 def main():
     try:
         factory = ProxyFactory()
-        reactor.listenSSL(443, factory,
-                          ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/depend/listen/keys/server.key',
-                                                           f'{PROJECT_ROOT}/depend/listen/keys/server.crt'))
+        reactor.listenSSL(setting.HTTPS_PORT, factory,
+                          ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/conf/server.key',
+                                                           f'{PROJECT_ROOT}/conf/server.crt'))
 
         reactor.run()
         print("HTTPS 协议监听模块已开启 443 port starting listen ...")
