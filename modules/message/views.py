@@ -21,7 +21,7 @@ from rest_framework.viewsets import GenericViewSet
 from django.db.models import Avg, Max, Min, Count, Sum, Q
 from utils.helper import get_payload, send_message, get_message_type_name, reconstruct_request, get_param_message
 from modules.task.constants import TASK_TMP
-from modules.config.setting import PLATFORM_DOMAIN
+from modules.config import setting
 from utils.helper import is_base64
 
 
@@ -224,7 +224,7 @@ def index(request):
                              raw=raw_response)
 
     # http 请求日志
-    elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
+    elif len(domain_key) == 4 and domain_key != setting.PLATFORM_DOMAIN.split('.')[0]:
         task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                          task__status=1).first()
         if task_config_item:
