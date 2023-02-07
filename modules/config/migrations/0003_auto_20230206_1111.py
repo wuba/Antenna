@@ -35,4 +35,5 @@ class Migration(migrations.Migration):
         ('config', '0002_auto_20220826_0751'),
     ]
     operations = [
+        migrations.RunPython(create_default_config),
     ]
