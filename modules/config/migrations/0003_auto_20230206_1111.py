@@ -16,30 +16,19 @@ def create_default_config(apps, schema_editor):
     ftp_port = os.getenv("FTP_PORT")
     https_port = os.getenv("HTTPS_PORT")
 
-    Config.objects.bulk_update([
-        Config(name="SERVER_IP", type=0, ),
-        Config(name="OPEN_EMAIL", type=2, ),
-        Config(name="EMAIL_HOST", type=2, ),
-        Config(name="EMAIL_PORT", type=2, ),
-        Config(name="EMAIL_HOST_USER", type=2, ),
-        Config(name="EMAIL_HOST_PASSWORD", type=2, ),
-        Config(name="NS1_DOMAIN", type=4, ),
-        Config(name="NS2_DOMAIN", type=4, ),
-        Config(name="DNS_DOMAIN", type=4, ),
-        Config(name="JNDI_PORT", type=5, ),
-
-    ])
-
     Config.objects.bulk_create(
         [
             Config(name="LOGIN_PATH", type=0, value=login_path),
-            Config(name="SAVE_MESSAGE_SEVEN_DAYS", type=3, value=save_message_seven_days),
-            Config(name="DNS_PORT", type=4, value=dns_port),
-            Config(name="DNS_DOMAIN_IP", type=4, value=dns_domain_ip),
-            Config(name="FTP_PORT", type=7, value=ftp_port),
-            Config(name="HTTPS_PORT", type=6, value=https_port)
+            Config(name="SAVE_MESSAGE_SEVEN_DAYS", type=0, value=save_message_seven_days),
+            Config(name="DNS_PORT", type=1, value=dns_port),
+            Config(name="DNS_DOMAIN_IP", type=1, value=dns_domain_ip),
+            Config(name="FTP_PORT", type=1, value=ftp_port),
+            Config(name="HTTPS_PORT", type=1, value=https_port)
         ]
     )
+
+
+
 
 class Migration(migrations.Migration):
     dependencies = [
