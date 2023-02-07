@@ -10,7 +10,7 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
-from modules.config.setting import PLATFORM_DOMAIN
+
 from modules.message.constants import MESSAGE_TYPES
 from modules.message.models import Message
 from modules.task.models import TaskConfigItem
@@ -47,11 +47,11 @@ class Ftp(LineReceiver):
                                                          task__status=1).first()
         if task_config_item and (
             task_config_item.template.name == "FTP" or task_config_item.template.name == "XXE"):
-            Message.objects.create(domain=PLATFORM_DOMAIN, message_type=MESSAGE_TYPES.FTP,
+            Message.objects.create(domain=setting.PLATFORM_DOMAIN, message_type=MESSAGE_TYPES.FTP,
                                    remote_addr=self.remote_addr,
                                    task_id=task_config_item.task_id, template_id=task_config_item.template_id,
                                    content=self.content)
-            send_message(url=PLATFORM_DOMAIN, remote_addr=self.remote_addr, uri='', header='',
+            send_message(url=setting.PLATFORM_DOMAIN, remote_addr=self.remote_addr, uri='', header='',
                          message_type=MESSAGE_TYPES.HTTP, content=self.content,
                          task_id=task_config_item.task_id)
 
