@@ -23,7 +23,7 @@ def create_default_config(apps, schema_editor):
             Config(name="DNS_PORT", type=1, value=dns_port),
             Config(name="DNS_DOMAIN_IP", type=1, value=dns_domain_ip),
             Config(name="FTP_PORT", type=1, value=ftp_port),
-            Config(name="HTTPS_PORT", type=1, value=https_port)
+            Config(name="HTTPS_PORT", type=1, value=https_port),
         ]
     )
 
