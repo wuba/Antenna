@@ -16,7 +16,7 @@ def create_default_config(apps, schema_editor):
     ftp_port = os.getenv("FTP_PORT")
     https_port = os.getenv("HTTPS_PORT")
 
-    Config.objects.bulk_create(
+    Config.objects.create(
         [
             Config(name="LOGIN_PATH", type=0, value=login_path),
             Config(name="SAVE_MESSAGE_SEVEN_DAYS", type=0, value=save_message_seven_days),
