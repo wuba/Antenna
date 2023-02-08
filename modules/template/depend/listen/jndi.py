@@ -5,9 +5,7 @@ import sys
 
 import django
 
-from utils.helper import send_message
-
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
@@ -17,6 +15,7 @@ from modules.message.models import Message
 from modules.task.models import Task, TaskConfig
 from modules.template.depend.base import BaseTemplate
 from modules.message.constants import MESSAGE_TYPES
+from utils.helper import send_message
 
 
 class SocketTemplate(BaseTemplate):

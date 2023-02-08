@@ -40,16 +40,19 @@ try:
     # 隐藏后台地址
     LOGIN_PATH = config_record.get(name="LOGIN_PATH").value
     # 消息七天保存
-    SAVE_MESSAGE_SEVEN_DAYS = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
+    SAVE_MESSAGE_SEVEN_DAYS = int(get_bool(config_record.get(name="SAVE_MESSAGE_SEVEN_DAYS").value))
     # DNS 端口
     DNS_PORT = int(config_record.get(name="DNS_PORT").value)
     # DNS域名解析IP
     DNS_DOMAIN_IP = config_record.get(name="DNS_DOMAIN_IP").value
+    # DNS_DOMAIN_IP = "127.0.0.1"
     # FTP 端口
-    FTP_PORT = int(config_record.get(name="FTP_PORT"))
+    FTP_PORT = int(config_record.get(name="FTP_PORT").value)
     # HTTPS 端口
-    HTTPS_PORT = int(config_record.get(name="HTTPS_PORT"))
+    HTTPS_PORT = int(config_record.get(name="HTTPS_PORT").value)
+
 except Exception as e:
+    print(e)
     pass
 
 
@@ -68,3 +71,9 @@ def reload_config(type):
     globals()['EMAIL_PORT'] = int(config_record.get(name="EMAIL_PORT").value)
     globals()['EMAIL_HOST_USER'] = config_record.get(name="EMAIL_HOST").value
     globals()['EMAIL_HOST_PASSWORD'] = config_record.get(name="EMAIL_HOST_PASSWORD").value
+    globals()['LOGIN_PATH'] = config_record.get(name="LOGIN_PATH").value
+    globals()['SAVE_MESSAGE_SEVEN_DAYS'] = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
+    globals()['DNS_PORT'] = int(config_record.get(name="DNS_PORT").value)
+    globals()['DNS_DOMAIN_IP'] = config_record.get(name="DNS_DOMAIN_IP").value
+    globals()['FTP_PORT'] = int(config_record.get(name="FTP_PORT").value)
+    globals()['HTTPS_PORT'] = int(config_record.get(name="HTTPS_PORT").value)
