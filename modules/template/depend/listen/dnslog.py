@@ -9,7 +9,7 @@ from dnslib import QTYPE, RCODE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
-print(PROJECT_ROOT)
+print(os.path.abspath(os.path.dirname(__file__)+ "../../../../"))
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
