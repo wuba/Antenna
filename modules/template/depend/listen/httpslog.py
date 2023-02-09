@@ -58,7 +58,6 @@ class ProxyProtocol(Protocol):
     def dataReceived(self, data):
         self.request = data
         index1 = self.request.index(b' ')
-        print(self.request)
         index2 = self.request.index(b' ', index1 + 1)
         if (index1 == -1) or (index2 == -1):
             raise Exception('http url error')
