@@ -15,7 +15,7 @@ from modules.message.constants import MESSAGE_TYPES
 from modules.message.models import Message
 from modules.task.models import TaskConfigItem
 from modules.template.depend.base import BaseTemplate
-from utils.helper import send_message
+from utils.helper import send_message, send_email_message
 from modules.config import setting
 
 WELCOME_MSG = b'220 (vsFTPd 2.0.5) '
@@ -47,6 +47,8 @@ class Ftp(LineReceiver):
                                                          task__status=1).first()
         if task_config_item and (
             task_config_item.template.name == "FTP" or task_config_item.template.name == "XXE"):
+            username = task_config_item.task.user.username
+            send_email_message(username, self.remote_addr)
             Message.objects.create(domain=setting.PLATFORM_DOMAIN, message_type=MESSAGE_TYPES.FTP,
                                    remote_addr=self.remote_addr,
                                    task_id=task_config_item.task_id, template_id=task_config_item.template_id,

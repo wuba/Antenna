@@ -15,7 +15,7 @@ from modules.message.models import Message
 from modules.task.models import Task, TaskConfig
 from modules.template.depend.base import BaseTemplate
 from modules.message.constants import MESSAGE_TYPES
-from utils.helper import send_message
+from utils.helper import send_message, send_email_message
 
 
 class SocketTemplate(BaseTemplate):
@@ -85,6 +85,8 @@ class SocketTemplate(BaseTemplate):
                 task_config_record = TaskConfig.objects.get(key=path)
                 if task_config_record:
                     task_id = task_config_record.task_id
+                    username = task_config_record.task.user.username
+                    send_email_message(username, remote_addr)
                     Message.objects.create(domain=self.domain, remote_addr=remote_addr, uri=path,
                                            message_type=MESSAGE_TYPES.LDAP, task_id=task_id, template_id=10)
                     send_message(url=self.domain, remote_addr=remote_addr, uri=path, header='',
@@ -100,6 +102,8 @@ class SocketTemplate(BaseTemplate):
                 remote_addr = addr[0]
                 task_config_record = TaskConfig.objects.get(key=path)
                 if task_config_record:
+                    username = task_config_record.task.user.username
+                    send_email_message(username, remote_addr)
                     task_id = task_config_record.task_id
                     Message.objects.create(domain=self.domain, remote_addr=remote_addr, uri=path,
                                            message_type=MESSAGE_TYPES.RMI, task_id=task_id, template_id=10)

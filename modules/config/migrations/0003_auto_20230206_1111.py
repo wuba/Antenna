@@ -8,13 +8,11 @@ def create_default_config(apps, schema_editor):
     # We can't import the Person model directly as it may be a newer
     # version than this migration expects. We use the historical version.
     Config = apps.get_model("config", "Config")
-    # from modules.config.models import Config
     login_path = os.getenv("LOGIN_PATH")
     save_message_seven_days = os.getenv("SAVE_MESSAGE_SEVEN_DAYS")
     dns_port = os.getenv("DNS_PORT")
     dns_domain_ip = os.getenv("DNS_DOMAIN_IP")
-    ftp_port = os.getenv("FTP_PORT")
-    https_port = os.getenv("HTTPS_PORT")
+    register_type = os.getenv("REGISTER_TYPE")
 
     Config.objects.bulk_create(
         [
@@ -22,12 +20,9 @@ def create_default_config(apps, schema_editor):
             Config(name="SAVE_MESSAGE_SEVEN_DAYS", type=0, value=save_message_seven_days),
             Config(name="DNS_PORT", type=1, value=dns_port),
             Config(name="DNS_DOMAIN_IP", type=1, value=dns_domain_ip),
-            Config(name="FTP_PORT", type=1, value=ftp_port),
-            Config(name="HTTPS_PORT", type=1, value=https_port),
+            Config(name="REGISTER_TYPE", type=1, value=register_type),
         ]
     )
-
-
 
 
 class Migration(migrations.Migration):

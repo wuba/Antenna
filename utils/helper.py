@@ -137,7 +137,7 @@ def get_payload(key, payload):
     """
 
     return payload.replace("{domain}", setting.PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}",
-                                                                                      str(setting.JNDI_PORT)).replace(
+                                                                                              str(setting.JNDI_PORT)).replace(
         "{dns_domain}", setting.DNS_DOMAIN)
 
 
@@ -168,6 +168,14 @@ def send_mail(to, message):
     except Exception as e:
         print(e)
         return False
+
+
+def send_email_message(username, ip):
+    """接收到消息发送给对应用户"""
+    if setting.OPEN_EMAIL == 1:
+        message = f"""
+    【ANTENNA】平台接收到来自{ip}的请求,请查看"""
+        send_mail(username, message)
 
 
 def is_base64(content):

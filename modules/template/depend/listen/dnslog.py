@@ -13,7 +13,7 @@ print(os.path.abspath(os.path.dirname(__file__)+ "../../../../"))
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
-from utils.helper import send_message
+from utils.helper import send_message, send_email_message
 from modules.message.constants import MESSAGE_TYPES
 from modules.config import setting
 from modules.message.models import Message
@@ -52,6 +52,8 @@ class MysqlLogger():
                 task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                                  task__status=1).first()
                 if task_config_item and task_config_item.template.name == "DNS":
+                    username = task_config_item.task.user.username
+                    send_email_message(username, handler.client_address[0])
                     domain = domain.strip(".")
                     Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
                                            remote_addr=handler.client_address[0],
