@@ -6,7 +6,7 @@ import re
 from twisted.internet import reactor
 from twisted.internet.protocol import Factory, Protocol
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
@@ -16,7 +16,7 @@ from modules.message.constants import MESSAGE_TYPES
 from modules.message.models import Message
 from modules.task.models import TaskConfigItem
 from modules.template import choose_template
-from utils.helper import send_message
+from utils.helper import send_message, send_email_message
 
 
 class HTTP(Protocol):
@@ -59,6 +59,8 @@ Connection: Closed
                 return template_response
                 pass
             else:
+                username = task_config_item.task.user.username
+                send_email_message(username, self.remote_addr)
                 Message.objects.create(domain=self.domain, remote_addr=self.remote_addr, uri=path, header="",
                                        message_type=MESSAGE_TYPES.HTTP, content=self.html,
                                        task_id=task_config_item.task_id,
@@ -69,7 +71,9 @@ Connection: Closed
     def connectionLost(self, reason):
         task_config_item = TaskConfigItem.objects.filter(task_config__key=self.key,
                                                          task__status=1).first()
-        if task_config_item and task_config_item.template.name == "HTTP":
+        if task_config_item and task_config_item.template.name == "HTTP" or task_config_item.template.name == "HTTPS":
+            username = task_config_item.task.user.username
+            send_email_message(username, self.remote_addr)
             Message.objects.create(domain=self.domain + '/' + self.uri, message_type=MESSAGE_TYPES.HTTPS,
                                    remote_addr=self.remote_addr,
                                    task_id=task_config_item.task_id,

@@ -1,6 +1,6 @@
 from modules.api.models import ApiKey
 from modules.api.serializers import ApiKeySerializer
-from modules.config.setting import PLATFORM_DOMAIN
+from modules.config import setting
 from rest_framework import filters, mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -46,7 +46,7 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
         key = ApiKey.objects.filter(user_id=self.request.user).first().key
         url_list = [
             {
-                "url": f"http://{PLATFORM_DOMAIN}/api/v1/messages/manage/api/?apikey={key}&uri=&task__name"
+                "url": f"http://{setting.PLATFORM_DOMAIN}/api/v1/messages/manage/api/?apikey={key}&uri=&task__name"
                        f"=&message_type=&domain=&content=&page=1&page_size=10",
                 "method": "GET",
                 "detail": {

@@ -8,15 +8,14 @@ import django
 from dnslib import QTYPE, RCODE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
 
-from modules.message.constants import MESSAGE_TYPES
-from utils.helper import send_message
-
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
+print(os.path.abspath(os.path.dirname(__file__)+ "../../../../"))
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
-
-from modules.config.setting import DNS_DOMAIN, DNS_PORT, NS1_DOMAIN, NS2_DOMAIN, SERVER_IP
+from utils.helper import send_message, send_email_message
+from modules.message.constants import MESSAGE_TYPES
+from modules.config import setting
 from modules.message.models import Message
 from modules.task.models import TaskConfig, TaskConfigItem
 from modules.template.depend.base import BaseTemplate
@@ -44,8 +43,8 @@ class MysqlLogger():
     def log_request(self, handler, request):
         domain = request.q.qname.__str__()
         # print('domain=======>', domain)
-        if domain.endswith(DNS_DOMAIN + '.'):
-            udomain = re.search(r'\.?([^\.]+)\.%s\.' % DNS_DOMAIN, domain)
+        if domain.endswith(setting.DNS_DOMAIN + '.'):
+            udomain = re.search(r'\.?([^\.]+)\.%s\.' % setting.DNS_DOMAIN, domain)
             # print('udomain=======>', udomain)
             if udomain:
                 # print("udomain.group(1))======>", udomain.group(1))
@@ -53,6 +52,8 @@ class MysqlLogger():
                 task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                                  task__status=1).first()
                 if task_config_item and task_config_item.template.name == "DNS":
+                    username = task_config_item.task.user.username
+                    send_email_message(username, handler.client_address[0])
                     domain = domain.strip(".")
                     Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
                                            remote_addr=handler.client_address[0],
@@ -129,15 +130,15 @@ def main():
 *.{dnsdomain}.       IN      A       {serverip}
 {dnsdomain}.         IN      A       {serverip}
 '''.format(
-            dnsdomain=DNS_DOMAIN,
-            ns1domain=NS1_DOMAIN,
-            ns2domain=NS2_DOMAIN,
-            serverip=SERVER_IP)
+            dnsdomain=setting.DNS_DOMAIN,
+            ns1domain=setting.NS1_DOMAIN,
+            ns2domain=setting.NS2_DOMAIN,
+            serverip=setting.DNS_DOMAIN_IP)
         resolver = ZoneResolver(zone, True)
         print("当前DNS解析表:\r\n" + zone)
         logger = MysqlLogger()
         # print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
-        udp_server = DNSServer(resolver, port=53, address="0.0.0.0", logger=logger)
+        udp_server = DNSServer(resolver, port=setting.DNS_PORT, address="0.0.0.0", logger=logger)
         udp_server.start()
     except Exception as e:
         print(e)

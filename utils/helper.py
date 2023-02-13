@@ -25,8 +25,7 @@ from django.conf import settings
 import requests
 from django_filters.filters import Filter
 from modules.task.models import Task, TaskConfig
-from modules.config.setting import JNDI_PORT, PLATFORM_DOMAIN, EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, \
-    EMAIL_HOST_PASSWORD, DNS_DOMAIN
+from modules.config import setting
 
 
 def get_host_ip():
@@ -137,9 +136,9 @@ def get_payload(key, payload):
     获取地址
     """
 
-    return payload.replace("{domain}", PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}",
-                                                                                      str(JNDI_PORT)).replace(
-        "{dns_domain}", DNS_DOMAIN)
+    return payload.replace("{domain}", setting.PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}",
+                                                                                              str(setting.JNDI_PORT)).replace(
+        "{dns_domain}", setting.DNS_DOMAIN)
 
 
 def send_mail(to, message):
@@ -147,10 +146,10 @@ def send_mail(to, message):
     发送邮件
     """
     try:
-        mailserver = EMAIL_HOST  # 邮箱服务器地址
-        port = int(EMAIL_PORT)
-        username_send = EMAIL_HOST_USER  # 邮箱用户名
-        password = EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
+        mailserver = setting.EMAIL_HOST  # 邮箱服务器地址
+        port = int(setting.EMAIL_PORT)
+        username_send = setting.EMAIL_HOST_USER  # 邮箱用户名
+        password = setting.EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
         username_recv = "".join(to)  # 收件人，多个收件人用逗号隔开
         mail = MIMEText(message)
         mail['Subject'] = 'Antenna平台邮件'
@@ -171,6 +170,14 @@ def send_mail(to, message):
         return False
 
 
+def send_email_message(username, ip):
+    """接收到消息发送给对应用户"""
+    if setting.OPEN_EMAIL == 1:
+        message = f"""
+    【ANTENNA】平台接收到来自{ip}的请求,请查看"""
+        send_mail(username, message)
+
+
 def is_base64(content):
     """
     判断内容是否base64编码
@@ -185,15 +192,11 @@ def is_base64(content):
 
 
 def restart():
+    """重启服务"""
     try:
-        if enviroment == 'code':
-            shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/restart.sh")
-            print(f"开始重启 {shell_path}")
-            os.system(f"sh {shell_path}")
-        elif enviroment == 'docker':
-            shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/docker_restart.sh")
-            print(f"开始重启 {shell_path}")
-            subprocess.Popen(['/bin/sh', shell_path], start_new_session=True)
+        shell_path = os.path.abspath(os.path.dirname(__file__) + "/../bin/docker_restart.sh")
+        print(f"开始重启 {shell_path}")
+        subprocess.Popen(['/bin/sh', shell_path], start_new_session=True)
     except Exception as e:
         print(e)
 

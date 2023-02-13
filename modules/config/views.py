@@ -6,9 +6,8 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from modules.config.constants import CONFIG_TYPES
-from modules.config.setting import INVITE_TO_REGISTER
-
-from utils.helper import restart
+from modules.config import setting
+from modules.config.setting import reload_config
 
 
 class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
@@ -26,7 +25,6 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
             _data[i["name"]] = i['value']
         return Response(_data, status=status.HTTP_200_OK)
 
-
     @action(methods=["POST"], detail=False, permission_classes=[IsAdminUser, ])
     def platform_update(self, request, *args, **kwargs):
         """
@@ -37,6 +35,7 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         try:
             for k in request.data.keys():
                 Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).update(value=str(request.data[k]))
+            reload_config()
             return Response(data=request.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
@@ -51,6 +50,7 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         try:
             for k in request.data.keys():
                 Config.objects.filter(name=k, type=CONFIG_TYPES.PROTOCAL).update(value=str(request.data[k]))
+            reload_config()
             return Response(data=request.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
@@ -60,16 +60,4 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         """
         查看是否开启邀请码设置
         """
-        return Response({"open_invite": int(INVITE_TO_REGISTER)}, status=status.HTTP_200_OK)
-
-    @action(methods=["GET"], detail=False, permission_classes=[IsAdminUser, ])
-    def platform_restart(self, requests, *args, **kwargs):
-        """
-        重启平台
-        """
-        try:
-            restart()
-            return Response({}, status=status.HTTP_200_OK)
-        except Exception as e:
-            print(e)
-            return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
+        return Response({"open_invite": int(setting.INVITE_TO_REGISTER)}, status=status.HTTP_200_OK)

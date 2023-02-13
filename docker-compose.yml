@@ -23,8 +23,6 @@ services:
     container_name: antenna
     volumes:
       - ./:/antenna
-      - /etc/timezone:/etc/timezone
-      - /etc/localtime:/etc/localtime
       - type: bind
         source: ./conf/antenna.ini
         target: /etc/supervisor.d/antenna.ini
@@ -40,19 +38,8 @@ services:
       MYSQL_PORT: 3306
       MYSQL_USERNAME: root
       MYSQL_PASSWORD: Antenna@58.com
-      # 平台配置
-      PLATFORM_DOMAIN: test.com
-      PLATFORM_ENVIROMENT: docker
-      #登陆页面路径，如设置成abc 则登陆页面地址为http://platform.com/abc
-      LOGIN_PATH: ''
-      PLATFORM_ROOT_USER: antenna@58.com
-
-      # DNS配置
-      DNS_DOMAIN: test.cn
-      NS1_DOMAIN: ns1.test.cn
-      NS2_DOMAIN: ns2.test.cn
-      SERVER_IP: 127.0.0.1
-
+    env_file:
+      - .env
     networks:
       - antenna
     restart: always
