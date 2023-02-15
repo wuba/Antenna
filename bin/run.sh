@@ -16,5 +16,5 @@
 #fi
 cp ../conf/antenna.ini /etc/supervisord.d/antenna.ini
 echo "antenna.ini cp success!"
-unlink /run/supervisord.sock
+unlink /run/supervisor/supervisord.sock
 supervisord -c /etc/supervisord.conf

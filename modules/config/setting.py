@@ -18,8 +18,8 @@ try:
     # 监听DNS端口
     DNS_PORT = 53
     # NS域名
-    NS1_DOMAIN = config_record.get(name="NS1_DOMAIN").value
-    NS2_DOMAIN = config_record.get(name="NS2_DOMAIN").value
+    # NS1_DOMAIN = config_record.get(name="NS1_DOMAIN").value
+    # NS2_DOMAIN = config_record.get(name="NS2_DOMAIN").value
     # 服务器外网地址
     SERVER_IP = config_record.get(name="SERVER_IP").value
     # JNDI监听端口
@@ -39,8 +39,8 @@ try:
     # 消息七天保存
     SAVE_MESSAGE_SEVEN_DAYS = int(get_bool(config_record.get(name="SAVE_MESSAGE_SEVEN_DAYS").value))
     # DNS域名解析IP
-    DNS_DOMAIN_IP = config_record.get(name="DNS_DOMAIN_IP").value
-    # DNS_DOMAIN_IP = "127.0.0.1"
+    # DNS_DOMAIN_IP = config_record.get(name="DNS_DOMAIN_IP").value
+    DNS_DOMAIN_IP = "127.0.0.1"
     # 注册方式
     REGISTER_TYPE = int(config_record.get(name="REGISTER_TYPE").value)
     # HTTPS 端口
@@ -60,13 +60,11 @@ def reload_config(type):
         globals()['SERVER_IP'] = config_record.get(name="SERVER_IP").value
         globals()['LOGIN_PATH'] = config_record.get(name="LOGIN_PATH").value
         globals()['REGISTER_TYPE'] = config_record.get(name="REGISTER_TYPE").value
-    elif type == CONFIG_TYPES.EMAIL:
         globals()['INVITE_TO_REGISTER'] = int(get_bool(config_record.get(name="INVITE_TO_REGISTER").value))
         globals()['EMAIL_HOST'] = config_record.get(name="EMAIL_HOST_USER").value
         globals()['EMAIL_PORT'] = int(config_record.get(name="EMAIL_PORT").value)
         globals()['EMAIL_HOST_USER'] = config_record.get(name="EMAIL_HOST").value
         globals()['EMAIL_HOST_PASSWORD'] = config_record.get(name="EMAIL_HOST_PASSWORD").value
-    elif type == CONFIG_TYPES.MESSAGE:
         globals()['SAVE_MESSAGE_SEVEN_DAYS'] = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
     elif type == CONFIG_TYPES.DNS:
         globals()['DNS_DOMAIN'] = config_record.get(name="DNS_DOMAIN").value

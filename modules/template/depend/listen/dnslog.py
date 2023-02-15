@@ -1,147 +1,83 @@
-import copy
+# 导入twisted的相关模块
 import os
 import re
 import sys
-import tempfile
-
+import fnmatch
 import django
-from dnslib import QTYPE, RCODE, RR, TXT
-from dnslib.server import BaseResolver, DNSServer
+from itertools import cycle
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
-print(os.path.abspath(os.path.dirname(__file__)+ "../../../../"))
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
+
+from twisted.internet import reactor
+from twisted.names import dns, server
 from utils.helper import send_message, send_email_message
 from modules.message.constants import MESSAGE_TYPES
-from modules.config import setting
+from modules.config.models import DnsConfig
 from modules.message.models import Message
 from modules.task.models import TaskConfig, TaskConfigItem
 from modules.template.depend.base import BaseTemplate
 
 
-class MysqlLogger():
-    def log_data(self, dnsobj):
-        pass
+# 创建一个DNS协议的处理类，继承自twisted.names.dns.DNSDatagramProtocol
+class DNS(dns.DNSDatagramProtocol):
+    def __init__(self, controller, reactor=None):
+        super().__init__(controller, reactor)
+        # 初始化变量
+        self.dns_config = {}
+        dns_recoed = DnsConfig.objects.all()
+        self.dns_config_domain = [_dns.domain for _dns in dns_recoed]
+        for _dns in dns_recoed:
+            self.dns_config[_dns.domain] = cycle(_dns.value)
 
-    def log_error(self, handler, e):
-        pass
-
-    def log_pass(self, *args):
-        pass
-
-    def log_prefix(self, handler):
-        pass
-
-    def log_recv(self, handler, data):
-        pass
-
-    def log_reply(self, handler, reply):
-        pass
-
-    def log_request(self, handler, request):
-        domain = request.q.qname.__str__()
-        # print('domain=======>', domain)
-        if domain.endswith(setting.DNS_DOMAIN + '.'):
-            udomain = re.search(r'\.?([^\.]+)\.%s\.' % setting.DNS_DOMAIN, domain)
-            # print('udomain=======>', udomain)
-            if udomain:
-                # print("udomain.group(1))======>", udomain.group(1))
-                domain_key = udomain.group(1)
-                task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
-                                                                 task__status=1).first()
-                if task_config_item and task_config_item.template.name == "DNS":
-                    username = task_config_item.task.user.username
-                    send_email_message(username, handler.client_address[0])
-                    domain = domain.strip(".")
-                    Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
-                                           remote_addr=handler.client_address[0],
-                                           task_id=task_config_item.task_id, template_id=task_config_item.template_id)
-                    send_message(url=domain, remote_addr=handler.client_address[0], uri='', header='',
-                                 message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
-
-    def log_send(self, handler, data):
-        pass
-
-    def log_truncated(self, handler, reply):
-        pass
-
-
-class ZoneResolver(BaseResolver):
-    """
-        Simple fixed zone file resolver.
-    """
-
-    def __init__(self, zone, glob=False):
-        """
-            Initialise resolver from zone file.
-            Stores RRs as a list of (label,type,rr) tuples
-            If 'glob' is True use glob match against zone file
-        """
-        self.zone = [(rr.rname, QTYPE[rr.rtype], rr)
-                     for rr in RR.fromZone(zone)]
-        self.glob = glob
-        self.eq = 'matchGlob' if glob else '__eq__'
-
-    def resolve(self, request, handler):
-        """
-            Respond to DNS request - parameters are request packet & handler.
-            Method is expected to return DNS response
-        """
-        reply = request.reply()
-        qname = request.q.qname
-        qtype = QTYPE[request.q.qtype]
-        if qtype == 'TXT':
-            txtpath = os.path.join(tempfile.gettempdir(), str(qname).lower())
-            if os.path.isfile(txtpath):
-                reply.add_answer(
-                    RR(qname, QTYPE.TXT, rdata=TXT(open(txtpath).read().strip())))
-        for name, rtype, rr in self.zone:
-            # Check if label & type match
-            if getattr(qname, self.eq)(name) and (qtype == rtype or qtype == 'ANY'
-                                                  or rtype == 'CNAME'):
-                # If we have a glob match fix reply label
-                if self.glob:
-                    a = copy.copy(rr)
-                    a.rname = qname
-                    reply.add_answer(a)
-                else:
-                    reply.add_answer(rr)
-                # Check for A/AAAA records associated with reply and
-                # add in additional section
-                if rtype in ['CNAME', 'NS', 'MX', 'PTR']:
-                    for a_name, a_rtype, a_rr in self.zone:
-                        if a_name == rr.rdata.label and a_rtype in [
-                            'A', 'AAAA'
-                        ]:
-                            reply.add_ar(a_rr)
-        if not reply.rr:
-            reply.header.rcode = RCODE.NXDOMAIN
-        # print('reply======>', reply)
-        return reply
-
-
-def main():
-    try:
-        zone = '''
-*.{dnsdomain}.       IN      NS      {ns1domain}.
-*.{dnsdomain}.       IN      NS      {ns2domain}.
-*.{dnsdomain}.       IN      A       {serverip}
-{dnsdomain}.         IN      A       {serverip}
-'''.format(
-            dnsdomain=setting.DNS_DOMAIN,
-            ns1domain=setting.NS1_DOMAIN,
-            ns2domain=setting.NS2_DOMAIN,
-            serverip=setting.DNS_DOMAIN_IP)
-        resolver = ZoneResolver(zone, True)
-        print("当前DNS解析表:\r\n" + zone)
-        logger = MysqlLogger()
-        # print("Starting Zone Resolver (%s:%d) [%s]" % ("*", DNS_PORT, "UDP"))
-        udp_server = DNSServer(resolver, port=setting.DNS_PORT, address="0.0.0.0", logger=logger)
-        udp_server.start()
-    except Exception as e:
-        print(e)
+    # 重写datagramReceived方法，用来接收和处理DNS报文
+    def datagramReceived(self, data, addr):
+        # 使用twisted.names.dns.Message类来解析DNS报文
+        print(addr[0])
+        message = dns.Message()
+        message.fromStr(data)
+        # 获取查询的域名和类型
+        query = message.queries[0]
+        name = query.name.name
+        type = query.type
+        # 根据自己的逻辑返回相应的结果，例如IP地址或错误码
+        self.dns_config_domain.sort(key=lambda x: x.startswith("*"))  # 进行排序
+        for domain in self.dns_config_domain:
+            if fnmatch.fnmatch(name.decode("utf-8"), domain) and type == dns.A:
+                # 创建一个回复的报文
+                reply = dns.RRHeader(name=name, type=dns.A,
+                                     payload=dns.Record_A(
+                                         address=bytes(next(self.dns_config[domain]), encoding="utf-8")))
+                # 把回复的报文添加到答案部分
+                message.answers.append(reply)
+                # 设置响应码为0，表示成功
+                message.rCode = 0
+                # 存储数据
+                udomain = re.search(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
+                if udomain:
+                    domain_key = udomain.group(1)
+                    task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
+                                                                     task__status=1).first()
+                    if task_config_item and task_config_item.template.name == "DNS":
+                        username = task_config_item.task.user.username
+                        send_email_message(username, addr[0])
+                        domain = domain.strip(".")
+                        Message.objects.create(domain=domain, message_type=MESSAGE_TYPES.DNS,
+                                               remote_addr=addr[0],
+                                               task_id=task_config_item.task_id,
+                                               template_id=task_config_item.template_id)
+                        send_message(url=domain, remote_addr=addr[0], uri='', header='',
+                                     message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
+                break
+            else:
+                # 设置响应码为3，表示域名不存在
+                message.rCode = 3
+        # 把回复的报文转换为字节串
+        data = message.toStr()
+        # 把回复的报文发送给客户端
+        self.transport.write(data, addr)
 
 
 class DnsTemplate(BaseTemplate):
@@ -166,6 +102,12 @@ class DnsTemplate(BaseTemplate):
 
     def __init__(self):
         super().__init__()
+
+
+def main():
+    reactor.listenUDP(53, DNS(controller=server.DNSServerFactory))
+    # 使用twisted.internet.reactor.run方法，运行事件循环，等待客户端的请求
+    reactor.run()
 
 
 if __name__ == '__main__':
