@@ -11,11 +11,11 @@ RUN apk add --no-cache tzdata \
     && echo "Asia/Shanghai" > /etc/timezone \
     && apk del tzdata
 
-ADD . /antenna
-WORKDIR /antenna
+ADD . /Antenna
+WORKDIR /Antenna
 #RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN cp /antenna/.env.example  /antenna/.env
-RUN pip3 install -r /antenna/requirements.txt
+RUN cp /Antenna/.env.example  /Antenna/.env
+RUN pip3 install -r /Antenna/requirements.txt
 
 EXPOSE 53 2345 80 21 443
 
