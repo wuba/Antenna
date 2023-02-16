@@ -15,15 +15,11 @@ try:
     PLATFORM_DOMAIN = config_record.get(name="PLATFORM_DOMAIN").value
     # 做 dns 记录的域名,可以和平台域名用作同一个
     DNS_DOMAIN = config_record.get(name="DNS_DOMAIN").value
-    # 监听DNS端口
-    DNS_PORT = 53
     # NS域名
     # NS1_DOMAIN = config_record.get(name="NS1_DOMAIN").value
     # NS2_DOMAIN = config_record.get(name="NS2_DOMAIN").value
     # 服务器外网地址
     SERVER_IP = config_record.get(name="SERVER_IP").value
-    # JNDI监听端口
-    JNDI_PORT = 2345
     # 开放邮箱通知
     OPEN_EMAIL = int(get_bool(config_record.get(name="OPEN_EMAIL").value))
     # 邮箱服务器地址
@@ -39,14 +35,11 @@ try:
     # 消息七天保存
     SAVE_MESSAGE_SEVEN_DAYS = int(get_bool(config_record.get(name="SAVE_MESSAGE_SEVEN_DAYS").value))
     # DNS域名解析IP
-    # DNS_DOMAIN_IP = config_record.get(name="DNS_DOMAIN_IP").value
+    # DNS_DOMAIN_IP = json.loads(config_record.get(name="DNS_DOMAIN_IP").value)
     DNS_DOMAIN_IP = "127.0.0.1"
     # 注册方式
     REGISTER_TYPE = int(config_record.get(name="REGISTER_TYPE").value)
-    # HTTPS 端口
-    HTTPS_PORT = 443
-    # FTP 端口
-    FTP_PORT = 21
+
 except Exception as e:
     print(e)
     pass
