@@ -13,11 +13,6 @@ try:
     config_record = Config.objects.all()
     # 平台域名
     PLATFORM_DOMAIN = config_record.get(name="PLATFORM_DOMAIN").value
-    # 做 dns 记录的域名,可以和平台域名用作同一个
-    DNS_DOMAIN = config_record.get(name="DNS_DOMAIN").value
-    # NS域名
-    # NS1_DOMAIN = config_record.get(name="NS1_DOMAIN").value
-    # NS2_DOMAIN = config_record.get(name="NS2_DOMAIN").value
     # 服务器外网地址
     SERVER_IP = config_record.get(name="SERVER_IP").value
     # 开放邮箱通知
@@ -34,9 +29,6 @@ try:
     LOGIN_PATH = config_record.get(name="LOGIN_PATH").value
     # 消息七天保存
     SAVE_MESSAGE_SEVEN_DAYS = int(get_bool(config_record.get(name="SAVE_MESSAGE_SEVEN_DAYS").value))
-    # DNS域名解析IP
-    # DNS_DOMAIN_IP = json.loads(config_record.get(name="DNS_DOMAIN_IP").value)
-    DNS_DOMAIN_IP = "127.0.0.1"
     # 注册方式
     REGISTER_TYPE = int(config_record.get(name="REGISTER_TYPE").value)
 
