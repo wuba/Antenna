@@ -31,6 +31,11 @@ try:
     SAVE_MESSAGE_SEVEN_DAYS = int(get_bool(config_record.get(name="SAVE_MESSAGE_SEVEN_DAYS").value))
     # 注册方式
     REGISTER_TYPE = int(config_record.get(name="REGISTER_TYPE").value)
+    # 端口
+    JNDI_PORT = 2345
+    HTTPS_PORT = 443
+    FTP_PORT = 21
+    DNS_PORT = 53
 
 except Exception as e:
     print(e)
