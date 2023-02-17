@@ -14,7 +14,7 @@ RUN apk add --no-cache tzdata \
 ADD . /Antenna
 WORKDIR /Antenna
 #RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN cp /Antenna/.env.example  /Antenna/.env
+RUN if [ ! -f "/Antenna/.env" ]; then cp /Antenna/.env.example  /Antenna/.env; fi
 RUN pip3 install -r /Antenna/requirements.txt
 
 EXPOSE 53 2345 80 21 443
