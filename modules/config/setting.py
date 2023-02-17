@@ -1,4 +1,4 @@
-from modules.config.models import Config
+from modules.config.models import Config, DnsConfig
 from modules.config.constants import CONFIG_TYPES
 
 
@@ -11,6 +11,7 @@ def get_bool(key):
 
 try:
     config_record = Config.objects.all()
+    dns_record = DnsConfig.objects.all()
     # 平台域名
     PLATFORM_DOMAIN = config_record.get(name="PLATFORM_DOMAIN").value
     # 服务器外网地址
@@ -31,6 +32,9 @@ try:
     SAVE_MESSAGE_SEVEN_DAYS = int(get_bool(config_record.get(name="SAVE_MESSAGE_SEVEN_DAYS").value))
     # 注册方式
     REGISTER_TYPE = int(config_record.get(name="REGISTER_TYPE").value)
+    # DNS域名
+    dns_domain = dns_record.get(id=1).value
+    DNS_DOMAIN = dns_domain.strip("*.")
     # 端口
     JNDI_PORT = 2345
     HTTPS_PORT = 443

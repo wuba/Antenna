@@ -11,8 +11,8 @@ def create_default_config(apps, schema_editor):
 
     DnsConfig.objects.bulk_create(
         [
-            DnsConfig(domain="*." + str(dns_domain), value=dns_domain_ip),
-            DnsConfig(domain=dns_domain, value=dns_domain_ip)
+            DnsConfig(domain=str(dns_domain), value=dns_domain_ip),
+            DnsConfig(domain="*." + str(dns_domain), value=dns_domain_ip)
         ]
     )
 
