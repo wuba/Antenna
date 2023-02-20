@@ -64,7 +64,8 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         重启dns组件
         """
         try:
-            os.system("supervisorctl restart antenna-dns")
+            os.system("supervisorctl stop antenna-dns")
+            os.system("supervisorctl start antenna-dns")
         except Exception as e:
             print(e)
 
