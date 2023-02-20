@@ -74,9 +74,8 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         修改dns配置
         {
         "id":1,
-        "type": 2,
-        "domain":"[*.test.com]",
-        "value":"",
+        "domain":"*.test.com",
+        "value":["127.0.0.1"],
         }
         """
         serializer = DnsConfigSerializer(data=request.data)
@@ -95,7 +94,7 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
     @action(methods=['delete'], detail=False, permission_classes=[IsAdminUser])
     def dns_delete(self, request, *args, **kwargs):
         """
-        批量删除任务
+        删除DNS解析配置
         """
         delete_id = request.query_params.get('id', None)
         if not delete_id:
