@@ -47,14 +47,15 @@ class PlatformUpdateSerializer(serializers.Serializer):
     平台序列化器
     """
     PLATFORM_DOMAIN = serializers.CharField(required=True, help_text="平台域名")
-    OPEN_REGISTER = serializers.BooleanField(required=True, help_text="开放注册")
-    INVITE_TO_REGISTER = serializers.BooleanField(required=True, help_text="开放邀请注册")
-    OPEN_EMAIL = serializers.BooleanField(required=True, help_text="开放邮箱通知")
+    SERVER_IP = serializers.IPAddressField(required=True, help_text="平台IP")
+    LOGIN_PATH = serializers.CharField(required=True, help_text="后台注册地址")
+    REGISTER_TYPE = serializers.BooleanField(required=True, help_text="注册类型")
     EMAIL_HOST = serializers.CharField(required=True, help_text="注册邮箱")
-    EMAIL_PORT = serializers.CharField(required=True, help_text="邮箱服务器短裤")
+    EMAIL_PORT = serializers.CharField(required=True, help_text="邮箱服务器端口")
     EMAIL_HOST_USER = serializers.EmailField(required=True, allow_null=True, allow_blank=True, help_text="账户")
     EMAIL_HOST_PASSWORD = serializers.CharField(required=True, allow_null=True, allow_blank=True, help_text="授权码")
-    SERVER_IP = serializers.IPAddressField(required=True, help_text="平台IP")
+    SAVE_MESSAGE_SEVEN_DAYS = serializers.BooleanField(required=True, help_text="是否保留七天内消息")
+    OPEN_EMAIL = serializers.BooleanField(required=True, help_text="开放邮箱通知")
 
     def validate(self, attrs):
         return attrs

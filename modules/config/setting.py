@@ -49,19 +49,14 @@ except Exception as e:
 def reload_config(type):
     """根据配置类型选择决定重启哪些配置"""
     config_record = Config.objects.all()
-    if type == CONFIG_TYPES.PLATFORM:
-        globals()['PLATFORM_DOMAIN'] = config_record.get(name="PLATFORM_DOMAIN").value
-        globals()['SERVER_IP'] = config_record.get(name="SERVER_IP").value
-        globals()['LOGIN_PATH'] = config_record.get(name="LOGIN_PATH").value
-        globals()['REGISTER_TYPE'] = config_record.get(name="REGISTER_TYPE").value
-        globals()['INVITE_TO_REGISTER'] = int(get_bool(config_record.get(name="INVITE_TO_REGISTER").value))
-        globals()['EMAIL_HOST'] = config_record.get(name="EMAIL_HOST_USER").value
-        globals()['EMAIL_PORT'] = int(config_record.get(name="EMAIL_PORT").value)
-        globals()['EMAIL_HOST_USER'] = config_record.get(name="EMAIL_HOST").value
-        globals()['EMAIL_HOST_PASSWORD'] = config_record.get(name="EMAIL_HOST_PASSWORD").value
-        globals()['SAVE_MESSAGE_SEVEN_DAYS'] = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
-    elif type == CONFIG_TYPES.DNS:
-        globals()['DNS_DOMAIN'] = config_record.get(name="DNS_DOMAIN").value
-        globals()['NS1_DOMAIN'] = config_record.get(name="NS1_DOMAIN").value
-        globals()['NS2_DOMAIN'] = config_record.get(name="NS2_DOMAIN").value
-        globals()['DNS_DOMAIN_IP'] = config_record.get(name="DNS_DOMAIN_IP").value
+    globals()['PLATFORM_DOMAIN'] = config_record.get(name="PLATFORM_DOMAIN").value
+    globals()['SERVER_IP'] = config_record.get(name="SERVER_IP").value
+    globals()['LOGIN_PATH'] = config_record.get(name="LOGIN_PATH").value
+    globals()['REGISTER_TYPE'] = config_record.get(name="REGISTER_TYPE").value
+    globals()['INVITE_TO_REGISTER'] = int(get_bool(config_record.get(name="INVITE_TO_REGISTER").value))
+    globals()['EMAIL_HOST'] = config_record.get(name="EMAIL_HOST_USER").value
+    globals()['EMAIL_PORT'] = int(config_record.get(name="EMAIL_PORT").value)
+    globals()['EMAIL_HOST_USER'] = config_record.get(name="EMAIL_HOST").value
+    globals()['EMAIL_HOST_PASSWORD'] = config_record.get(name="EMAIL_HOST_PASSWORD").value
+    globals()['SAVE_MESSAGE_SEVEN_DAYS'] = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
+
