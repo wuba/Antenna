@@ -33,7 +33,7 @@ try:
     # 注册方式
     REGISTER_TYPE = int(config_record.get(name="REGISTER_TYPE").value)
     # DNS域名
-    dns_domain = dns_record.get(id=1).value
+    dns_domain = dns_record.get(id=1).domain
     DNS_DOMAIN = dns_domain.strip("*.")
     # 端口
     JNDI_PORT = 2345
