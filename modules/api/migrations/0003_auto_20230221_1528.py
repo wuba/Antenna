@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         # merge #56 初始化可自定义密码，感谢shadow1ng
         root_password = os.getenv("PLATFORM_ROOT_PASSWORD")
         sha256_pwd = make_password(root_password, None, 'pbkdf2_sha256')
-        User.object.filter(id=1).update(password=sha256_pwd)
+        User.objects.filter(id=1).update(password=sha256_pwd)
 
     dependencies = [
         ('api', '0002_auto_20220826_0811'),
