@@ -57,13 +57,11 @@ class DNS(dns.DNSDatagramProtocol):
                     # 存储数据
                     udomain = re.search(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
                     if udomain:
-                        domain_key = udomain.group(1)
-                        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
+                        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain,
                                                                          task__status=1).first()
                         if task_config_item and task_config_item.template.name == "DNS":
                             username = task_config_item.task.user.username
                             send_email_message(username, name.decode("utf-8"))
-                            domain = domain.strip(".")
                             Message.objects.create(domain=name.decode("utf-8"), message_type=MESSAGE_TYPES.DNS,
                                                    remote_addr=addr[0],
                                                    task_id=task_config_item.task_id,
