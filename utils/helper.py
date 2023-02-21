@@ -146,6 +146,8 @@ def send_mail(to, message):
     发送邮件
     """
     try:
+        if to == "antenna@58.com":
+            return False
         mailserver = setting.EMAIL_HOST  # 邮箱服务器地址
         port = int(setting.EMAIL_PORT)
         username_send = setting.EMAIL_HOST_USER  # 邮箱用户名
