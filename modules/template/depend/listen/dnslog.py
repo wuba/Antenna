@@ -34,8 +34,8 @@ class DNS(dns.DNSDatagramProtocol):
 
     # 重写datagramReceived方法，用来接收和处理DNS报文
     def datagramReceived(self, data, addr):
+        # 使用twisted.names.dns.Message类来解析DNS报文
         try:
-            # 使用twisted.names.dns.Message类来解析DNS报文
             message = dns.Message()
             message.fromStr(data)
             # 获取查询的域名和类型
@@ -55,17 +55,18 @@ class DNS(dns.DNSDatagramProtocol):
                     # 设置响应码为0，表示成功
                     message.rCode = 0
                     # 存储数据
-                    udomain = re.search(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
+                    udomain = re.findall(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
                     if udomain:
-                        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain,
+                        print(udomain[0], flush=True)
+                        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain[0],
                                                                          task__status=1).first()
                         if task_config_item and task_config_item.template.name == "DNS":
                             username = task_config_item.task.user.username
-                            send_email_message(username, name.decode("utf-8"))
                             Message.objects.create(domain=name.decode("utf-8"), message_type=MESSAGE_TYPES.DNS,
                                                    remote_addr=addr[0],
                                                    task_id=task_config_item.task_id,
                                                    template_id=task_config_item.template_id)
+                            send_email_message(username, addr[0])
                             send_message(url=name.decode("utf-8"), remote_addr=addr[0], uri='', header='',
                                          message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
                     break
@@ -75,9 +76,10 @@ class DNS(dns.DNSDatagramProtocol):
             # 把回复的报文转换为字节串
             data = message.toStr()
             # 把回复的报文发送给客户端
-            self.transport.write(data, addr)
         except Exception as e:
-            print(repr(e),flush=True)
+            print("dns error", repr(e), flush=True)
+        finally:
+            self.transport.write(data, addr)
 
 
 class DnsTemplate(BaseTemplate):

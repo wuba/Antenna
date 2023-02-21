@@ -146,6 +146,8 @@ def send_mail(to, message):
     发送邮件
     """
     try:
+        if to == "antenna@58.com":
+            return False
         mailserver = setting.EMAIL_HOST  # 邮箱服务器地址
         port = int(setting.EMAIL_PORT)
         username_send = setting.EMAIL_HOST_USER  # 邮箱用户名
@@ -164,18 +166,21 @@ def send_mail(to, message):
         smtp.sendmail(username_send, username_recv, mail.as_string())  # 参数分别是发送者，接收者，第三个是把上面的发送邮件的内容变成字符串
         smtp.quit()  # 发送完毕后退出smtp
         return True
-
     except Exception as e:
-        print(e)
+        print("send email error", repr(e))
         return False
 
 
 def send_email_message(username, ip):
     """接收到消息发送给对应用户"""
-    if setting.OPEN_EMAIL == 1:
-        message = f"""
-    【ANTENNA】平台接收到来自{ip}的请求,请查看"""
-        send_mail(username, message)
+    try:
+        print(setting.OPEN_EMAIL, flush=True)
+        if setting.OPEN_EMAIL == 1:
+            message = f"""
+        【ANTENNA】平台接收到来自{ip}的请求,请查看"""
+            send_mail(username, message)
+    except Exception as e:
+        print("send_email_message error", repr(e))
 
 
 def is_base64(content):
@@ -210,11 +215,12 @@ def send_message(url, remote_addr, uri, header, message_type, content, task_id, 
             "domain": url, "remote_addr": remote_addr, "uri": uri, "header": header,
             "message_type": message_type, "content": content, "raw": raw}
         task_record = Task.objects.get(id=task_id)
-        message_url = task_record.callback_url
-        message_headers = json.loads(task_record.callback_url_headers)
-        if message_url and message_headers:
-            requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
-            print("发送请求")
+        if task_record.callback_url:
+            message_url = task_record.callback_url
+            message_headers = json.loads(task_record.callback_url_headers)
+            if message_url and message_headers:
+                requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
+                print("发送请求")
     except Exception as e:
         print(e)
 

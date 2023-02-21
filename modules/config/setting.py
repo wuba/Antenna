@@ -19,11 +19,11 @@ try:
     # 开放邮箱通知
     OPEN_EMAIL = int(get_bool(config_record.get(name="OPEN_EMAIL").value))
     # 邮箱服务器地址
-    EMAIL_HOST = config_record.get(name="EMAIL_HOST_USER").value
+    EMAIL_HOST = config_record.get(name="EMAIL_HOST").value
     # 邮箱服务器端口
     EMAIL_PORT = int(config_record.get(name="EMAIL_PORT").value)
     # 邮箱账户
-    EMAIL_HOST_USER = config_record.get(name="EMAIL_HOST").value
+    EMAIL_HOST_USER = config_record.get(name="EMAIL_HOST_USER").value
     # 邮箱授权码
     EMAIL_HOST_PASSWORD = config_record.get(name="EMAIL_HOST_PASSWORD").value
     # 隐藏后台地址
@@ -59,4 +59,4 @@ def reload_config(type):
     globals()['EMAIL_HOST_USER'] = config_record.get(name="EMAIL_HOST").value
     globals()['EMAIL_HOST_PASSWORD'] = config_record.get(name="EMAIL_HOST_PASSWORD").value
     globals()['SAVE_MESSAGE_SEVEN_DAYS'] = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
-
+    globals()['OPEN_EMAIL'] = int(get_bool(config_record.get(name="OPEN_EMAIL").value))
