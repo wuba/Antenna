@@ -7,7 +7,7 @@ from django.db import migrations, models
 def create_default_config(apps, schema_editor):
     DnsConfig = apps.get_model('config', "DnsConfig")
     dns_domain = os.environ.get('DNS_DOMAIN')
-    dns_domain_ip = [os.environ.get('DNS_DOMAIN_IP')]
+    dns_domain_ip = os.environ.get('DNS_DOMAIN_IP').split(",")
 
     DnsConfig.objects.bulk_create(
         [
