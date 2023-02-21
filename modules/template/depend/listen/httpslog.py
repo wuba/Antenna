@@ -61,10 +61,10 @@ class ProxyProtocol(Protocol):
         index2 = self.request.index(b' ', index1 + 1)
         if (index1 == -1) or (index2 == -1):
             raise Exception('http url error')
-        part1 = self.request[index1 + 1:index2]
-        index3 = part1.index(b'/', 8)
-        url = part1[7:index3]
-        print('get the url: ', url, flush=True)
+        # part1 = self.request[index1 + 1:index2]
+        # index3 = part1.index(b'/', 8)
+        # url = part1[7:index3]
+        # print('get the url: ', url, flush=True)
         proxy_factory = ProxyWebFactory(self.request, self)
         reactor.connectTCP("0.0.0.0", 80, proxy_factory)
 
