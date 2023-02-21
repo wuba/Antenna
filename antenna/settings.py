@@ -107,6 +107,7 @@ DATABASES = {
         "ATOMIC_REQUESTS": True,
         "OPTIONS": {
             "init_command": "SET sql_mode=STRICT_TRANS_TABLES",
+            #"init_command": "SET GLOBAL max_connections = 100000",
         },
         "CONN_MAX_AGE": 5 * 10,
     }
