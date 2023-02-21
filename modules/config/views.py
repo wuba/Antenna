@@ -1,4 +1,5 @@
 import os
+from django.db import transaction
 
 from modules.config.models import Config, DnsConfig
 from modules.config.serializers import ConfigSerializer, PlatformUpdateSerializer, DnsConfigSerializer
@@ -64,8 +65,7 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         重启dns组件
         """
         try:
-            os.system("supervisorctl stop antenna-dns")
-            os.system("supervisorctl start antenna-dns")
+            os.system("supervisorctl restart antenna-dns")
         except Exception as e:
             print(e)
 
@@ -83,11 +83,11 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         serializer.is_valid(raise_exception=True)
         try:
             data = request.data
-            id = data.get('id')
+            _id = data.get('id')
             domain = data.get('domain')
             value = data.get('value')
-            DnsConfig.objects.update_or_create(defaults={"domain": domain, "value": value}, id=id)
-            self.reload_dns()
+            DnsConfig.objects.update_or_create(defaults={"domain": domain, "value": value}, id=_id)
+            transaction.on_commit(func=DnsConfigViewSet.reload_dns)
             return Response(data=request.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"参数操作错误,原因:{e}"}, status=status.HTTP_200_OK)
