@@ -113,7 +113,7 @@ class FtpTemplate(BaseTemplate):
 
 def main():
     try:
-        reactor.listenTCP(setting.FTP_PORT, FtpFactory())
+        reactor.listenTCP(21, FtpFactory())
         print("FTP 协议监听模块已开启 21 port starting listen ...")
         reactor.run()
     except Exception as e:

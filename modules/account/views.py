@@ -13,7 +13,6 @@ from modules.api.models import ApiKey
 from modules.account.models import User, VerifyCode, InviteCode
 from modules.account.serializers import UserInfoSerializer, EmailSerializer, UserRegisterSerializer, \
     ForgetPasswordSerializer, UserLoginSerializer, ChangePasswordSerializer, TestEmailSerializer
-from modules.config.setting import REGISTER_TYPE
 from modules.task.models import Task, TaskConfig
 from modules.template.models import Template, TemplateConfigItem
 from utils.helper import generate_code, send_mail
@@ -22,6 +21,7 @@ from modules.task.constants import SHOW_DASHBOARD, TASK_TMP, TASK_STATUS
 from modules.task.models import TaskConfigItem
 from modules.account.constants import FIRST_LOGIN
 from modules.config import setting
+from modules.account.constants import REGISTER_TYPE
 
 
 class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):

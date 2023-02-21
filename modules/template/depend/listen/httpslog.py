@@ -12,7 +12,6 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
 from modules.template.depend.base import BaseTemplate
-from modules.config import setting
 
 class ProxyWebProtocol(Protocol):
 
@@ -103,9 +102,9 @@ class HttpsTemplate(BaseTemplate):
 
 def main():
     try:
-        print(f"HTTPS 协议监听模块已开启 {setting.HTTPS_PORT} port starting listen ...")
+        print(f"HTTPS 协议监听模块已开启 443 port starting listen ...")
         factory = ProxyFactory()
-        reactor.listenSSL(setting.HTTPS_PORT, factory,
+        reactor.listenSSL(443, factory,
                           ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/conf/server.key',
                                                            f'{PROJECT_ROOT}/conf/server.crt'))
         reactor.run()

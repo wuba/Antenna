@@ -22,7 +22,7 @@ services:
       - db
     container_name: antenna
     volumes:
-      - ./:/antenna
+      - ./:/Antenna
       - type: bind
         source: ./conf/antenna.ini
         target: /etc/supervisor.d/antenna.ini

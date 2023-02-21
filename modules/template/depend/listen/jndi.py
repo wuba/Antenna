@@ -134,7 +134,7 @@ class SocketTemplate(BaseTemplate):
 
 def main():
     jndi_server = SocketTemplate()
-    jndi_server.start("0.0.0.0", setting.JNDI_PORT)
+    jndi_server.start("0.0.0.0", 2345)
 
 
 if __name__ == "__main__":
