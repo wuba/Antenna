@@ -87,6 +87,7 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
             domain = data.get('domain')
             value = data.get('value')
             DnsConfig.objects.update_or_create(defaults={"domain": domain, "value": value}, id=_id)
+            # 解决事务问题
             transaction.on_commit(func=DnsConfigViewSet.reload_dns)
             return Response(data=request.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -97,8 +98,12 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         """
         删除DNS解析配置
         """
-        delete_id = request.query_params.get('id', None)
-        if not delete_id:
-            return Response({"message": "删除失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
-        DnsConfig.objects.filter(id=delete_id).delete()
-        return Response({"message": "success", "code": 1}, status=status.HTTP_200_OK)
+        try:
+            delete_id = request.query_params.get('id', None)
+            if not delete_id:
+                return Response({"message": "删除失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
+            DnsConfig.objects.filter(id=delete_id).delete()
+            transaction.on_commit(func=DnsConfigViewSet.reload_dns)
+            return Response({"message": "success", "code": 1}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"code": 0, "message": f"参数操作错误,原因:{e}"}, status=status.HTTP_200_OK)
