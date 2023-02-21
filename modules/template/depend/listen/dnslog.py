@@ -55,13 +55,14 @@ class DNS(dns.DNSDatagramProtocol):
                     # 设置响应码为0，表示成功
                     message.rCode = 0
                     # 存储数据
-                    udomain = re.search(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
+                    udomain = re.findall(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
                     if udomain:
-                        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain,
+                        print(1, udomain[0], type(udomain), flush=True)
+                        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain[0],
                                                                          task__status=1).first()
                         if task_config_item and task_config_item.template.name == "DNS":
                             username = task_config_item.task.user.username
-                            send_email_message(username, name.decode("utf-8"))
+                            send_email_message(username, addr[0])
                             Message.objects.create(domain=name.decode("utf-8"), message_type=MESSAGE_TYPES.DNS,
                                                    remote_addr=addr[0],
                                                    task_id=task_config_item.task_id,
@@ -77,7 +78,7 @@ class DNS(dns.DNSDatagramProtocol):
             # 把回复的报文发送给客户端
             self.transport.write(data, addr)
         except Exception as e:
-            print(repr(e),flush=True)
+            print(repr(e), flush=True)
 
 
 class DnsTemplate(BaseTemplate):

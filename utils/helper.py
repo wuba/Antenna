@@ -210,11 +210,12 @@ def send_message(url, remote_addr, uri, header, message_type, content, task_id, 
             "domain": url, "remote_addr": remote_addr, "uri": uri, "header": header,
             "message_type": message_type, "content": content, "raw": raw}
         task_record = Task.objects.get(id=task_id)
-        message_url = task_record.callback_url
-        message_headers = json.loads(task_record.callback_url_headers)
-        if message_url and message_headers:
-            requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
-            print("发送请求")
+        if task_record.callback_url and task_record.callback_url_headers:
+            message_url = task_record.callback_url
+            message_headers = json.loads(task_record.callback_url_headers)
+            if message_url and message_headers:
+                requests.post(url=message_url, json=data, headers=message_headers, timeout=3)
+                print("发送请求")
     except Exception as e:
         print(e)
 
