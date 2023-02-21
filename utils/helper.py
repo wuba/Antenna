@@ -147,8 +147,6 @@ def send_mail(to, message):
     """
     try:
         mailserver = setting.EMAIL_HOST  # 邮箱服务器地址
-        if mailserver == "1.1.1.1":
-            return False
         port = int(setting.EMAIL_PORT)
         username_send = setting.EMAIL_HOST_USER  # 邮箱用户名
         password = setting.EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
