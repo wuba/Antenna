@@ -57,7 +57,7 @@ class DNS(dns.DNSDatagramProtocol):
                     # 存储数据
                     udomain = re.findall(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
                     if udomain:
-                        print(1, udomain[0], type(udomain), flush=True)
+                        print(udomain[0], flush=True)
                         task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain[0],
                                                                          task__status=1).first()
                         if task_config_item and task_config_item.template.name == "DNS":
