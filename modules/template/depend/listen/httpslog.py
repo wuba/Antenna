@@ -13,6 +13,7 @@ django.setup()
 
 from modules.template.depend.base import BaseTemplate
 
+
 class ProxyWebProtocol(Protocol):
 
     def __init__(self):
@@ -60,10 +61,10 @@ class ProxyProtocol(Protocol):
         index2 = self.request.index(b' ', index1 + 1)
         if (index1 == -1) or (index2 == -1):
             raise Exception('http url error')
-        # part1 = self.request[index1 + 1:index2]
-        # index3 = part1.index(b'/', 8)
-        # url = part1[7:index3]
-        # print('get the url: ', url)
+        part1 = self.request[index1 + 1:index2]
+        index3 = part1.index(b'/', 8)
+        url = part1[7:index3]
+        print('get the url: ', url, flush=True)
         proxy_factory = ProxyWebFactory(self.request, self)
         reactor.connectTCP("0.0.0.0", 80, proxy_factory)
 
@@ -102,7 +103,7 @@ class HttpsTemplate(BaseTemplate):
 
 def main():
     try:
-        print(f"HTTPS 协议监听模块已开启 443 port starting listen ...")
+        print(f"HTTPS 协议监听模块已开启 443 port starting listen ...", flush=True)
         factory = ProxyFactory()
         reactor.listenSSL(443, factory,
                           ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/conf/server.key',

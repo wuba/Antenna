@@ -96,7 +96,7 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
     @action(methods=['delete'], detail=False, permission_classes=[IsAdminUser])
     def dns_delete(self, request, *args, **kwargs):
         """
-        删除DNS解析配置
+        删除DNS解析配置,
         """
         try:
             delete_id = request.query_params.get('id', None)
