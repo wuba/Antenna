@@ -32,12 +32,6 @@ services:
       - "2345:2345"
       - "53:53/udp"
       - "443:443"
-    environment:
-      # 平台数据库配置，与上mysql配置保持一致
-      MYSQL_HOST: db
-      MYSQL_PORT: 3306
-      MYSQL_USERNAME: root
-      MYSQL_PASSWORD: Antenna@58.com
     env_file:
       - .env
     networks:
