@@ -11,3 +11,10 @@ FIRST_LOGIN = Enumeration([
     (0, "FALSE", "false"),
     (1, "TRUE", "true"),
 ])
+
+# 平台注册方式
+REGISTER_TYPE = Enumeration([
+    (0, "REFUSE", "refuse"),
+    (1, "EMAIL", "email"),
+    (2, "INVITE", "invite"),
+])

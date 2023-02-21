@@ -6,13 +6,12 @@ import re
 from twisted.internet import ssl, reactor
 from twisted.internet.protocol import Factory, Protocol, ClientFactory, ServerFactory
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
 from modules.template.depend.base import BaseTemplate
-from modules.config.setting import PLATFORM_DOMAIN
 
 class ProxyWebProtocol(Protocol):
 
@@ -66,7 +65,7 @@ class ProxyProtocol(Protocol):
         # url = part1[7:index3]
         # print('get the url: ', url)
         proxy_factory = ProxyWebFactory(self.request, self)
-        reactor.connectTCP(PLATFORM_DOMAIN, 80, proxy_factory)
+        reactor.connectTCP("0.0.0.0", 80, proxy_factory)
 
     # self.transport.loseConnection()
 
@@ -103,13 +102,12 @@ class HttpsTemplate(BaseTemplate):
 
 def main():
     try:
+        print(f"HTTPS 协议监听模块已开启 443 port starting listen ...")
         factory = ProxyFactory()
         reactor.listenSSL(443, factory,
-                          ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/depend/listen/keys/server.key',
-                                                           f'{PROJECT_ROOT}/depend/listen/keys/server.crt'))
-
+                          ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/conf/server.key',
+                                                           f'{PROJECT_ROOT}/conf/server.crt'))
         reactor.run()
-        print("HTTPS 协议监听模块已开启 443 port starting listen ...")
     except Exception as e:
         print(e)
 

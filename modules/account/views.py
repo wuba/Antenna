@@ -20,7 +20,8 @@ from rest_framework import mixins, status
 from modules.task.constants import SHOW_DASHBOARD, TASK_TMP, TASK_STATUS
 from modules.task.models import TaskConfigItem
 from modules.account.constants import FIRST_LOGIN
-from modules.config.setting import OPEN_REGISTER, INVITE_TO_REGISTER
+from modules.config import setting
+from modules.account.constants import REGISTER_TYPE
 
 
 class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
@@ -60,7 +61,6 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
             return Response({"message": "发送邮件失败"}, status=status.HTTP_200_OK)
         return Response({"email": username}, status=status.HTTP_200_OK)
 
-
 class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet, ):
     queryset = User.objects.all().order_by("-id")
     serializer_class = UserInfoSerializer
@@ -95,14 +95,13 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         注册用户
         """
         serializer = UserRegisterSerializer(data=request.data,
-                                            context={"INVITE_TO_REGISTER": INVITE_TO_REGISTER,
-                                                     "OPEN_REGISTER": OPEN_REGISTER})
+                                            context={"REGISTER_TYPE": setting.REGISTER_TYPE})
         serializer.is_valid(raise_exception=True)
         username = request.data["username"]
         password = request.data["password"]
         user = User.objects.create_user(username=username, password=password)
         invite_code = request.data.get("invite_code", "")
-        if INVITE_TO_REGISTER == "1":  # 判断是开放邀请注册
+        if setting.REGISTER_TYPE == REGISTER_TYPE.INVITE:  # 判断是开放邀请注册
             InviteCode.objects.filter(code=invite_code).delete()
         apikey = generate_code(32)
         ApiKey.objects.create(user=user, key=apikey)

@@ -14,3 +14,14 @@ class Config(models.Model):
 
     class Meta:
         db_table = 'config'
+
+
+class DnsConfig(models.Model):
+    """
+    DNS解析配置
+    """
+    domain = models.CharField(max_length=32, help_text='域名')
+    value = models.JSONField(max_length=128, default=list, help_text="解析类型")
+
+    class Meta:
+        db_table = 'dnsconfig'

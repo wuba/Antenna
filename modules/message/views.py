@@ -19,9 +19,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from django.db.models import Avg, Max, Min, Count, Sum, Q
-from utils.helper import get_payload, send_message, get_message_type_name, reconstruct_request, get_param_message
+from utils.helper import get_payload, send_message, get_message_type_name, reconstruct_request, get_param_message, \
+    send_email_message
 from modules.task.constants import TASK_TMP
-from modules.config.setting import PLATFORM_DOMAIN
+from modules.config import setting
 from utils.helper import is_base64
 
 
@@ -224,10 +225,12 @@ def index(request):
                              raw=raw_response)
 
     # http 请求日志
-    elif len(domain_key) == 4 and domain_key != PLATFORM_DOMAIN.split('.')[0]:
+    elif len(domain_key) == 4 and domain_key != setting.PLATFORM_DOMAIN.split('.')[0]:
         task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                          task__status=1).first()
         if task_config_item:
+            username = task_config_item.task.user.username
+            send_email_message(username, remote_addr)
             Message.objects.create(domain=host, remote_addr=remote_addr, uri=path, header=headers,
                                    message_type=MESSAGE_TYPES.HTTP, content=message,
                                    task_id=task_config_item.task_id,

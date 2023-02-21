@@ -3,6 +3,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from modules.account.models import VerifyCode, InviteCode, User
 from modules.config.models import Config
+from modules.config import setting
+from modules.account.constants import REGISTER_TYPE
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -105,8 +107,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return verify_code
 
     def validate_invite_code(self, invite_code=""):
-        INVITE_TO_REGISTER = self.context["INVITE_TO_REGISTER"]
-        if INVITE_TO_REGISTER != 1:
+        REGISTER_TYPE = self.context["REGISTER_TYPE"]
+        if REGISTER_TYPE != REGISTER_TYPE.INVITE:
             return invite_code
         invite_code_record = InviteCode.objects.filter(code=invite_code).exists()
         if not invite_code_record:
@@ -114,8 +116,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return invite_code
 
     def validate(self, attrs):
-        OPEN_REGISTER = self.context["OPEN_REGISTER"]
-        if OPEN_REGISTER != 1:
+        REGISTER_TYPE = self.context["REGISTER_TYPE"]
+        if REGISTER_TYPE == REGISTER_TYPE.REFUSE:
             raise serializers.ValidationError('禁止注册')
         return attrs
 

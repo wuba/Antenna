@@ -10,6 +10,6 @@ python3 manage.py migrate
 echo "migrate success!"
 
 #python3 manage.py runserver 0.0.0.0:80
-unlink /run/supervisord.sock
+unlink /run/supervisor/supervisor.sock
 supervisord -n -c /etc/supervisord.conf
 
