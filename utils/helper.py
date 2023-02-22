@@ -174,7 +174,6 @@ def send_mail(to, message):
 def send_email_message(username, ip):
     """接收到消息发送给对应用户"""
     try:
-        print(setting.OPEN_EMAIL, flush=True)
         if setting.OPEN_EMAIL == 1:
             message = f"""
         【ANTENNA】平台接收到来自{ip}的请求,请查看"""
