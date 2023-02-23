@@ -95,8 +95,8 @@ class DynamicResolver(object):
             if fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()):
                 answers.append(dns.RRHeader(
                     name=name,
-                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain]), encoding="utf-8"))))
-                #存储数据
+                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain]), encoding="utf-8")), ttl=0))
+                # 存储数据
                 udomain = re.findall(r'\.?([^\.]+)\.%s' % domain.strip("*."), name.decode("utf-8"))
                 if udomain:
                     task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain[0],
@@ -135,6 +135,30 @@ def main():
     reactor.listenUDP(53, protocol, interface="0.0.0.0")
 
     reactor.run()
+
+
+class DnsTemplate(BaseTemplate):
+    info = [{
+        "template_info": {
+            "name": "DNS",  # 组件名
+            "title": "DNS协议监听组件",  # 组件展示标题名
+            "author": "bios000",  # 组件作者
+            "type": 1,  # 组件类型，1是监听0是利用
+            "desc": "",  # 组件介绍
+            "desc_url": "",  # 组件使用说明链接
+            "choice_type": 0,  # 组件选择类型0是单选，1是多选
+            "payload": "{key}.{dns_domain}",  # 组件利用实例
+            "file_name": "dnslog.py",
+
+        },
+        "item_info": [{
+            "name": "dns_log",
+            "config": [],
+
+        }]}]
+
+    def __init__(self):
+        super().__init__()
 
 
 if __name__ == '__main__':
