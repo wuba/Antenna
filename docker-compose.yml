@@ -10,6 +10,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: Antenna@58.com
       MYSQL_DATABASE: antenna
+      TZ: Asia/Shanghai
     networks:
       - antenna
     restart: always
