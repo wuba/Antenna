@@ -25,7 +25,7 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         mapping = {"1": True, "true": True, "0": False, "false": False}
         for i in data:
             if i["name"] == "REGISTER_TYPE":
-                _data[i["name"]] = i['value']
+                _data[i["name"]] = int(i['value'])
             else:
                 _data[i["name"]] = mapping.get(i['value'], i['value'])
         return Response(_data, status=status.HTTP_200_OK)

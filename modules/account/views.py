@@ -1,7 +1,3 @@
-import string
-from datetime import datetime
-from random import random
-
 from django.contrib import auth
 from django.contrib.auth.models import update_last_login
 from django.db import transaction
@@ -45,18 +41,6 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
         VerifyCode.objects.create(verify_code=code, username=username)  # 保存验证码
         return Response({"email": username}, status=status.HTTP_200_OK)
 
-    # from django.core.mail import send_mail
-    #
-    # # ...
-    #
-    # send_status = send_mail(
-    #     subject="验证码",
-    #     message=f"您的验证码是{code}",
-    #     from_email=None,
-    #     recipient_list=[username],
-    #     fail_silently=False,
-    # )
-
     @action(methods=['POST'], detail=False, permission_classes=[IsAdminUser])
     def test(self, request, *args, **kwargs):
         """
@@ -77,58 +61,49 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
         return Response({"email": username}, status=status.HTTP_200_OK)
 
 
-# class TaskCreator:
-#     DNS_CODE_LENGTH = 4
-#     HTTP_CODE_LENGTH = 4
-#
-#     def __init__(self, user_id):
-#         self.user_id = user_id
-#
-#     def create_initial_task(self):
-#         """
-#         创建初始任务
-#         """
-#         initial_task = Task.objects.create(
-#             name="初始任务",
-#             user_id=self.user_id,
-#             status=TASK_STATUS.OPEN,
-#             is_tmp=TASK_TMP.FORMAL,
-#             show_dashboard=SHOW_DASHBOARD.TRUE
-#         )
-#
-#         dns_code = self._generate_code(self.DNS_CODE_LENGTH)
-#         dns_task_config = self._create_task_config(initial_task, dns_code, "DNS", "dns_log")
-#
-#         http_code = self._generate_code(self.HTTP_CODE_LENGTH)
-#         http_task_config = self._create_task_config(initial_task, http_code, "HTTP", "http_log")
-#
-#         return initial_task
-#
-#     @staticmethod
-#     def _generate_code(length):
-#         """
-#         生成指定长度的随机字符串
-#         """
-#         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-#
-#     @staticmethod
-#     def _create_task_config(task, key, template_name, config_item_name):
-#         """
-#         创建任务配置项
-#         """
-#         template = Template.objects.get(name=template_name)
-#         template_config_item = TemplateConfigItem.objects.get(name=config_item_name)
-#
-#         task_config = TaskConfig.objects.create(task=task, key=key)
-#         TaskConfigItem.objects.create(
-#             value={},
-#             template_config_item=template_config_item,
-#             task=task,
-#             template=template,
-#             task_config=task_config
-#         )
-#
-#         return task_config
+class TaskCreator:
+    DNS_CODE_LENGTH = 4
+    HTTP_CODE_LENGTH = 4
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+
+    def create_initial_task(self):
+        """
+        创建初始任务
+        """
+        initial_task = Task.objects.create(
+            name="初始任务",
+            user_id=self.user_id,
+            status=TASK_STATUS.OPEN,
+            is_tmp=TASK_TMP.FORMAL,
+            show_dashboard=SHOW_DASHBOARD.TRUE
+        )
+
+        dns_code = generate_code(self.DNS_CODE_LENGTH)
+        dns_task_config = self._create_task_config(initial_task, dns_code, "DNS", "dns_log")
+        http_code = generate_code(self.HTTP_CODE_LENGTH)
+        http_task_config = self._create_task_config(initial_task, http_code, "HTTP", "http_log")
+
+        return initial_task
+
+    @staticmethod
+    def _create_task_config(task, key, template_name, config_item_name):
+        """
+        创建任务配置项
+        """
+        template = Template.objects.get(name=template_name)
+        template_config_item = TemplateConfigItem.objects.get(name=config_item_name)
+        task_config = TaskConfig.objects.create(task=task, key=key)
+        TaskConfigItem.objects.create(
+            value={},
+            template_config_item=template_config_item,
+            task=task,
+            template=template,
+            task_config=task_config
+        )
+
+        return task_config
 
 
 class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet, ):
@@ -138,35 +113,11 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
     filter_fields = ("username", "is_staff", "is_active")
     permission_classes = (IsAdminUser,)
 
-    @staticmethod
-    def create_initial_task(user_id):
-        """
-        创建初始任务
-        TODO: 减少重复查询数据库：可以使用 select_related() 或 prefetch_related()
-        """
-        initial_task = Task.objects.create(name=f"初始任务", user_id=user_id, status=TASK_STATUS.OPEN,
-                                           is_tmp=TASK_TMP.FORMAL,
-                                           show_dashboard=SHOW_DASHBOARD.TRUE)  # 创建初始任务
-        dns_code = generate_code(4)
-        dns_task_config = TaskConfig.objects.create(task_id=initial_task.id, key=dns_code)
-        TaskConfigItem.objects.create(value={},
-                                      template_config_item_id=TemplateConfigItem.objects.get(name="dns_log").id,
-                                      task_id=initial_task.id, template_id=Template.objects.get(name="DNS").id,
-                                      task_config_id=dns_task_config.id)
-        http_code = generate_code(4)
-        http_task_config = TaskConfig.objects.create(task_id=initial_task.id, key=http_code)
-        TaskConfigItem.objects.create(value={},
-                                      template_config_item_id=TemplateConfigItem.objects.get(name="http_log").id,
-                                      task_id=initial_task.id, template_id=Template.objects.get(name="HTTP").id,
-                                      task_config_id=http_task_config.id)
-
     @action(methods=["POST"], detail=False, permission_classes=[AllowAny])
-    # @transaction.atomic()
+    @transaction.atomic()
     def register(self, request, *args, **kwargs):
         """
         注册用户
-        Todo:使用事务处理数据库操作：将代码包裹在 transaction.atomic() 中，以确保数据库操作的原子性。
-            这将确保如果任何操作失败，整个事务将被回滚。将部分逻辑移入帮助函数中：将注册方法中的代码拆分为较小的
         """
         serializer = UserRegisterSerializer(data=request.data,
                                             context={"REGISTER_TYPE": setting.REGISTER_TYPE})
@@ -179,7 +130,8 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
             InviteCode.objects.filter(code=invite_code).delete()
         apikey = generate_code(32)
         ApiKey.objects.create(user=user, key=apikey)
-        self.create_initial_task(user_id=user.id)
+        task_creator = TaskCreator(user_id=user.id)
+        task_creator.create_initial_task()
         response_data = {
             "username": username,
             "apikey": apikey
