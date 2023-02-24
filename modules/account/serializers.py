@@ -1,10 +1,13 @@
 import datetime
+
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from modules.account.models import VerifyCode, InviteCode, User
 from modules.config.models import Config
 from modules.config import setting
 from modules.account.constants import REGISTER_TYPE
+from django.core.cache import cache
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -29,6 +32,50 @@ class EmailSerializer(serializers.Serializer):
         num_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
         if VerifyCode.objects.filter(username=username, create_time__gt=num_time).count() > 10:
             raise serializers.ValidationError('短时间内超过获取验证码次数')
+        return username
+
+
+# class EmailSerializer(serializers.Serializer):
+"""
+Todo:在上述示例中，我们使用 Django 内置的缓存系统来实现缓存功能。在序列化器初始化时，我们设置了一个缓存键
+email_verify_codes。然后在 validate_username 方法中，我们从缓存中获取已发送验证码的邮箱列表，并检查输入
+的邮箱地址是否存在于缓存中。如果存在，我们检查该邮箱地址的发送次数和最近一次发送时间是否符合限制，并更新缓存中该
+邮箱地址的发送次数和最近一次发送时间。如果不存在，我们将该邮箱地址添加到缓存中，并设置发送次数为 1，最近一次发送时间
+为当前时间。最后，我们返回输入的邮箱地址。"""
+
+
+#     username = serializers.EmailField(required=True, help_text='验证码',
+#                                       error_messages={
+#                                           'required': '该字段是必填字段',
+#                                           'blank': '请输入邮箱地址'
+#                                       })
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.cache_key = 'email_verify_codes'
+#
+#     def validate_username(self, username):
+#         num_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
+#
+#         # 从缓存中获取已发送验证码的邮箱列表
+#         email_codes = cache.get(self.cache_key, {})
+#         email_code = email_codes.get(username, {'count': 0, 'last_sent': None})
+#
+#         # 检查发送次数是否超过限制
+#         if email_code['count'] > 10:
+#             raise serializers.ValidationError('短时间内超过获取验证码次数')
+#
+#         # 检查最近一次发送时间是否超过 5 分钟
+#         if email_code['last_sent'] is not None and email_code['last_sent'] > num_time:
+#             raise serializers.ValidationError('操作过于频繁，请稍后再试')
+#
+#         # 更新缓存中该邮箱地址的发送次数和最近一次发送时间
+#         email_code['count'] += 1
+#         email_code['last_sent'] = datetime.datetime.now()
+#         email_codes[username] = email_code
+#         cache.set(self.cache_key, email_codes, timeout=300)
+#
+#         return username
 
 
 class TestEmailSerializer(serializers.Serializer):
@@ -41,13 +88,16 @@ class TestEmailSerializer(serializers.Serializer):
     EMAIL_HOST_PASSWORD = serializers.CharField(required=True, help_text="用户授权码")
 
     def validate(self, attrs):
+        # OLD_EMAIL_HOST, OLD_EMAIL_PORT, OLD_EMAIL_HOST_USER, OLD_EMAIL_HOST_PASSWORD = (
+        #     config_record.get(name=name).value for name in ["EMAIL_HOST", "EMAIL_PORT", "EMAIL_HOST_USER", "EMAIL_HOST_PASSWORD"]
+        # )
         config_record = Config.objects.all()
         OLD_EMAIL_HOST = config_record.get(name="EMAIL_HOST").value
         OLD_EMAIL_PORT = config_record.get(name="EMAIL_PORT").value
         OLD_EMAIL_HOST_USER = config_record.get(name="EMAIL_HOST_USER").value
         OLD_EMAIL_HOST_PASSWORD = config_record.get(name="EMAIL_HOST_PASSWORD").value
         if OLD_EMAIL_HOST != attrs["EMAIL_HOST"] or OLD_EMAIL_PORT != attrs["EMAIL_PORT"] or OLD_EMAIL_HOST_USER != \
-                attrs["EMAIL_HOST_USER"] or OLD_EMAIL_HOST_PASSWORD != attrs["EMAIL_HOST_PASSWORD"]:
+            attrs["EMAIL_HOST_USER"] or OLD_EMAIL_HOST_PASSWORD != attrs["EMAIL_HOST_PASSWORD"]:
             raise serializers.ValidationError('平台配置未保存，请保存后再进行测试')
         return attrs
 
@@ -76,7 +126,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         'blank': '请输入名字'
     }, validators=[UniqueValidator(queryset=User.objects.
                                    all(), message="用户已存在")])
-    password = serializers.CharField(required=True, allow_blank=False, min_length=8, max_length=16,
+    password = serializers.CharField(required=True, allow_blank=False, min_length=6, max_length=16,
                                      help_text='用户密码',
                                      error_messages={
                                          'min_length': '密码不能少于6位', 'required': '该字段是必填字段',
@@ -91,33 +141,30 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     # 对code字段单独验证(validate_+字段名)
     def validate_verify_code(self, verify_code):
-        verify_records = VerifyCode.objects.filter(username=self.initial_data['username']).order_by(
-            '-create_time').first()
-        if verify_records:
-            # 判断验证码是否正确
-            if verify_records.verify_code != verify_code:
-                raise serializers.ValidationError('验证码错误')
-            # 判断验证码是否过期
-            five_minutes_ago = datetime.datetime.now() - datetime.timedelta(hours=0, minutes=5, seconds=0)  # 获取5分钟之前的时间
-            if verify_records.create_time < five_minutes_ago.replace(tzinfo=None):
-                raise serializers.ValidationError('验证码过期')
-            # 不用将verify_code返回到数据库中，只是做验证
-        else:
+        user_email = self.initial_data['username']
+        try:
+            verify_records = VerifyCode.objects.filter(username=user_email).order_by('-create_time').first()
+        except VerifyCode.DoesNotExist:
             raise serializers.ValidationError('验证码错误')
+        # 判断验证码是否正确
+        if verify_records.verify_code != verify_code:
+            raise serializers.ValidationError('验证码错误')
+        # 判断验证码是否过期
+        five_minutes_ago = timezone.now() - datetime.timedelta(minutes=5)
+        if verify_records.create_time < five_minutes_ago.replace(tzinfo=None):
+            raise serializers.ValidationError('验证码过期')
         return verify_code
 
     def validate_invite_code(self, invite_code=""):
-        REGISTER_TYPE = self.context["REGISTER_TYPE"]
-        if REGISTER_TYPE != REGISTER_TYPE.INVITE:
-            return invite_code
-        invite_code_record = InviteCode.objects.filter(code=invite_code).exists()
-        if not invite_code_record:
-            raise serializers.ValidationError('邀请码错误或失效')
+        register_type = self.context["REGISTER_TYPE"]
+        if register_type == REGISTER_TYPE.INVITE:
+            if not InviteCode.objects.filter(code=invite_code).exists():
+                raise serializers.ValidationError('邀请码错误或失效')
         return invite_code
 
     def validate(self, attrs):
-        REGISTER_TYPE = self.context["REGISTER_TYPE"]
-        if REGISTER_TYPE == REGISTER_TYPE.REFUSE:
+        register_type = self.context["REGISTER_TYPE"]
+        if register_type == REGISTER_TYPE.REFUSE:
             raise serializers.ValidationError('禁止注册')
         return attrs
 
@@ -135,7 +182,7 @@ class ForgetPasswordSerializer(serializers.ModelSerializer):
                                           'required': '该字段是必填字段',
                                           'blank': '请输入验证码'
                                       })
-    password = serializers.CharField(required=True, allow_blank=False, min_length=8, max_length=16,
+    password = serializers.CharField(required=True, allow_blank=False, min_length=6, max_length=16,
                                      help_text='用户密码',
                                      validators=[UniqueValidator(queryset=User.objects.
                                                                  filter(username=username), message='密码与之前相同')],
@@ -152,26 +199,24 @@ class ForgetPasswordSerializer(serializers.ModelSerializer):
         fields = ('username', 'verify_code', 'password', 'password_confirm')
 
     def validate_username(self, username):
-        username_record = User.objects.filter(username=username)
-        if not username_record:
+        if not User.objects.filter(username=username).exists():
             raise serializers.ValidationError('用户名不存在')
         return username
 
     def validate_verify_code(self, verify_code):
-        verify_records = VerifyCode.objects.filter(username=self.initial_data['username']).order_by(
-            '-create_time').first()
-        if verify_records:
-            # 判断验证码是否正确
-            if verify_records.verify_code != verify_code:
-                raise serializers.ValidationError('验证码错误')
-            # 判断验证码是否过期
-            five_minutes_ago = datetime.datetime.now() - datetime.timedelta(hours=0, minutes=1, seconds=0)  # 获取1分钟之前的时间
-            if verify_records.create_time < five_minutes_ago:
-                raise serializers.ValidationError('验证码过期')
-            # 不用将code返回到数据库中，只是做验证
-            return verify_code
-        else:
+        user_email = self.initial_data['username']
+        try:
+            verify_records = VerifyCode.objects.filter(username=user_email).order_by('-create_time').first()
+        except VerifyCode.DoesNotExist:
             raise serializers.ValidationError('验证码错误')
+        # 判断验证码是否正确
+        if verify_records.verify_code != verify_code:
+            raise serializers.ValidationError('验证码错误')
+        # 判断验证码是否过期
+        five_minutes_ago = timezone.now() - datetime.timedelta(minutes=5)
+        if verify_records.create_time < five_minutes_ago.replace(tzinfo=None):
+            raise serializers.ValidationError('验证码过期')
+        return verify_code
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
@@ -197,12 +242,23 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'old_password', 'password', 'password_confirm')
 
-    def validate(self, attrs):
-        if attrs["old_password"] == attrs["password"]:
-            raise serializers.ValidationError('新密码与旧密码相同')
-        if attrs["password"] != attrs["password_confirm"]:
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError('旧密码不正确')
+        return value
+
+    def validate_password_confirm(self, value):
+        password = self.initial_data.get('password')
+        if password != value:
             raise serializers.ValidationError('确认密码与新密码不同')
-        return attrs
+        return value
+
+    def validate_password(self, value):
+        old_password = self.initial_data.get('old_password')
+        if old_password == value:
+            raise serializers.ValidationError('新密码与旧密码相同')
+        return value
 
 
 class UserLoginSerializer(serializers.ModelSerializer):

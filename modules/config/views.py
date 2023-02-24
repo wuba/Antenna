@@ -1,4 +1,6 @@
 import os
+import subprocess
+
 from django.db import transaction
 
 from modules.config.models import Config, DnsConfig
@@ -20,38 +22,37 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
 
     def get_paginated_response(self, data):
         _data = {}
+        mapping = {"1": True, "true": True, "0": False, "false": False}
         for i in data:
-            if i['value'] == "1" or i['value'].lower() == "true":
-                i['value'] = True
-            elif i['value'] == "0" or i['value'].lower() == "false":
-                i['value'] = False
-            _data[i["name"]] = i['value']
+            if i["name"] == "REGISTER_TYPE":
+                _data[i["name"]] = int(i['value'])
+            else:
+                _data[i["name"]] = mapping.get(i['value'], i['value'])
         return Response(_data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[IsAdminUser, ])
     def platform_update(self, request, *args, **kwargs):
-        """
-        更新平台配置
-        """
+        """ 更新平台配置 """
         serializer = PlatformUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        try:
-            for k in request.data.keys():
-                Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).update(value=str(request.data[k]))
-            reload_config()
-            return Response(data=request.data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
+        for k in request.data.keys():
+            if Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).exists():
+                try:
+                    Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).update(value=str(request.data[k]))
+                    transaction.on_commit(func=reload_config)
+                    return Response(data=request.data, status=status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message": "更新失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
 
     @action(methods=["GET"], detail=False, permission_classes=[AllowAny, ])
     def open_invite(self, requests, *args, **kwargs):
         """
         查看是否开启邀请码设置
         """
-        flag = False
-        if setting.REGISTER_TYPE == 2:
-            flag = True
-        return Response({"open_invite": int(flag)}, status=status.HTTP_200_OK)
+        flag = int(setting.REGISTER_TYPE == 2)
+        return Response({"open_invite": flag}, status=status.HTTP_200_OK)
 
 
 class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
@@ -65,7 +66,7 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         重启dns组件
         """
         try:
-            os.system("supervisorctl restart antenna-dns")
+            subprocess.Popen(["supervisorctl", "restart", "antenna-dns"], stdout=subprocess.PIPE)
         except Exception as e:
             print(e)
 
@@ -84,8 +85,8 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         try:
             data = request.data
             _id = data.get('id')
-            domain = data.get('domain')
-            value = data.get('value')
+            domain = request.data.get('domain')
+            value = request.data.get('value')
             DnsConfig.objects.update_or_create(defaults={"domain": domain, "value": value}, id=_id)
             # 解决事务问题
             transaction.on_commit(func=DnsConfigViewSet.reload_dns)
@@ -95,14 +96,12 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
 
     @action(methods=['delete'], detail=False, permission_classes=[IsAdminUser])
     def dns_delete(self, request, *args, **kwargs):
-        """
-        删除DNS解析配置,
-        """
+        """ 删除DNS解析配置, """
+        delete_id = request.query_params.get('id', None)
+        if not delete_id:
+            return Response({"message": "删除失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
         try:
-            delete_id = request.query_params.get('id', None)
-            if not delete_id:
-                return Response({"message": "删除失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
-            DnsConfig.objects.filter(id=delete_id).delete()
+            DnsConfig.objects.get(id=delete_id).delete()
             transaction.on_commit(func=DnsConfigViewSet.reload_dns)
             return Response({"message": "success", "code": 1}, status=status.HTTP_200_OK)
         except Exception as e:

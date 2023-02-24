@@ -13,17 +13,24 @@
                     <div class="left">平台设置</div>
                 </div>
                 <div class="content">
-                    <a-form-model-item label="开放注册">
-                        <a-switch v-model="form.OPEN_REGISTER" @click="openBtn($event, 'OPEN_REGISTER')" />
-                    </a-form-model-item>
-                    <a-form-model-item label="仅允许邀请注册">
-                        <a-switch v-model="form.INVITE_TO_REGISTER" @click="openBtn($event, 'INVITE_TO_REGISTER')" />
+                    <a-form-model-item label="平台注册">
+                        <a-select v-model="form.REGISTER_TYPE" style="width: 120px" @change="handleChange">
+                            <a-select-option :key="1" :value="0">关闭</a-select-option>
+                            <a-select-option :key="2" :value="1">开放(需填写通知)-SMTP配置</a-select-option>
+                            <a-select-option :key="3" :value="3">仅允许(需填写通知)-SMTP配置</a-select-option>
+                        </a-select>
                     </a-form-model-item>
                     <a-form-model-item ref="PLATFORM_DOMAIN" label="平台域名" prop="PLATFORM_DOMAIN">
                         <a-input v-model="form.PLATFORM_DOMAIN" addon-before="http://" placeholder="请输入" />
                     </a-form-model-item>
                     <a-form-model-item label="开启邮件通知">
                         <a-switch v-model="form.OPEN_EMAIL" @click="openBtn($event, 'OPEN_EMAIL')" />
+                    </a-form-model-item>
+                    <a-form-model-item label="保留七天消息">
+                        <a-switch
+                            v-model="form.SAVE_MESSAGE_SEVEN_DAYS"
+                            @click="openBtn($event, 'SAVE_MESSAGE_SEVEN_DAYS')"
+                        />
                     </a-form-model-item>
                     <a-form-model-item ref="EMAIL_HOST" label="SMTP服务器" prop="EMAIL_HOST">
                         <a-input
@@ -104,27 +111,21 @@
                     <div class="left">协议设置</div>
                 </div>
                 <div class="content">
-                    <a-form-model-item ref="DNS_DOMAIN" label="DNS记录域名" prop="DNS_DOMAIN">
-                        <a-input v-model="form.DNS_DOMAIN" placeholder="必填,仅支持smtp协议,如：smtp.xxx.com" />
-                    </a-form-model-item>
-                    <a-form-model-item ref="SERVER_IP" label="解析IP" prop="SERVER_IP">
-                        <a-input v-model="form.SERVER_IP" placeholder="必填,如0.0.0.0" />
-                    </a-form-model-item>
-                    <a-form-model-item ref="NS1_DOMAIN" label="NS1域名" prop="NS1_DOMAIN">
-                        <a-input v-model="form.NS1_DOMAIN" placeholder="必填,仅支持smtp协议,如：smtp.xxx.com" />
-                    </a-form-model-item>
-                    <a-form-model-item ref="NS2_DOMAIN" label="NS2域名" prop="NS2_DOMAIN">
-                        <a-input v-model="form.NS2_DOMAIN" placeholder="必填,如：334" />
-                    </a-form-model-item>
-                    <a-form-model-item ref="JNDI_PORT" label="JNDI监听端口" prop="JNDI_PORT">
-                        <a-input v-model="form.JNDI_PORT" placeholder="必填,如：text@xxx.com" />
-                    </a-form-model-item>
-                    <a-form-model-item :wrapper-col="{ span: 4, offset: 4 }" class="wb-m-t-20">
-                        <a-button type="primary" @click="onSubmit('ruleForm1')" :loading="protocalUpdateLoafing">
-                            保存
-                        </a-button>
-                        <a-button @click="resetForm('ruleForm1')" class="wb-m-l-5">重置</a-button>
-                    </a-form-model-item>
+                    <a-table :columns="columns" :data-source="tableData" key="id">
+                        <a slot="type" slot-scope="type">A</a>
+                        <a slot="domain" slot-scope="domain, record">
+                            <a-Input :value="domain" @change="inputDomain($event, record)" />
+                        </a>
+                        <a slot="value" slot-scope="value, record">
+                            <a-select @change="(e) => setvalues(e, record)" mode="tags" :value="value" />
+                        </a>
+                        <a slot="id" slot-scope="id, record">
+                            <a-button type="primary" class="mgright5" @click="saveDns(record)">保存</a-button>
+                            <a-popconfirm title="确认删除本行吗?" ok-text="是" cancel-text="否" @confirm="onDel(id)">
+                                <a-button type="danger">删除</a-button>
+                            </a-popconfirm>
+                        </a>
+                    </a-table>
                 </div>
             </a-form-model>
         </div>
@@ -141,6 +142,7 @@ export default {
             wrapperCol1: { span: 20 },
             form: {
                 OPEN_REGISTER: '',
+                REGISTER_TYPE: 0,
                 name: '',
                 INVITE_TO_REGISTER: '',
                 PLATFORM_DOMAIN: '',
@@ -149,7 +151,7 @@ export default {
                 EMAIL_HOST_USER: '',
                 EMAIL_PORT: '',
                 EMAIL_HOST_PASSWORD: '',
-
+                SAVE_MESSAGE_SEVEN_DAYS: false,
                 DNS_DOMAIN: '',
                 SERVER_IP: '',
                 NS1_DOMAIN: '',
@@ -194,16 +196,105 @@ export default {
             sendMailLoaging: false,
             form2: {},
             num: 1,
+            columns: [
+                {
+                    dataIndex: 'id',
+                    key: 'id',
+                    title: 'id',
+                },
+                {
+                    dataIndex: 'type',
+                    key: 'type',
+                    title: '解析类型',
+                    scopedSlots: { customRender: 'type' },
+                },
+                {
+                    dataIndex: 'domain',
+                    key: 'domain',
+                    title: '解析域名(*.test.com)代表所有子域名',
+                    scopedSlots: { customRender: 'domain' },
+                },
+                {
+                    dataIndex: 'value',
+                    key: 'value',
+                    title: '解析内容',
+                    scopedSlots: { customRender: 'value' },
+                },
+                {
+                    dataIndex: 'id',
+                    key: 'id',
+                    title: '操作',
+                    scopedSlots: { customRender: 'id' },
+                },
+            ],
+            tableData: [],
         }
     },
     created() {
         this.initData()
     },
-    mounted() {},
+    mounted() {
+        this.getDnsInfo()
+    },
     methods: {
+        saveDns(record) {
+            Service.dns_update({ id: record.id, value: record.value, domain: record.domain }).then((res) => {
+                if (res.code === 1) {
+                    //保存成功
+                    this.$message.success('保存成功')
+                    this.getDnsInfo()
+                }
+            })
+        },
+        setvalues(e, r) {
+            const a = e.filter((item) => this.isIP(item))
+
+            this.tableData.forEach((item) => {
+                if (item.id === r.id) {
+                    item.value = a
+                }
+            })
+        },
+        isIP(ip) {
+            var re =
+                /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+            return re.test(ip)
+        },
+        inputDomain(e, r) {
+            this.tableData.forEach((item) => {
+                if (item.id === r.id) {
+                    item.domain = e.target.value
+                }
+            })
+        },
+        onDel(n) {
+            const length = this.tableData.length
+            if (this.tableData[length - 1].id === n) {
+                this.$message.warn('不能删除最后一项')
+            } else {
+                Service.dns_delete({ id: n }).then((res) => {
+                    if (res.code === 1) {
+                        //删除成功
+                        this.$message.success('删除成功')
+                        this.getDnsInfo()
+                    }
+                })
+            }
+        },
+        getDnsInfo() {
+            Service.get_dns().then((res) => {
+                const arr = res.data.results
+                const length = arr.length
+                if (length) {
+                    arr.push({ id: arr[length - 1].id + 1, domain: '', value: [] })
+                } else {
+                    arr.push({ id: 1, domain: '', value: [] })
+                }
+                this.tableData = arr
+            })
+        },
         initData() {
             Service.getConfigsManage({ page_size: 20 }).then((res) => {
-                debugger
                 if (res.code === 1) {
                     this.form = res.data
                     this.formSpare = Object.assign({}, res.data)
@@ -268,7 +359,6 @@ export default {
             )
         },
         openBtn(e, name) {
-            debugger
             let _this = this,
                 title = e ? '是否打开' : '是否关闭'
             this.$confirm({
@@ -299,6 +389,9 @@ export default {
     margin-bottom: 5px;
     line-height: 32px;
 }
+.inputWidth {
+    width: 100px;
+}
 .platform {
     .ant-form-item {
         margin-bottom: 12px;
@@ -313,6 +406,9 @@ export default {
         text-overflow: ellipsis;
         -webkit-line-clamp: 3;
         margin-bottom: 0px;
+    }
+    .mgright5 {
+        margin-right: 5px;
     }
 }
 </style>

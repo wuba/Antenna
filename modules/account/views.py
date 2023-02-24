@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from django.contrib import auth
 from django.contrib.auth.models import update_last_login
+from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
@@ -34,9 +33,9 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = request.data["username"]
+        username = serializer.validated_data["username"]
         code = generate_code(6)  # 随机生成code
-        send_status = send_mail(username, "验证码:" + str(code))
+        send_status = send_mail(username, f"验证码:{code}")
         if not send_status:
             return Response({"code": 0, "message": "发送邮件失败"}, status=status.HTTP_200_OK)
         VerifyCode.objects.create(verify_code=code, username=username)  # 保存验证码
@@ -61,6 +60,52 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
             return Response({"message": "发送邮件失败"}, status=status.HTTP_200_OK)
         return Response({"email": username}, status=status.HTTP_200_OK)
 
+
+class TaskCreator:
+    DNS_CODE_LENGTH = 4
+    HTTP_CODE_LENGTH = 4
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+
+    def create_initial_task(self):
+        """
+        创建初始任务
+        """
+        initial_task = Task.objects.create(
+            name="初始任务",
+            user_id=self.user_id,
+            status=TASK_STATUS.OPEN,
+            is_tmp=TASK_TMP.FORMAL,
+            show_dashboard=SHOW_DASHBOARD.TRUE
+        )
+
+        dns_code = generate_code(self.DNS_CODE_LENGTH)
+        dns_task_config = self._create_task_config(initial_task, dns_code, "DNS", "dns_log")
+        http_code = generate_code(self.HTTP_CODE_LENGTH)
+        http_task_config = self._create_task_config(initial_task, http_code, "HTTP", "http_log")
+
+        return initial_task
+
+    @staticmethod
+    def _create_task_config(task, key, template_name, config_item_name):
+        """
+        创建任务配置项
+        """
+        template = Template.objects.get(name=template_name)
+        template_config_item = TemplateConfigItem.objects.get(name=config_item_name)
+        task_config = TaskConfig.objects.create(task=task, key=key)
+        TaskConfigItem.objects.create(
+            value={},
+            template_config_item=template_config_item,
+            task=task,
+            template=template,
+            task_config=task_config
+        )
+
+        return task_config
+
+
 class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet, ):
     queryset = User.objects.all().order_by("-id")
     serializer_class = UserInfoSerializer
@@ -68,28 +113,8 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
     filter_fields = ("username", "is_staff", "is_active")
     permission_classes = (IsAdminUser,)
 
-    @staticmethod
-    def create_initial_task(user_id):
-        """
-        创建初始任务
-        """
-        initial_task = Task.objects.create(name=f"初始任务", user_id=user_id, status=TASK_STATUS.OPEN,
-                                           is_tmp=TASK_TMP.FORMAL,
-                                           show_dashboard=SHOW_DASHBOARD.TRUE)  # 创建初始任务
-        dns_code = generate_code(4)
-        dns_task_config = TaskConfig.objects.create(task_id=initial_task.id, key=dns_code)
-        TaskConfigItem.objects.create(value={},
-                                      template_config_item_id=TemplateConfigItem.objects.get(name="dns_log").id,
-                                      task_id=initial_task.id, template_id=Template.objects.get(name="DNS").id,
-                                      task_config_id=dns_task_config.id)
-        http_code = generate_code(4)
-        http_task_config = TaskConfig.objects.create(task_id=initial_task.id, key=http_code)
-        TaskConfigItem.objects.create(value={},
-                                      template_config_item_id=TemplateConfigItem.objects.get(name="http_log").id,
-                                      task_id=initial_task.id, template_id=Template.objects.get(name="HTTP").id,
-                                      task_config_id=http_task_config.id)
-
     @action(methods=["POST"], detail=False, permission_classes=[AllowAny])
+    @transaction.atomic()
     def register(self, request, *args, **kwargs):
         """
         注册用户
@@ -99,14 +124,19 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         serializer.is_valid(raise_exception=True)
         username = request.data["username"]
         password = request.data["password"]
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(username=username, password=password)  # user = serializer.save()
         invite_code = request.data.get("invite_code", "")
         if setting.REGISTER_TYPE == REGISTER_TYPE.INVITE:  # 判断是开放邀请注册
             InviteCode.objects.filter(code=invite_code).delete()
         apikey = generate_code(32)
         ApiKey.objects.create(user=user, key=apikey)
-        self.create_initial_task(user_id=user.id)
-        return Response({"username": username, "apikey": apikey},
+        task_creator = TaskCreator(user_id=user.id)
+        task_creator.create_initial_task()
+        response_data = {
+            "username": username,
+            "apikey": apikey
+        }
+        return Response(response_data,
                         status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[AllowAny])
@@ -116,16 +146,16 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         """
         serializer = UserLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = request.data["username"]
-        password = request.data["password"]
+        username = serializer.validated_data["username"]
+        password = serializer.validated_data["password"]
         user = auth.authenticate(username=username, password=password)
-        if not user:
-            return Response({"code": 0, "message": "用户名或密码错误!"}, status=status.HTTP_200_OK)
-        Token.objects.filter(user=user).delete()  # 删除原有的Token
-        token = Token.objects.create(user=user)
-        private = int(User.objects.get(username=username).is_staff)  # 获取用户角色
-        return Response({"username": user.username, "token": token.key, "is_staff": private},
-                        status=status.HTTP_200_OK)
+        if user is not None:
+            Token.objects.filter(user=user).delete()  # 删除原有的Token
+            token = Token.objects.create(user=user)
+            private = int(User.objects.get(username=username).is_staff)  # 获取用户角色
+            return Response({"username": user.username, "token": token.key, "is_staff": private},
+                            status=status.HTTP_200_OK)
+        return Response({"code": 0, "message": "用户名或密码错误!"}, status=status.HTTP_200_OK)
 
     @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated])
     def logout(self, request, *args, **kwargs):
@@ -134,7 +164,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         """
         user = self.request.user
         auth.logout(request)
-        Token.objects.filter(user_id=user.id).delete()  # 删除原有的Token
+        Token.objects.get(user_id=user.id).delete()  # 删除原有的Token
         update_last_login(user=user, sender=None)
         return Response({"code": 1, "message": "用户成功退出"}, status=status.HTTP_200_OK)
 
@@ -150,18 +180,17 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         user = User.objects.get(username=username)
         user.set_password(password)
         user.save()
-        return Response({"username": username, "password": password},
-                        status=status.HTTP_200_OK)
+        return Response({"message": "密码修改成功"}, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated])
     def change_password(self, request, *args, **kwargs):
         """
         登陆后修改密码
         """
-        serializer = ChangePasswordSerializer(data=request.data)
+        serializer = ChangePasswordSerializer(data=request.data, context={"request": self.request})
         serializer.is_valid(raise_exception=True)
-        user = User.objects.get(username=request.data["username"])
-        old_password = request.data["old_password"]
+        user = request.user
+        old_password = serializer.validated_data["old_password"]
         result = user.check_password(old_password)
         if not result:
             return Response({"code": 0, "message": "旧密码错误"}, status=status.HTTP_200_OK)
@@ -185,10 +214,6 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         判断是否为第一次登录
         """
         result = FIRST_LOGIN.TRUE
-        user_id = self.request.user.id
-        user_record = User.objects.get(id=user_id)
-        if not user_record.last_login or user_record.last_login == "2022-01-01 00:00:00":
+        if (self.request.user.last_login is None) or self.request.user.last_login == "2022-01-01 00:00:00":
             result = FIRST_LOGIN.FALSE
-            user_record.last_login = datetime.now()
-            user_record.save()
         return Response({"first_login": result}, status=status.HTTP_200_OK)
