@@ -146,4 +146,16 @@ export default {
     initial_template(data) {
         return axios.get('/api/v1/templates/manage/initial_template/', data)
     },
+    //获取dns解析配置
+    get_dns(data) {
+        return axios.get('/api/v1/configs/dns/', data)
+    },
+    //修改dns解析配置
+    dns_update(data) {
+        return axios.post('/api/v1/configs/dns/dns_update/', data)
+    },
+    //删除dns解析配置
+    dns_delete(data) {
+        return axios.del('/api/v1/configs/dns/dns_delete/', data)
+    },
 }
