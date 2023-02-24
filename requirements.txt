@@ -19,3 +19,4 @@ Twisted~=21.2.0
 pyOpenSSL==22.0.0
 service_identity==21.1.0
 supervisor==4.2.4
+django-crontab == 0.7.1
