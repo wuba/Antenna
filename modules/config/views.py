@@ -24,7 +24,10 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         _data = {}
         mapping = {"1": True, "true": True, "0": False, "false": False}
         for i in data:
-            _data[i["name"]] = mapping.get(i['value'], i['value'])
+            if i["name"] == "REGISTER_TYPE":
+                _data[i["name"]] = i['value']
+            else:
+                _data[i["name"]] = mapping.get(i['value'], i['value'])
         return Response(_data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[IsAdminUser, ])

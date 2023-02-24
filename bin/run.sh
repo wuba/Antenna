@@ -12,6 +12,7 @@ python3 ../manage.py makemigrations
 echo "make migrations success!"
 python3 ../manage.py migrate
 echo "migrate success!"
-
+python3 ../manage.py crontab add
+echo "crontab add success!"
 unlink /run/supervisor/supervisor.sock
 supervisord -c /etc/supervisord.conf
