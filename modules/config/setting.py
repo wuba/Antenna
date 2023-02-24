@@ -55,5 +55,5 @@ def reload_config():
     globals()['EMAIL_PORT'] = int(config_record.get(name="EMAIL_PORT").value)
     globals()['EMAIL_HOST_USER'] = config_record.get(name="EMAIL_HOST").value
     globals()['EMAIL_HOST_PASSWORD'] = config_record.get(name="EMAIL_HOST_PASSWORD").value
-    globals()['SAVE_MESSAGE_SEVEN_DAYS'] = int(config_record.get(name="EMAIL_SAVE_MESSAGE_SEVEN_DAYS").value)
+    globals()['SAVE_MESSAGE_SEVEN_DAYS'] = int(get_bool(config_record.get(name="SAVE_MESSAGE_SEVEN_DAYS").value))
     globals()['OPEN_EMAIL'] = int(get_bool(config_record.get(name="OPEN_EMAIL").value))

@@ -32,7 +32,7 @@ PLATFORM_IP = os.getenv("PLATFORM_IP")
 SECRET_KEY = "django-insecure-$c$ul+6ti8f1-hkj-rkgjv$)im$c)8e)n-en4wx4lg=g!gu7ay"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
