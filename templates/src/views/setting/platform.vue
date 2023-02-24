@@ -247,11 +247,18 @@ export default {
             })
         },
         setvalues(e, r) {
+            const a = e.filter((item) => this.isIP(item))
+
             this.tableData.forEach((item) => {
                 if (item.id === r.id) {
-                    item.value = e
+                    item.value = a
                 }
             })
+        },
+        isIP(ip) {
+            var re =
+                /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+            return re.test(ip)
         },
         inputDomain(e, r) {
             this.tableData.forEach((item) => {
