@@ -38,7 +38,7 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         for k in request.data.keys():
             if Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).exists():
                 try:
-                    Config.objects.get(name=k, type=CONFIG_TYPES.PLATFORM).update(value=str(request.data[k]))
+                    Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).update(value=str(request.data[k]))
                     transaction.on_commit(func=reload_config)
                     return Response(data=request.data, status=status.HTTP_200_OK)
                 except Exception as e:

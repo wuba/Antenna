@@ -261,7 +261,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         """
         判断是否为第一次登录
         """
-        result = FIRST_LOGIN.FALSE
+        result = FIRST_LOGIN.TRUE
         if (self.request.user.last_login is None) or self.request.user.last_login == "2022-01-01 00:00:00":
-            result = FIRST_LOGIN.TRUE
+            result = FIRST_LOGIN.FALSE
         return Response({"first_login": result}, status=status.HTTP_200_OK)

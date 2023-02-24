@@ -8,7 +8,7 @@ python3 manage.py makemigrations
 echo "make migrations success!"
 python3 manage.py migrate
 echo "migrate success!"
-python3 ../manage.py crontab add
+python3 manage.py crontab add
 echo "crontab add success!"
 #python3 manage.py runserver 0.0.0.0:80
 unlink /run/supervisor/supervisor.sock
