@@ -16,9 +16,11 @@ def create_default_config(apps, schema_editor):
         [
             Config(name="LOGIN_PATH", type=0, value=login_path),
             Config(name="SAVE_MESSAGE_SEVEN_DAYS", type=0, value=save_message_seven_days),
-            Config(name="REGISTER_TYPE", type=1, value=register_type),
+            Config(name="REGISTER_TYPE", type=0, value=register_type),
         ]
     )
+
+    Config.objects.filter(name="SERVER_IP").update(type=0)
 
 
 class Migration(migrations.Migration):

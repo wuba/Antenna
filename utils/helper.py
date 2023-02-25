@@ -234,26 +234,19 @@ def reconstruct_request(request):
     """
     拼接http报文
     """
-    headers = ''
-    for header, value in request.META.items():
-        if not header.startswith('HTTP'):
-            continue
-        header = '-'.join([h.capitalize() for h in header[5:].lower().split('_')])
-        headers += '{}: {}\n'.format(header, value)
+    headers = '\n'.join(
+        f'{header.replace("_", "-").title()}: {value}'
+        for header, value in request.META.items()
+        if header.startswith('HTTP')
+    )
 
     return (
-        '{method} /{uri} HTTP/1.1\n'
-        'Content-Length: {content_length}\n'
-        'Content-Type: {content_type}\n'
-        '{headers}\n\n'
-        '{body}'
-    ).format(
-        method=request.method,
-        uri=request.path.strip("/"),
-        content_length=request.META['CONTENT_LENGTH'],
-        content_type=request.META['CONTENT_TYPE'],
-        headers=headers,
-        body=str(request.body, encoding="utf-8"))
+        f'{request.method} /{request.path.strip("/")} HTTP/1.1\n'
+        f'Content-Length: {request.META.get("CONTENT_LENGTH", 0)}\n'
+        f'Content-Type: {request.META.get("CONTENT_TYPE", "")}\n'
+        f'{headers}\n\n'
+        f'{request.body.decode()}'
+    )
 
 
 def get_param_message(request):
