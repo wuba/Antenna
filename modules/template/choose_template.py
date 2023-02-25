@@ -57,14 +57,10 @@ def load_template():
             continue
         for info in c.info:
             template = info.get("template_info", "")
-            template_record = Template.objects.filter(name=template.get("name", ""))
-            if not template_record.exists():
-                template["code"] = view_template_code(filename=template.get("file_name", ""),
-                                                      template_type=template.get("type", 1))
-                template_record = Template.objects.create(**template)
+            template["code"] = view_template_code(filename=template.get("file_name", ""),
+                                                  template_type=template.get("type", 1))
+            template_record = Template.objects.update_or_create(template, name=template.get("name", ""))
             item = info.get("item_info", "")
             for i in item:
                 i["template_id"] = template_record.id
-                template_config_record = TemplateConfigItem.objects.filter(name=i.get("name", ""))
-                if not template_config_record.exists():
-                    TemplateConfigItem.objects.create(**i)
+                TemplateConfigItem.objects.update_or_create(i, name=i.get("name", ""))
