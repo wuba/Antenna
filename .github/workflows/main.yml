@@ -23,4 +23,6 @@ jobs:
         with:
           push: true
           file: ./Dockerfile
-          tags: jihongjun/antenna:${{ github.ref }},jihongjun/antenna:latest
+          tags:
+            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:${{ github.ref }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:latest
