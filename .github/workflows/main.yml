@@ -23,4 +23,6 @@ jobs:
         with:
           push: true
           file: ./Dockerfile
-          tags: antenna:${{ github.ref }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:${{ if startsWith(github.ref, 'refs/tags/v') }}${{ replace(github.ref, 'refs/tags/v', '') }}{{ else }}latest{{ endif }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:latest
