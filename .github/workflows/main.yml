@@ -23,4 +23,4 @@ jobs:
         with:
           push: true
           file: ./Dockerfile
-          tags: jihongjun/antenna:latest
+          tags: jihongjun/antenna:${{ github.ref }},jihongjun/antenna:latest
