@@ -49,13 +49,13 @@ class PlatformUpdateSerializer(serializers.Serializer):
     PLATFORM_DOMAIN = serializers.CharField(required=True, help_text="平台域名")
     SERVER_IP = serializers.IPAddressField(required=True, help_text="平台IP")
     LOGIN_PATH = serializers.CharField(required=True, help_text="后台注册地址")
-    REGISTER_TYPE = serializers.CharField(required=True, help_text="注册类型")
+    REGISTER_TYPE = serializers.IntegerField(required=True, help_text="注册类型")
     EMAIL_HOST = serializers.CharField(required=True, help_text="注册邮箱")
     EMAIL_PORT = serializers.CharField(required=True, help_text="邮箱服务器端口")
     EMAIL_HOST_USER = serializers.EmailField(required=True, allow_null=True, allow_blank=True, help_text="账户")
     EMAIL_HOST_PASSWORD = serializers.CharField(required=True, allow_null=True, allow_blank=True, help_text="授权码")
     SAVE_MESSAGE_SEVEN_DAYS = serializers.BooleanField(required=True, help_text="是否保留七天内消息")
-    OPEN_EMAIL = serializers.CharField(required=True, help_text="开放邮箱通知")
+    OPEN_EMAIL = serializers.BooleanField(required=True, help_text="开放邮箱通知")
 
     def validate(self, attrs):
         return attrs

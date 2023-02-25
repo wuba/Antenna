@@ -10,7 +10,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from modules.config.constants import CONFIG_TYPES
 from modules.config import setting
 from modules.config.setting import reload_config
 
@@ -36,22 +35,23 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         serializer = PlatformUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         for k in request.data.keys():
-            if Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).exists():
+            if Config.objects.filter(name=k).exists():
                 try:
-                    Config.objects.filter(name=k, type=CONFIG_TYPES.PLATFORM).update(value=str(request.data[k]))
-                    transaction.on_commit(func=reload_config)
-                    return Response(data=request.data, status=status.HTTP_200_OK)
+                    Config.objects.filter(name=k).update(value=str(request.data[k]))
                 except Exception as e:
                     return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
             else:
                 return Response({"message": "更新失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
+        transaction.on_commit(func=reload_config)
+        return Response(data=request.data, status=status.HTTP_200_OK)
 
     @action(methods=["GET"], detail=False, permission_classes=[AllowAny, ])
     def open_invite(self, requests, *args, **kwargs):
         """
         查看是否开启邀请码设置
         """
-        flag = int(setting.REGISTER_TYPE == 2)
+        from modules.account.constants import REGISTER_TYPE
+        flag = int(setting.REGISTER_TYPE == REGISTER_TYPE.INVITE)
         return Response({"open_invite": flag}, status=status.HTTP_200_OK)
 
 

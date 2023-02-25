@@ -73,5 +73,5 @@ class DeleteTmpTaskSerializer(serializers.Serializer):
     task_id = serializers.IntegerField(required=True, help_text="删除缓存任务")
 
     def validate_task_id(self, task_id):
-        if not Task.objects.filter(task_id=task_id, user_id=self.context["user"].id).exists():
+        if not Task.objects.filter(id=task_id, user_id=self.context["user"].id).exists():
             raise ValidationError('未知的任务id')
