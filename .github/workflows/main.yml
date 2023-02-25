@@ -24,5 +24,4 @@ jobs:
           push: true
           file: ./Dockerfile
           tags:
-            antenna:${{ github.ref }}
-            antenna:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:${{ github.ref }}
