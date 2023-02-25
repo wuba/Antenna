@@ -25,5 +25,5 @@ jobs:
           file: ./Dockerfile
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/antenna:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:${{ github.ref.replace('refs/tags/', '') }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:${{ github.event.release.tag_name }}
 
