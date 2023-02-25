@@ -68,10 +68,6 @@ USER antenna
 
 
 ## 相关教程链接
-### 最新公告
-
-Antenna chrome扩展 antenna-tools(试用版)发布[Antenna-tools 使用教程](http://blog.antenna.cool/blog/antenna_plugin)
-
 
 ### 关于部署
 基础部署教程:[安装部署](http://blog.antenna.cool/docs/intro)
