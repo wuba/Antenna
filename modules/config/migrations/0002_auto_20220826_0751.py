@@ -9,12 +9,12 @@ def create_default_config(apps, schema_editor):
     Config = apps.get_model("config", "Config")
     # from modules.config.models import Config
     platform_domain = os.getenv("PLATFORM_DOMAIN")
-    dns_ip = os.getenv("SERVER_IP")
+    server_ip = os.getenv("SERVER_IP")
 
     Config.objects.bulk_create(
         [
             Config(name="PLATFORM_DOMAIN", type=0, value=platform_domain),
-            Config(name="SERVER_IP", type=1, value=dns_ip),
+            Config(name="SERVER_IP", type=0, value=server_ip),
             Config(name="JNDI_PORT", type=1, value="2345"),
             Config(name="OPEN_EMAIL", type=0, value="0"),
             Config(name="EMAIL_HOST", type=0, value="smtp.qq.com"),

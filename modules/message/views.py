@@ -92,6 +92,9 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         message_list = [{
             "id": message.id,
             "domain": message.domain,
+            "html": message.html,
+            "uri": message.uri,
+            "header": message.header,
             "remote_addr": message.remote_addr,
             "task_name": message.task.name,
             "message_type": get_message_type_name(message.message_type),
