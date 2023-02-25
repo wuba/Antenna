@@ -1,10 +1,10 @@
-import datetime
-import os
-
 from django.http import HttpResponse
 from django.shortcuts import render
 import re
 from django_filters.rest_framework import DjangoFilterBackend
+import datetime
+from django.db.models.functions import Cast
+from django.db.models import DateField
 from modules.api.models import ApiKey
 from modules.message.models import Message
 from modules.message.serializers import MessageFilter, MessageSerializer
@@ -73,49 +73,29 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         计算当前时间起，前七天的数据
         """
 
-        today = datetime.datetime.now()
-        oneday = datetime.timedelta(days=6)
-        message_count_list = list(
-            message_record.filter(create_time__gte=today - oneday, ).extra(
-                select={"create_time": "DATE_FORMAT(message.create_time,'%%Y-%%m-%%d')"}).values(
-                'create_time').annotate(message_count=Count('create_time')))
-
-        def day_get(today):  # 通过for 循环得到天数
-            for i in range(0, 7):
-                oneday = datetime.timedelta(days=i)
-                day = today - oneday
-                date_to = datetime.datetime(day.year, day.month, day.day)
-                yield str(date_to)[0:10]
-
-        q_time = day_get(today)
-        list_day = [obj for obj in q_time][::-1]
-        list_message_day_count = []
-        index = 0
-        for day in list_day:
-            if index <= len(message_count_list) - 1 and len(message_count_list) != 0:
-                if day == message_count_list[index]["create_time"]:
-                    list_message_day_count.append(message_count_list[index]["message_count"])
-                    index += 1
-                else:
-                    list_message_day_count.append(0)
-            else:
-                list_message_day_count.append(0)
-        list_day = [obj[5::] for obj in list_day]  # 解决浏览器兼容问题，只展示年月
-        message_date_count = {"list_day": list_day, "message_count": list_message_day_count}
-        return message_date_count
+        now = datetime.datetime.now()
+        days = [(now - datetime.timedelta(days=i)).date() for i in range(6, -1, -1)]
+        message_count_list = message_record.filter(create_time__gte=days[0]).annotate(
+            date=Cast('create_time', DateField())).values('date').annotate(count=Count('id')).values_list('count',
+                                                                                                          flat=True)
+        message_count_list = list(message_count_list) + [0] * (7 - len(message_count_list))
+        list_day = [day.strftime('%m-%d') for day in days]
+        result = {"list_day": list_day, "message_count_list": message_count_list}
+        return result
 
     @staticmethod
     def message_last_list(message_record):
         """
         取最新的五条消息
         """
-        message_record = message_record.order_by("-create_time")[:5]
-        last_message_list = list(message_record.values())
-        message_list = []
-        for i in last_message_list:
-            i["task_name"] = Task.objects.get(id=i["task_id"]).name
-            i["message_type"] = get_message_type_name(i["message_type"])
-            message_list.append(i)
+        message_record = message_record.order_by("-create_time")[:5].prefetch_related("task")
+        message_list = [{
+            "id": message.id,
+            "task_name": message.task.name,
+            "message_type": get_message_type_name(message.message_type),
+            "create_time": message.create_time,
+            "content": message.content,
+        } for message in message_record]
         return message_list
 
     @staticmethod
@@ -125,18 +105,21 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         {"xss": "http://xxx.com/xxxx"}
         """
         url_list = []
-        task_config_item_record = TaskConfigItem.objects.filter(task__user=user_id, task__status=1,
-                                                                task__show_dashboard=1)
-        if task_config_item_record:
-            for task_config_item in task_config_item_record:
-                payload = task_config_item.template.payload
-                key = task_config_item.task_config.key
-                template = task_config_item.template.name
-                template_result = {"task_name": task_config_item.task.name, template: get_payload(key, payload)}
-                if template_result not in url_list:
-                    url_list.append(template_result)
-                if len(url_list) > 30:
-                    break
+        task_config_item_record = TaskConfigItem.objects.filter(
+            task__user=user_id,
+            task__status=1,
+            task__show_dashboard=1
+        ).select_related('template', 'task_config')
+
+        if not task_config_item_record:  # 如果为空，直接返回空列表
+            return url_list
+
+        url_list = [
+            {
+                "task_name": tci.task.name,
+                tci.template.name: get_payload(tci.task_config.key, tci.template.payload)
+            } for tci in task_config_item_record[:30]
+        ]
         return url_list
 
     @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated, ])
@@ -145,21 +128,29 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         首页内容view
         """
         user_id = self.request.user.id
+        current_date = datetime.datetime.now().date()
         # 基本数据计算
         message_record = Message.objects.filter(task__user_id=user_id)
+
         message_count = message_record.count()
-        today_message_count = message_record.filter(create_time__gte=datetime.datetime.now().date()).count()
+        today_message_count = message_record.filter(create_time__date=current_date).count()
+
         task_record = Task.objects.filter(user_id=user_id, is_tmp=TASK_TMP.FORMAL)
         task_count = task_record.count()
-        today_task_count = task_record.filter(create_time__gte=datetime.datetime.now().date()).count()
+        today_task_count = task_record.filter(create_time__date=current_date).count()
+
         template_record = Template.objects.filter(Q(user_id=user_id) | Q(is_private=PRIVATE_TYPES.PUBLIC))
         template_count = template_record.count()
-        today_template_count = template_record.filter(create_time__gte=datetime.datetime.now().date()).count()
+        today_template_count = template_record.filter(create_time__date=current_date).count()
+
         # 曲线图数据计算
         message_date_count = self.message_date_count(message_record)
+
         # message最新五个消息
         last_message_list = self.message_last_list(message_record)
+        # 展示链接
         show_dashboard_url = self.show_dashboard_url(user_id)
+
         result = {
             "message_count": message_count,
             "today_message_count": today_message_count,
@@ -206,11 +197,10 @@ def index(request):
     headers = dict((regex.sub('', header), value) for (header, value) in request.META.items() if
                    header.startswith('HTTP_'))
     # 利用组件返回response
-    if path == os.environ.get('LOGIN_PATH'):
+    if path == setting.LOGIN_PATH:
         return render(request, '../static/index.html')
     elif len(path) == 4:
-        task_config_item = TaskConfigItem.objects.filter(task_config__key=path,
-                                                         task__status=1).first()  # 查看是否是开启状态任务下的链接
+        task_config_item = TaskConfigItem.objects.filter(task_config__key=path, task__status=1).first()  # 是否是开启状态任务
         if task_config_item:
             if task_config_item.template.type == 0 and not message:  # 如果消息为空并且是利用组件
                 template_response = match_template(task_config_item, param_list)
@@ -234,8 +224,7 @@ def index(request):
             Message.objects.create(domain=host, remote_addr=remote_addr, uri=path, header=headers,
                                    message_type=MESSAGE_TYPES.HTTP, content=message,
                                    task_id=task_config_item.task_id,
-                                   template_id=task_config_item.template_id, html=raw_response,
-                                   create_time=datetime.datetime.now())
+                                   template_id=task_config_item.template_id, html=raw_response, )
             send_message(url=host, remote_addr=remote_addr, uri=path, header=headers,
                          message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
                          raw=raw_response)
