@@ -80,7 +80,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
                                                                                                           flat=True)
         message_count_list = list(message_count_list) + [0] * (7 - len(message_count_list))
         list_day = [day.strftime('%m-%d') for day in days]
-        result = {"list_day": list_day, "message_count_list": message_count_list}
+        result = {"list_day": list_day, "message_count": message_count_list}
         return result
 
     @staticmethod
@@ -91,6 +91,8 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         message_record = message_record.order_by("-create_time")[:5].prefetch_related("task")
         message_list = [{
             "id": message.id,
+            "domain": message.domain,
+            "remote_addr": message.remote_addr,
             "task_name": message.task.name,
             "message_type": get_message_type_name(message.message_type),
             "create_time": message.create_time,

@@ -62,5 +62,5 @@ def load_template():
             template_record = Template.objects.update_or_create(template, name=template.get("name", ""))
             item = info.get("item_info", "")
             for i in item:
-                i["template_id"] = template_record.id
+                i["template_id"] = template_record[0].id
                 TemplateConfigItem.objects.update_or_create(i, name=i.get("name", ""))
