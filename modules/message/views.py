@@ -88,7 +88,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         """
         取最新的五条消息
         """
-        message_record = message_record.order_by("-create_time")[:5].prefetch_related("task")
+        message_record = message_record.order_by("-create_time")[:5].select_related("task")
         message_list = [{
             "id": message.id,
             "domain": message.domain,
