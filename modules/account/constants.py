@@ -16,5 +16,5 @@ FIRST_LOGIN = Enumeration([
 REGISTER_TYPE = Enumeration([
     (0, "REFUSE", "refuse"),
     (1, "EMAIL", "email"),
-    (3, "INVITE", "invite"),
+    (2, "INVITE", "invite"),
 ])

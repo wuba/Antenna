@@ -305,8 +305,8 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
 
         with transaction.atomic():
             task_id = task_config.task_id
-            TaskConfig.objects.get(id=task_config_id).delete()
-            TaskConfigItem.objects.get(task_config_id=task_config_id).delete()
+            TaskConfig.objects.filter(id=task_config_id).delete()
+            TaskConfigItem.objects.filter(task_config_id=task_config_id).delete()
 
         queryset = self.filter_queryset(
             TaskConfigItem.objects.filter(task_config__task__user=self.request.user.id, task_id=task_id))
