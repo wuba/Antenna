@@ -15,13 +15,16 @@
                 <div class="content">
                     <a-form-model-item label="平台注册">
                         <a-select v-model="form.REGISTER_TYPE" style="width: 120px" @change="handleChange">
-                            <a-select-option :key="1" :value="0">关闭</a-select-option>
-                            <a-select-option :key="2" :value="1">开放(需填写通知)-SMTP配置</a-select-option>
-                            <a-select-option :key="3" :value="3">仅允许(需填写通知)-SMTP配置</a-select-option>
+                            <a-select-option :key="1" :value="0">禁止注册</a-select-option>
+                            <a-select-option :key="2" :value="1">开放注册</a-select-option>
+                            <a-select-option :key="3" :value="2">邀请码注册</a-select-option>
                         </a-select>
                     </a-form-model-item>
                     <a-form-model-item ref="PLATFORM_DOMAIN" label="平台域名" prop="PLATFORM_DOMAIN">
                         <a-input v-model="form.PLATFORM_DOMAIN" addon-before="http://" placeholder="请输入" />
+                    </a-form-model-item>
+                    <a-form-model-item ref="SERVER_IP" label="公网IP" prop="PLATFORM_DOMAIN">
+                        <a-input v-model="form.SERVER_IP" placeholder="请输入" />
                     </a-form-model-item>
                     <a-form-model-item label="开启邮件通知">
                         <a-switch v-model="form.OPEN_EMAIL" @click="openBtn($event, 'OPEN_EMAIL')" />
