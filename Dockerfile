@@ -13,6 +13,10 @@ RUN apk add --no-cache tzdata \
 
 ADD . /Antenna
 WORKDIR /Antenna
+WORKDIR /etc/supervisor.d
+
+COPY /conf/antenna.ini /etc/supervisor.d/antenna.ini
+
 #RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 RUN pip3 install -r /Antenna/requirements.txt
 
