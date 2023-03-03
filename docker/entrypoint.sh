@@ -11,5 +11,7 @@ echo "migrate success!"
 python3 manage.py crontab add
 echo "crontab add success!"
 #python3 manage.py runserver 0.0.0.0:80
+cp /Antenna/conf/antenna.ini /etc/supervisor.d/antenna.ini
+echo "mv success!"
 unlink /run/supervisor/supervisor.sock
 supervisord -n -c /etc/supervisord.conf
