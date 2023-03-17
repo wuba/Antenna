@@ -1,3 +1,4 @@
+from pip._internal.cli.cmdoptions import help_
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
@@ -17,11 +18,7 @@ class TemplateInfoSerializer(serializers.ModelSerializer):
     choice_type = serializers.IntegerField(required=True, help_text="组件是否支持多选")
     is_private = serializers.IntegerField(required=True, help_text="组件是否公开")
     code = serializers.CharField(required=True, help_text="代码")
-
-    def create(self, validated_data):
-        validated_data["template_id"] = self.context["template_id"]
-        instance = TemplateConfigItem.objects.create(**validated_data)
-        return instance
+    file_name = serializers.JSONField(default=list, help_text="文件名")
 
     def validate_template_item_info(self, template_item_info):
         template_item_info = list(template_item_info)
