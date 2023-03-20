@@ -357,7 +357,7 @@ function writeSource() {
                 for name in self.__dir__():
                     if name == item_name:
                         code = code + getattr(self, name)(i)
-            return HttpResponse(code, content_type='application/javascript')
+            return HttpResponse(code, content_type='application/x-javascript')
         except Exception as e:
             import traceback
             traceback.print_exc()
