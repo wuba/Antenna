@@ -23,7 +23,8 @@ OAST)通过任务的形式，将不同漏洞场景检测能力通过插件的形
 
 演示平台(暂时关闭)：[演示平台](http://jiemuzu.cn)
 
-漏洞靶场(已支持docker部署,docker-compose文件在项目docker目录中)：[lcttty/antenna-range:0.0.1](https://github.com/wuba/Antenna/blob/main/docker/docker-compose-range.yaml)
+漏洞靶场(已支持docker部署,docker-compose文件在项目docker目录中)
+：[lcttty/antenna-range:0.0.1](https://github.com/wuba/Antenna/blob/main/docker/docker-compose-range.yaml)
 
 ## Antenna_Inside计划
 
@@ -38,38 +39,36 @@ Antenna_Inside计划，如果您是使用扫描工具的用户或者作者请联
 |------------|----------------------------------------------------------------------------|
 | EasyPen    | [https://github.com/lijiejie/EasyPen](https://github.com/lijiejie/EasyPen) |
 
-
 ## 近期使用疑问解答
 
+#### 1、源码部署服务未启动，或者启动了DNS不好使
 
-#### 1、关于各类组件的使用说明以及能否再详细的进行说明自定义组件开发教程
+回答: 该项目暂不推荐使用python3.7版本以下环境部署，请认真查看安装部署教程-源码部署部分，
+检查配置中项目路径与实际项目路径相同，启动后也可以尝试使用`supervisorctl status`
+查看各个组件运行状态
+
+#### 2、关于各类组件的使用说明以及能否再详细的进行说明自定义组件开发教程
 
 回答：文章将在Antenna博客不定时更新，基础文章已有，后续详细的也会有的，作者在加班加点的写，绝不会让各位师傅等太久
 
-#### 2、运行docker-compose命令后镜像构建时间过长
+#### 3、运行docker-compose命令后镜像构建时间过长
 
-回答：可修改docker-compose文件中镜像,系统镜像已打包至dockerhub https://hub.docker.com/r/jihongjun/antenna/tags
+1. 可尝试修改Dockerfile中制定相关下载源地址内容
+2. 可修改docker-compose文件中镜像,官方镜像已打包至dockerhub https://hub.docker.com/r/jihongjun/antenna/tags
+可尝试使用`docker pull jihongjun/antenna` 进行拉取
 
-#### 3、镜像部署总是遇到各种权限不允许的错误
-
-回答：可将docker下列内容删除
-
-```dockerfile
-RUN addgroup --system antenna \
-    && adduser --system --ingroup antenna antenna
-
-USER antenna
-```
-
-#### 5、其他问题
-
+#### 4、其他问题
 如果您遇到了其他问题可查阅项目issue进行寻找相关解决方案，如果发现并没有其他人遇到和您相关的问题，请新建issue，
 作者会及时回答您的疑问
 
-
 ## 相关教程链接
 
+## 最新公告
+
+DNS_REBINDING 功能演示:[Antenna v1.3.0 版本更新公告(含DNS REBINDING使用教程)](http://blog.antenna.cool/blog/V1.3.0%20update)
+
 ### 关于部署
+
 基础部署教程:[安装部署](http://blog.antenna.cool/docs/intro)
 
 隐匿部署教程：[关于Antenna的隐匿性部署](http://blog.antenna.cool/blog/%20%20Secrecy)
@@ -97,21 +96,22 @@ xss 组件使用教程:[xss组件使用教程](http://blog.antenna.cool/docs/%E5
 组件开发教程:[如何编写Antenna组件](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/template_demo)
 
 自定义HTTP组件使用教程[自定义HTTP组件使用教程](http://blog.antenna.cool/docs/%E5%85%B3%E4%BA%8E%E7%BB%84%E4%BB%B6/custom_http)
+
 ### 关于OPEN_API与CallBack
 
 OPEN_API与CallBack使用教程:[关于OPEN_API与CallBack](http://blog.antenna.cool/docs/api_back)
+
 ## 404星链计划
 
 ![](https://github.com/knownsec/404StarLink-Project/raw/master/logo.png)
 
 ANTENNA 项目 现已加入 [404星链计划](https://github.com/knownsec/404StarLink)
 
-
 ## Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/wuba/Antenna.svg)](https://starchart.cc/wuba/Antenna)
 
-##  联系我们
+## 联系我们
 
 如果对Antenna有任何建设性意见或 BUG 反馈，欢迎大家提 issue,进交流群 作者也会线下约饭进行奖励🐶
 
