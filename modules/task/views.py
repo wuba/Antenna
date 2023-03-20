@@ -283,14 +283,18 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         template_id = serializer.data["template"]
         task_config_id = serializer.data["task_config"]
         template_config_item_list = request.data["template_config_item_list"]
-        code = generate_code(4)
         with transaction.atomic():
+            task_config = TaskConfig.objects.filter(id=task_config_id, task__user_id=self.request.user.id).first()
+            if not task_config:
+                return Response({"code": 0, "message": "权限错误"}, status=status.HTTP_400_BAD_REQUEST)
+            old_key = task_config.key
+
             # 删除旧的任务配置项和任务配置
             TaskConfigItem.objects.filter(task_config_id=task_config_id).delete()
             TaskConfig.objects.filter(id=task_config_id).delete()
 
             # 创建新的任务配置
-            new_task_config = TaskConfig.objects.create(task_id=task_id, key=code)
+            new_task_config = TaskConfig.objects.create(task_id=task_id, key=old_key)
             new_task_config_id = new_task_config.id
 
             # 创建新的任务配置项
