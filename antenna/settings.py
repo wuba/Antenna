@@ -143,7 +143,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 STATIC_URL = "static/"
 
-## 定时运行
+# 定时运行
 CRONJOBS = [
     ('0 12 * * *', 'modules.message.crontab.delete_old_messages', f'>> /tmp/check_message.log'),
 ]

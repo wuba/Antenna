@@ -17,6 +17,7 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
     def get_queryset(self):
         return ApiKey.objects.filter(user=self.request.user)
 
+    # TODO 代码的格式化方式尽量统一
     @action(
         methods=["GET"],
         detail=False,

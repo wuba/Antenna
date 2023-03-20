@@ -3,6 +3,7 @@ from rest_framework.renderers import JSONRenderer
 
 class custom_render(JSONRenderer):
     # 重构render方法
+    # TODO: 标准输出是怎样的格式
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if renderer_context:
             msg, code = 'success', 1 if isinstance(data, dict) else 500

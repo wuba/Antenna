@@ -116,6 +116,7 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
         }
         """
         task_list = request.data.get("id", "")
+        # TODO int("")会抛出异常
         task_status = int(request.data.get("status", ""))
         if not task_list or task_status not in [0, 1]:
             return Response({"code": 0, "message": "传递参数值格式错误"}, status=status.HTTP_200_OK)

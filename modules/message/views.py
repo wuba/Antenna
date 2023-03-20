@@ -43,6 +43,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         """
         查询消息
         """
+        # TODO 这段代码仅仅是为了增加message_type吗？为何不在序列化里做？
         queryset = self.filter_queryset(self.get_queryset())
 
         page = self.paginate_queryset(queryset)
@@ -177,6 +178,8 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         key = ApiKey.objects.filter(key=apikey).first()
         if not key:
             return Response({"code": 0, "message": "apikey错误"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # TODO 分页？
         queryset = self.filter_queryset(Message.objects.filter(task__user=key.user_id))
         page = self.paginate_queryset(queryset)
         if page is not None:

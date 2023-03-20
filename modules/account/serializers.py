@@ -1,13 +1,14 @@
 import datetime
 
+from django.core.cache import cache
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from modules.account.models import VerifyCode, InviteCode, User
-from modules.config.models import Config
-from modules.config import setting
+
 from modules.account.constants import REGISTER_TYPE
-from django.core.cache import cache
+from modules.account.models import InviteCode, User, VerifyCode
+from modules.config import setting
+from modules.config.models import Config
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
@@ -29,12 +30,14 @@ class EmailSerializer(serializers.Serializer):
                                       })
 
     def validate_username(self, username):
+        print(username)
         num_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
+        print('111111111111')
         if VerifyCode.objects.filter(username=username, create_time__gt=num_time).count() > 10:
             raise serializers.ValidationError('短时间内超过获取验证码次数')
         return username
 
-
+# TODO: check
 # class EmailSerializer(serializers.Serializer):
 """
 Todo:在上述示例中，我们使用 Django 内置的缓存系统来实现缓存功能。在序列化器初始化时，我们设置了一个缓存键
@@ -82,6 +85,7 @@ class TestEmailSerializer(serializers.Serializer):
     """
     测试邮箱可用性序列化器
     """
+    # TODO 参数改为小写, 其他的序列化类似处理
     EMAIL_HOST = serializers.CharField(required=True, help_text="邮箱服务器地址")
     EMAIL_PORT = serializers.CharField(required=True, help_text="邮箱服务器端口")
     EMAIL_HOST_USER = serializers.CharField(required=True, help_text="邮箱服务器用户")
@@ -111,6 +115,8 @@ class InviteCodeSerializer(serializers.ModelSerializer):
         model = InviteCode
         fields = "__all__"
 
+
+# TODO: UserRegisterSerializer 与 ForgetPasswordSerializer可以共同继承一个公共类，用于处理validate_verify_code等公共部分
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     """

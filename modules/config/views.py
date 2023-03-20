@@ -34,10 +34,12 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         """ 更新平台配置 """
         serializer = PlatformUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        for k in request.data.keys():
+        # TODO keys方法改为items方法
+        for k, v in request.data.items():
+            # TODO 不需要再判断是否存在了，在序列化里已经校验过了
             if Config.objects.filter(name=k).exists():
                 try:
-                    Config.objects.filter(name=k).update(value=str(request.data[k]))
+                    Config.objects.filter(name=k).update(value=str(v))
                 except Exception as e:
                     return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
             else:

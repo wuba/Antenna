@@ -15,6 +15,7 @@ from functools import wraps
 import django
 from modules.message.constants import MESSAGE_TYPES
 
+# TODO: remove this
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
 sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
