@@ -235,7 +235,7 @@ def reconstruct_request(request):
     拼接http报文
     """
     headers = '\n'.join(
-        f'{header.replace("_", "-").title()}: {value}'
+        f'{header.replace("_", "-").replace("Http-", "").title()}: {value}'
         for header, value in request.META.items()
         if header.startswith('HTTP')
     )
