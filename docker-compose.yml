@@ -15,30 +15,62 @@ services:
       - antenna
     restart: always
 
-
   antenna:
-    build: ./
-    image: antenna:latest
+    image: jihongjun/antenna:latest
     depends_on:
       - db
     container_name: antenna
-    volumes:
-      - ./:/Antenna
-      - type: bind
-        source: ./conf/antenna.ini
-        target: /etc/supervisor.d/antenna.ini
     ports:
       - "21:21"
       - "80:80"
       - "2345:2345"
       - "53:53/udp"
       - "443:443"
-    env_file:
-      - .env
     networks:
       - antenna
+    environment:
+      # MYSQL配置,需保证与上述数据库一致
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: Antenna@58.com
+      # 平台配置
+      # 平台域名
+      PLATFORM_DOMAIN: 58antenna.cn
+      # 平台公网IP
+      SERVER_IP: 1.1.1.1
+      # 隐藏后台uri,如果设置成aaa,则后台地址为http://test.com/aaa
+      LOGIN_PATH: 'aaa'
+      # 初始登录用户
+      PLATFORM_ROOT_USER: antenna@58.com
+      # 初始账户密码
+      PLATFORM_ROOT_PASSWORD: antenna@58.com
+      # 平台注册配置 0代表不开放注册，1代表邀请码注册，2代表开放注册，但需要正确填写邮箱配置信息，不然用户无法收到消息
+      REGISTER_TYPE: 0
+      # 邮件配置
+      # SMTP服务器地址
+      EMAIL_HOST: 1.1.1.1
+      # SMTP服务器端口
+      EMAIL_PORT: 465
+      # SMTP账户
+      EMAIL_HOST_USER: antenna@58.com
+      # SMTP密码/授权码
+      EMAIL_HOST_PASSWORD: 123456
+      # 消息配置
+      # 保存近七天的消息记录，0代表关闭配置，1代表开启配置
+      SAVE_MESSAGE_SEVEN_DAYS: 1
+      # 代表平台接收到消息开启邮件通知 1开启邮箱通知 0代表关闭邮箱消息通知，注意如若开启邮箱通知，需正确填写邮箱配置信息，不然用户无法收到消息
+      OPEN_EMAIL: 0
+      # DNS解析记录
+      DNS_DOMAIN: test.cn
+      # 初始解析记录
+      DNS_DOMAIN_IP: 127.0.0.1
+      # 前后端分离部署
+      SERVER_URL: http://test.cn
     restart: always
 
 networks:
   antenna:
     driver: bridge
+
+
