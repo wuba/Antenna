@@ -51,11 +51,10 @@ Antenna_Inside计划，如果您是使用扫描工具的用户或者作者请联
 
 回答：文章将在Antenna博客不定时更新，基础文章已有，后续详细的也会有的，作者在加班加点的写，绝不会让各位师傅等太久
 
-#### 3、运行docker-compose命令后镜像构建时间过长
+#### 3、部分HTTPS请求接收不到
 
-1. 可尝试修改Dockerfile中制定相关下载源地址内容
-2. 可修改docker-compose文件中镜像,官方镜像已打包至dockerhub https://hub.docker.com/r/jihongjun/antenna/tags
-可尝试使用`docker pull jihongjun/antenna` 进行拉取
+回答：这可能是由于SSL证书的问题，项目使用的是`/conf`目录下测试证书`server.crt`与`server.key`
+建议使用个人证书进行替换(删除测试证书，将自己的证书放在该目录下，名字与测试证书相同)
 
 #### 4、其他问题
 如果您遇到了其他问题可查阅项目issue进行寻找相关解决方案，如果发现并没有其他人遇到和您相关的问题，请新建issue，
