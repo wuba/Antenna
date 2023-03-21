@@ -63,7 +63,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
                                                                                                           flat=True)
         message_count_list = list(message_count_list) + [0] * (7 - len(message_count_list))
         list_day = [day.strftime('%m-%d') for day in days]
-        result = {"list_day": list_day, "message_count": message_count_list}
+        result = {"list_day": list_day, "message_count": message_count_list[::-1]}
         return result
 
     @staticmethod
