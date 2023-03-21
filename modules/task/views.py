@@ -242,6 +242,8 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         task_id = serializer.data["task"]
         template_id = serializer.data["template"]
         code = generate_code(4)
+
+        # TODO 这里是否需要使用事务
         task_config = TaskConfig.objects.create(task_id=task_id, key=code)
         template_config_item_list = request.data["template_config_item_list"]
         task_config_items = [

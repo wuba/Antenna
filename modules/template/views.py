@@ -2,21 +2,23 @@ import os
 
 from django.db import transaction
 from django.db.models import Q
+from django.forms.models import model_to_dict
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet, ModelViewSet, ViewSet
 
 from modules.template.choose_template import load_template, view_template_code
 from modules.template.constants import PRIVATE_TYPES, TEMPLATE_TYPES
 from modules.template.models import Template, TemplateConfigItem
-from modules.template.serializers import TemplateConfigItemSerializer, TemplateInfoSerializer, \
-    UpdateTemplateInfoSerializer, DeleteTmplateSerializer
-from rest_framework import filters, mixins, status
-from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
-from rest_framework.viewsets import GenericViewSet, ModelViewSet, ViewSet
+from modules.template.serializers import (DeleteTmplateSerializer, TemplateConfigItemSerializer, TemplateInfoSerializer,
+                                          UpdateTemplateInfoSerializer,)
 from utils.helper import generate_code
-from django.forms.models import model_to_dict
+
+BASE_PATH = str(os.path.abspath(os.path.dirname(__file__)))
 
 
 class TemplateViewSet(ModelViewSet):
@@ -30,34 +32,29 @@ class TemplateViewSet(ModelViewSet):
         user_id = self.request.user.id
         return Template.objects.filter(Q(user=user_id) | Q(is_private=PRIVATE_TYPES.PUBLIC))  # 可查看公开组件
 
-    @classmethod
-    def _write_file(cls, template_type, file_name, code):
+
+    # TODO 可以理解下classmethod 和 staticmethod
+    def _write_file(self, template_type, file_name, code):
         """
         将代码内容写入组件文件中
         """
-        base_path = str(os.path.abspath(os.path.dirname(__file__)))
+        dir_name = TEMPLATE_TYPES.get_key_from_dict(template_type).lower()
+        file_path = os.path.join(BASE_PATH, 'depend', dir_name, file_name)
+
         # 删除旧文件
-        cls._delete_file(base_path, file_name)
-        if template_type == TEMPLATE_TYPES.PAYLOAD:
-            dir_name = 'payload'
-        else:
-            dir_name = 'listen'
-        file_path = os.path.join(base_path, 'depend', dir_name, file_name)
-        with open(file_path, 'w') as destination:
-            destination.write(code)
+        self._delete_file(file_path)
+        # 写新文件
+        with open(file_path, 'w') as f:
+            f.write(code)
 
     @staticmethod
-    def _delete_file(base_path=str(os.path.abspath(os.path.dirname(__file__))), file_name=None):
+    def _delete_file(file_path):
         """
         删除文件内容
         """
-
         # 删除旧文件
-        if file_name is not None:
-            for file_path in [os.path.join(base_path, 'depend', 'payload', file_name),
-                              os.path.join(base_path, 'depend', 'listen', file_name)]:
-                if os.path.exists(file_path):
-                    os.remove(file_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     def create(self, request, *args, **kwargs):
         """
@@ -97,9 +94,9 @@ class TemplateViewSet(ModelViewSet):
             template_record = Template.objects.create(**data)
 
             TemplateConfigItem.objects.bulk_create([
-            TemplateConfigItem(name=item["item_name"], config=item["config"], template=template_record)
-            for item in template_item_info
-        ])
+                TemplateConfigItem(name=item["item_name"], config=item["config"], template=template_record)
+                for item in template_item_info
+            ])
             # 本地创建文件
             self._write_file(data["type"], file_name, data["code"])
             return Response({"template_id": template_record.id}, status=status.HTTP_200_OK)
@@ -241,9 +238,12 @@ class TemplateViewSet(ModelViewSet):
                 return Response({"code": 0, "message": "组件id为空"}, status=status.HTTP_200_OK)
             template_obj = Template.objects.get(id=template_id, user_id=self.request.user.id)
             file_name = template_obj.file_name
+            template_type = template_obj.type
             template_obj.delete()
             # 删除组件
-            self._delete_file(file_name)
+            dir_name = TEMPLATE_TYPES.get_key_from_dict(template_type).lower()
+            file_path = os.path.join(BASE_PATH, 'depend', dir_name, file_name)
+            self._delete_file(file_path)
             return Response({"code": 1, "message": "删除组件成功"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
