@@ -198,18 +198,15 @@ def index(request):
                              message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
                              raw=raw_response)
 
-    # http/https 请求日志
+    # http 请求日志
     elif len(domain_key) == 4 and domain_key != setting.PLATFORM_DOMAIN.split('.')[0]:
-        message_type = MESSAGE_TYPES.HTTP
         task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                          task__status=1).first()
         if task_config_item:
             username = task_config_item.task.user.username
-            if task_config_item.template.name == "HTTPS":
-                message_type = MESSAGE_TYPES.HTTPS
             send_email_message(username, remote_addr)
             Message.objects.create(domain=host, remote_addr=remote_addr, uri=path, header=headers,
-                                   message_type=message_type, content=message,
+                                   message_type=MESSAGE_TYPES.HTTP, content=message,
                                    task_id=task_config_item.task_id,
                                    template_id=task_config_item.template_id, html=raw_response, )
             send_message(url=host, remote_addr=remote_addr, uri=path, header=headers,
