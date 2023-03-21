@@ -34,14 +34,11 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         """ 更新平台配置 """
         serializer = PlatformUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        for k in request.data.keys():
-            if Config.objects.filter(name=k).exists():
-                try:
-                    Config.objects.filter(name=k).update(value=str(request.data[k]))
-                except Exception as e:
-                    return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "更新失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
+        for k, v in request.data.items():
+            try:
+                Config.objects.filter(name=k).update(value=str(v))
+            except Exception as e:
+                return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
         transaction.on_commit(func=reload_config)
         return Response(data=request.data, status=status.HTTP_200_OK)
 
@@ -89,7 +86,8 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
             value = request.data.get('value')
             DnsConfig.objects.update_or_create(defaults={"domain": domain, "value": value}, id=_id)
             # 解决事务问题
-            transaction.on_commit(func=DnsConfigViewSet.reload_dns)
+            # TODO 是否可以把reload_dns写到 与reload_config同一个文件里
+            transaction.on_commit(func=self.reload_dns)
             return Response(data=request.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"参数操作错误,原因:{e}"}, status=status.HTTP_200_OK)
@@ -102,7 +100,7 @@ class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
             return Response({"message": "删除失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
         try:
             DnsConfig.objects.get(id=delete_id).delete()
-            transaction.on_commit(func=DnsConfigViewSet.reload_dns)
+            transaction.on_commit(func=self.reload_dns)
             return Response({"message": "success", "code": 1}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"参数操作错误,原因:{e}"}, status=status.HTTP_200_OK)

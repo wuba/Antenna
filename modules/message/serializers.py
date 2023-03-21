@@ -1,14 +1,20 @@
 import django_filters
+from django.contrib.gis.gdal.raster import source
 from rest_framework import serializers
 from modules.message.models import Message
+from utils.helper import get_message_type_name
 
 
 class MessageSerializer(serializers.ModelSerializer):
     task_name = serializers.CharField(source='task.name', read_only=True)
+    message_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
         fields = "__all__"
+
+    def get_message_type(self, obj):
+        return get_message_type_name(obj.message_type)
 
 
 class MessageFilter(django_filters.FilterSet):
@@ -24,6 +30,7 @@ class MessageFilter(django_filters.FilterSet):
     task = django_filters.NumberFilter(field_name='task')
     content = django_filters.CharFilter(field_name='content')
     create_time = django_filters.DateFilter(field_name="create_time")
+
     def order_by_desc(self, queryset, name, value):
         if value == "asc":
             return queryset.order_by('create_time')

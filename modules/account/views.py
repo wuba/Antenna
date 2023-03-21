@@ -2,25 +2,25 @@ from django.contrib import auth
 from django.contrib.auth.models import update_last_login
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+
+from modules.account.constants import FIRST_LOGIN, REGISTER_TYPE
+from modules.account.models import InviteCode, User, VerifyCode
+from modules.account.serializers import (ChangePasswordSerializer, EmailSerializer, ForgetPasswordSerializer,
+                                         TestEmailSerializer, UserInfoSerializer, UserLoginSerializer,
+                                         UserRegisterSerializer)
 from modules.api.models import ApiKey
-from modules.account.models import User, VerifyCode, InviteCode
-from modules.account.serializers import UserInfoSerializer, EmailSerializer, UserRegisterSerializer, \
-    ForgetPasswordSerializer, UserLoginSerializer, ChangePasswordSerializer, TestEmailSerializer
-from modules.task.models import Task, TaskConfig
+from modules.config import setting
+from modules.task.constants import SHOW_DASHBOARD, TASK_STATUS, TASK_TMP
+from modules.task.models import Task, TaskConfig, TaskConfigItem
 from modules.template.models import Template, TemplateConfigItem
 from utils.helper import generate_code, send_mail
-from rest_framework import mixins, status
-from modules.task.constants import SHOW_DASHBOARD, TASK_TMP, TASK_STATUS
-from modules.task.models import TaskConfigItem
-from modules.account.constants import FIRST_LOGIN
-from modules.config import setting
-from modules.account.constants import REGISTER_TYPE
 
 
 class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
@@ -57,53 +57,34 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
         username = self.request.user.username
         send_status = send_mail(username, "测试邮件")
         if not send_status:
-            return Response({"message": "发送邮件失败"}, status=status.HTTP_200_OK)
+            return Response({"code": 0, "message": "发送邮件失败"}, status=status.HTTP_200_OK)
         return Response({"email": username}, status=status.HTTP_200_OK)
 
 
 class TaskCreator:
-    DNS_CODE_LENGTH = 4
-    HTTP_CODE_LENGTH = 4
-
-    def __init__(self, user_id):
-        self.user_id = user_id
-
-    def create_initial_task(self):
+    @staticmethod
+    def create_initial_task(user_id):
         """
         创建初始任务
         """
-        initial_task = Task.objects.create(
+        task = Task.objects.create(
             name="初始任务",
-            user_id=self.user_id,
+            user_id=user_id,
             status=TASK_STATUS.OPEN,
             is_tmp=TASK_TMP.FORMAL,
             show_dashboard=SHOW_DASHBOARD.TRUE
         )
-
-        dns_code = generate_code(self.DNS_CODE_LENGTH)
-        dns_task_config = self._create_task_config(initial_task, dns_code, "DNS", "dns_log")
-        http_code = generate_code(self.HTTP_CODE_LENGTH)
-        http_task_config = self._create_task_config(initial_task, http_code, "HTTP", "http_log")
-
-        return initial_task
-
-    @staticmethod
-    def _create_task_config(task, key, template_name, config_item_name):
-        """
-        创建任务配置项
-        """
-        template = Template.objects.get(name=template_name)
-        template_config_item = TemplateConfigItem.objects.get(name=config_item_name)
-        task_config = TaskConfig.objects.create(task=task, key=key)
-        TaskConfigItem.objects.create(
-            value={},
-            template_config_item=template_config_item,
-            task=task,
-            template=template,
-            task_config=task_config
-        )
-
-        return task_config
+        for key_length, template_name, config_item_name in ((4, "DNS", "dns_log"), (4, "HTTP", "http_log")):
+            template = Template.objects.get(name=template_name)
+            template_config_item = TemplateConfigItem.objects.get(name=config_item_name)
+            task_config = TaskConfig.objects.create(task=task, key=generate_code(key_length))
+            TaskConfigItem.objects.create(
+                value={},
+                template_config_item=template_config_item,
+                task=task,
+                template=template,
+                task_config=task_config
+            )
 
 
 class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet, ):
@@ -124,20 +105,18 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         serializer.is_valid(raise_exception=True)
         username = request.data["username"]
         password = request.data["password"]
-        user = User.objects.create_user(username=username, password=password)  # user = serializer.save()
+        user = User.objects.create_user(username=username, password=password)
         invite_code = request.data.get("invite_code", "")
         if setting.REGISTER_TYPE == REGISTER_TYPE.INVITE:  # 判断是开放邀请注册
             InviteCode.objects.filter(code=invite_code).delete()
         apikey = generate_code(32)
         ApiKey.objects.create(user=user, key=apikey)
-        task_creator = TaskCreator(user_id=user.id)
-        task_creator.create_initial_task()
+        TaskCreator().create_initial_task(user.id)
         response_data = {
             "username": username,
             "apikey": apikey
         }
-        return Response(response_data,
-                        status=status.HTTP_200_OK)
+        return Response(response_data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[AllowAny])
     def login(self, request, *args, **kwargs):
@@ -152,7 +131,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         if user is not None:
             Token.objects.filter(user=user).delete()  # 删除原有的Token
             token = Token.objects.create(user=user)
-            private = int(User.objects.get(username=username).is_staff)  # 获取用户角色
+            private = int(user.is_staff)  # 获取用户角色
             return Response({"username": user.username, "token": token.key, "is_staff": private},
                             status=status.HTTP_200_OK)
         return Response({"code": 0, "message": "用户名或密码错误!"}, status=status.HTTP_200_OK)

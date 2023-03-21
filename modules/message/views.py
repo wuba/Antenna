@@ -39,23 +39,6 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         user_id = self.request.user.id
         return Message.objects.filter(task__user__id=user_id).order_by("-id")
 
-    def list(self, request, *args, **kwargs):
-        """
-        查询消息
-        """
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            for i in serializer.data:
-                i["message_type"] = get_message_type_name(i["message_type"])  # 兼容消息类型格式
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        for i in serializer.data:
-            i["message_type"] = get_message_type_name(i["message_type"])
-        return Response(serializer.data)
-
     @action(methods=['delete'], detail=False, permission_classes=[IsAuthenticated])
     def multiple_delete(self, request, *args, **kwargs):
         """
@@ -178,10 +161,6 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         if not key:
             return Response({"code": 0, "message": "apikey错误"}, status=status.HTTP_400_BAD_REQUEST)
         queryset = self.filter_queryset(Message.objects.filter(task__user=key.user_id))
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
