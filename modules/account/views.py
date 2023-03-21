@@ -41,7 +41,7 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
         VerifyCode.objects.create(verify_code=code, username=username)  # 保存验证码
         return Response({"email": username}, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False, permission_classes=[IsAdminUser], serializer_class=TestEmailSerializer)
+    @action(methods=['POST'], detail=False, permission_classes=[IsAdminUser])
     def test(self, request, *args, **kwargs):
         """
         测试邮件
@@ -52,6 +52,8 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
         "EMAIL_HOST_PASSWORD":"",
         }
         """
+        serializer = TestEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         username = self.request.user.username
         send_status = send_mail(username, "测试邮件")
         if not send_status:
@@ -103,7 +105,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         serializer.is_valid(raise_exception=True)
         username = request.data["username"]
         password = request.data["password"]
-        user = User.objects.create_user(username=username, password=password)  # user = serializer.save()
+        user = User.objects.create_user(username=username, password=password)
         invite_code = request.data.get("invite_code", "")
         if setting.REGISTER_TYPE == REGISTER_TYPE.INVITE:  # 判断是开放邀请注册
             InviteCode.objects.filter(code=invite_code).delete()
@@ -114,8 +116,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
             "username": username,
             "apikey": apikey
         }
-        return Response(response_data,
-                        status=status.HTTP_200_OK)
+        return Response(response_data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[AllowAny])
     def login(self, request, *args, **kwargs):

@@ -48,7 +48,7 @@ class TaskInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         exclude = ("user", "create_time")
-    # TODO 大写问题
+
     def get_message_counts(self, Task):
         task_id = Task.id
         message_counts = Message.objects.filter(task_id=task_id).count()

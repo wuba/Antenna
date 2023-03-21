@@ -30,9 +30,7 @@ class EmailSerializer(serializers.Serializer):
                                       })
 
     def validate_username(self, username):
-        print(username)
         num_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
-        print('111111111111')
         if VerifyCode.objects.filter(username=username, create_time__gt=num_time).count() > 10:
             raise serializers.ValidationError('短时间内超过获取验证码次数')
         return username
