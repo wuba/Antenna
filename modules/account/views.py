@@ -14,7 +14,7 @@ from modules.account.constants import FIRST_LOGIN, REGISTER_TYPE
 from modules.account.models import InviteCode, User, VerifyCode
 from modules.account.serializers import (ChangePasswordSerializer, EmailSerializer, ForgetPasswordSerializer,
                                          TestEmailSerializer, UserInfoSerializer, UserLoginSerializer,
-                                         UserRegisterSerializer,)
+                                         UserRegisterSerializer)
 from modules.api.models import ApiKey
 from modules.config import setting
 from modules.task.constants import SHOW_DASHBOARD, TASK_STATUS, TASK_TMP
@@ -31,7 +31,6 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
     permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
-        # TODO: 可以直接从request.data里获取username,例如：username = request.data.get('username')
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = serializer.validated_data["username"]
@@ -42,7 +41,7 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
         VerifyCode.objects.create(verify_code=code, username=username)  # 保存验证码
         return Response({"email": username}, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False, permission_classes=[IsAdminUser])
+    @action(methods=['POST'], detail=False, permission_classes=[IsAdminUser], serializer_class=TestEmailSerializer)
     def test(self, request, *args, **kwargs):
         """
         测试邮件
@@ -53,20 +52,14 @@ class EmailCodeViewSet(mixins.CreateModelMixin, GenericViewSet):
         "EMAIL_HOST_PASSWORD":"",
         }
         """
-        # TODO: 可以在action装饰器里配置serializer_class，下面两行就不需要了, 其他的接口也可做同样处理
-        serializer = TestEmailSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
         username = self.request.user.username
         send_status = send_mail(username, "测试邮件")
         if not send_status:
-            # TODO 返回数据格式为何不包含 code 了？
-            return Response({"message": "发送邮件失败"}, status=status.HTTP_200_OK)
+            return Response({"code": 0, "message": "发送邮件失败"}, status=status.HTTP_200_OK)
         return Response({"email": username}, status=status.HTTP_200_OK)
 
 
 class TaskCreator:
-
-    # TODO 已优化，是否有其他更好的方法？
     @staticmethod
     def create_initial_task(user_id):
         """
@@ -137,9 +130,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         if user is not None:
             Token.objects.filter(user=user).delete()  # 删除原有的Token
             token = Token.objects.create(user=user)
-
-            # TODO user上面已经获取到了，这里直接用int(user.is_staff即可)
-            private = int(User.objects.get(username=username).is_staff)  # 获取用户角色
+            private = int(user.is_staff)  # 获取用户角色
             return Response({"username": user.username, "token": token.key, "is_staff": private},
                             status=status.HTTP_200_OK)
         return Response({"code": 0, "message": "用户名或密码错误!"}, status=status.HTTP_200_OK)

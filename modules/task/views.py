@@ -51,7 +51,6 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
     def create_tmp_task(self, request, *args, **kwargs):
         """
         创建缓存任务，创建缓存任务默认添加dns与http组件
-        TODO: 使用classdata
         """
 
         task = Task.objects.create(name='', user=self.request.user, status=TASK_STATUS.OPEN, is_tmp=TASK_TMP.TMP)
@@ -116,8 +115,7 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
         }
         """
         task_list = request.data.get("id", "")
-        # TODO int("")会抛出异常
-        task_status = int(request.data.get("status", ""))
+        task_status = int(request.data.get("status", 1))
         if not task_list or task_status not in [0, 1]:
             return Response({"code": 0, "message": "传递参数值格式错误"}, status=status.HTTP_200_OK)
         Task.objects.filter(user_id=self.request.user.id, id__in=task_list).update(status=task_status)
@@ -218,7 +216,6 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         serializer = self.get_serializer(queryset, many=True)
         return self.get_result_data(serializer.data)
 
-    @transaction.atomic
     def create(self, request, *args, **kwargs):
         """
         添加组件实例
@@ -243,19 +240,20 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         template_id = serializer.data["template"]
         code = generate_code(4)
 
-        # TODO 这里是否需要使用事务
-        task_config = TaskConfig.objects.create(task_id=task_id, key=code)
-        template_config_item_list = request.data["template_config_item_list"]
-        task_config_items = [
-            TaskConfigItem(
-                value=template_config_item.get("value", {}),
-                template_config_item_id=int(template_config_item.get("template_config_item", 0)),
-                task_id=task_id,
-                template_id=template_id,
-                task_config_id=task_config.id,
-            ) for template_config_item in template_config_item_list
-        ]
-        TaskConfigItem.objects.bulk_create(task_config_items)
+        with transaction.atomic():
+            task_config = TaskConfig.objects.create(task_id=task_id, key=code)
+            template_config_item_list = request.data["template_config_item_list"]
+            task_config_items = [
+                TaskConfigItem(
+                    value=template_config_item.get("value", {}),
+                    template_config_item_id=int(template_config_item.get("template_config_item", 0)),
+                    task_id=task_id,
+                    template_id=template_id,
+                    task_config_id=task_config.id,
+                ) for template_config_item in template_config_item_list
+            ]
+            TaskConfigItem.objects.bulk_create(task_config_items)
+
         queryset = self.filter_queryset(
             TaskConfigItem.objects.filter(task_config__task__user=self.request.user.id, task_id=task_id))
         serializer = self.get_serializer(queryset, many=True)
@@ -359,3 +357,5 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
             if payload:
                 payload_list.add(payload)
         return Response(data={"payload": payload_list}, status=status.HTTP_200_OK)
+
+    from django.db import transaction

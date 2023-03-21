@@ -29,9 +29,8 @@ class TaskConfig(models.Model):
     """
     任务配置表
     """
-    # TODO 注意related_name的用法
-    task = models.ForeignKey(Task, related_name='task_task_config', on_delete=models.CASCADE,
-                             db_constraint=False, help_text="所属任务")
+    task = models.ForeignKey(Task, related_name='task_task_config', on_delete=models.CASCADE, db_constraint=False,
+                             help_text="所属任务")
     key = models.CharField(max_length=32, help_text='key')
 
     class Meta:

@@ -34,16 +34,11 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         """ 更新平台配置 """
         serializer = PlatformUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # TODO keys方法改为items方法
         for k, v in request.data.items():
-            # TODO 不需要再判断是否存在了，在序列化里已经校验过了
-            if Config.objects.filter(name=k).exists():
-                try:
-                    Config.objects.filter(name=k).update(value=str(v))
-                except Exception as e:
-                    return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "更新失败,输入参数格式错误", "code": 0}, status=status.HTTP_200_OK)
+            try:
+                Config.objects.filter(name=k).update(value=str(v))
+            except Exception as e:
+                return Response({"code": 0, "message": f"配置参数错误,原因:{e}"}, status=status.HTTP_200_OK)
         transaction.on_commit(func=reload_config)
         return Response(data=request.data, status=status.HTTP_200_OK)
 

@@ -15,7 +15,7 @@ from modules.template.choose_template import load_template, view_template_code
 from modules.template.constants import PRIVATE_TYPES, TEMPLATE_TYPES
 from modules.template.models import Template, TemplateConfigItem
 from modules.template.serializers import (DeleteTmplateSerializer, TemplateConfigItemSerializer, TemplateInfoSerializer,
-                                          UpdateTemplateInfoSerializer,)
+                                          UpdateTemplateInfoSerializer, )
 from utils.helper import generate_code
 
 BASE_PATH = str(os.path.abspath(os.path.dirname(__file__)))
@@ -32,9 +32,8 @@ class TemplateViewSet(ModelViewSet):
         user_id = self.request.user.id
         return Template.objects.filter(Q(user=user_id) | Q(is_private=PRIVATE_TYPES.PUBLIC))  # 可查看公开组件
 
-
-    # TODO 可以理解下classmethod 和 staticmethod
-    def _write_file(self, template_type, file_name, code):
+    @classmethod
+    def _write_file(cls, template_type, file_name, code):
         """
         将代码内容写入组件文件中
         """
@@ -42,7 +41,7 @@ class TemplateViewSet(ModelViewSet):
         file_path = os.path.join(BASE_PATH, 'depend', dir_name, file_name)
 
         # 删除旧文件
-        self._delete_file(file_path)
+        cls._delete_file(file_path)
         # 写新文件
         with open(file_path, 'w') as f:
             f.write(code)

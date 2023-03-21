@@ -11,5 +11,5 @@ class custom_render(JSONRenderer):
             if data.get('message') is not None:
                 msg, code = data.get('message'), data.get('code')
                 data = {}
-            data = {"code": code, 'message': msg, 'data': data, }
+            data = {"code": code, 'message': msg, 'data': data}
         return super().render(data, accepted_media_type, renderer_context)

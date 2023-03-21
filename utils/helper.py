@@ -15,13 +15,6 @@ from functools import wraps
 import django
 from modules.message.constants import MESSAGE_TYPES
 
-# TODO: remove this
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../")
-sys.path.append(PROJECT_ROOT)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
-django.setup()
-enviroment = os.environ.get('PLATFORM_ENVIROMENT')
-
 from django.conf import settings
 import requests
 from django_filters.filters import Filter
@@ -104,22 +97,6 @@ def generate_code(number):
     return random_code
 
 
-def create_salt(length=6):
-    """Generate a random string of letters and digits """
-    letters_digits = string.ascii_letters + string.digits
-    return ''.join(random.choice(letters_digits) for i in range(length))
-
-
-def create_md5(txt):
-    return hashlib.md5(txt.encode('utf-8')).hexdigest()
-
-
-def token_generate(content, salt=None):
-    token_str = str(content) + str(time.time()) + (salt if salt else create_salt())
-    md5_str = create_md5(token_str)
-    return md5_str.lower()
-
-
 def convert(data):
     if isinstance(data, bytes):
         return data.decode()
@@ -158,6 +135,7 @@ def send_mail(to, message):
         mail['Subject'] = 'Antenna平台邮件'
         mail['From'] = username_send
         mail['To'] = username_recv
+        smtp = None
         if port == 25 or port == 587:
             smtp = smtplib.SMTP(mailserver, port=port)
             smtp.starttls()
