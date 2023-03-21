@@ -202,7 +202,7 @@ def index(request):
     elif len(domain_key) == 4 and domain_key != setting.PLATFORM_DOMAIN.split('.')[0]:
         task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                          task__status=1).first()
-        if task_config_item:
+        if task_config_item and task_config_item.template.name == "HTTP":
             username = task_config_item.task.user.username
             send_email_message(username, remote_addr)
             Message.objects.create(domain=host, remote_addr=remote_addr, uri=path, header=headers,
