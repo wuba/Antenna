@@ -1,5 +1,4 @@
 import django_filters
-from django.contrib.gis.gdal.raster import source
 from rest_framework import serializers
 from modules.message.models import Message
 from utils.helper import get_message_type_name
