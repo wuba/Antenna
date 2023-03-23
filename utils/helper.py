@@ -161,17 +161,14 @@ def send_email_message(username, ip):
         print("send_email_message error", repr(e))
 
 
-def is_base64(content):
-    """
-    判断内容是否base64编码
-    """
-    content = content.replace(' ', '+')
-    if len(content) % 4 != 0:
-        return content
-    for i in content:
-        if not ('a' <= i <= 'z') or ('A' <= i <= 'Z') or ('0' <= i <= '9') or i == '+' or i == '/' or i == '=':
-            return content
-    return str(base64.b64decode(content), 'utf-8')
+def is_base64(s):
+    try:
+        # 尝试解码字符串
+        base64.decodebytes(s.encode('utf-8'))
+        return base64.b64decode(s).decode('utf-8')
+    except Exception:
+        # 解码失败，说明不是 base64 编码的字符串，返回原内容
+        return s
 
 
 def restart():
@@ -210,22 +207,27 @@ def get_message_type_name(message_type):
 
 
 def reconstruct_request(request):
-    """
-    拼接http报文
-    """
-    headers = '\n'.join(
-        f'{header.replace("_", "-").replace("Http-", "").title()}: {value}'
-        for header, value in request.META.items()
-        if header.startswith('HTTP')
+    # 请求行
+    request_line = '{method} {path} HTTP/1.1\r\n'.format(
+        method=request.method,
+        path=request.path
     )
 
-    return (
-        f'{request.method} /{request.path.strip("/")} HTTP/1.1\n'
-        f'Content-Length: {request.META.get("CONTENT_LENGTH", 0)}\n'
-        f'Content-Type: {request.META.get("CONTENT_TYPE", "")}\n'
-        f'{headers}\n\n'
-        f'{request.body.decode()}'
+    # 请求头
+    headers = ''
+    for name, value in request.headers.items():
+        headers += '{name}: {value}\r\n'.format(name=name, value=value)
+
+    # 请求体
+    body = request.body.decode('utf-8')
+
+    # 数据报文
+    message = '{request_line}{headers}\r\n{body}'.format(
+        request_line=request_line,
+        headers=headers,
+        body=body
     )
+    return message
 
 
 def get_param_message(request):
@@ -233,14 +235,21 @@ def get_param_message(request):
     获取请求的参数以及message参数
     """
     if request.method == 'GET':
-        param_list = dict(request.GET)
-        message = is_base64(request.GET.get('message', ''))  # 获取的参数message
+        params = request.GET.dict()
     elif request.method == 'POST':
-        param_list = dict(request.POST)
-        message = request.POST.get('message', '')
+        try:
+            params = request.POST.dict()
+        except Exception as e:
+            print(f'Failed to get POST params: {e}')
+            params = {}
     else:
-        json_str = request.body  # 属性获取最原始的请求体数据
-        param_list = json.loads(json_str)
-        message = param_list.get('message', '')
+        try:
+            json_str = request.body.decode('utf-8')
+            params = json.loads(json_str)
+        except Exception as e:
+            print(f'Failed to get JSON params: {e}')
+            params = {}
 
-    return param_list, message
+    base64_message = params.get('message', '')
+    message = is_base64(base64_message) if base64_message else ''
+    return params, message
