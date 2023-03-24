@@ -36,7 +36,6 @@ class HTTP(Protocol):
         self.domain = re.findall(r'Host: (.*?)\r\n', content)[0]
         self.key = self.domain.split('.')[0]
         self.content = content
-        print(content)
         self.uri = re.findall(r'/(.*?) HTTP', content)[0]
         echo_message = b"""HTTP/1.0 200 OK
 Server: 127.0.0.1
@@ -71,7 +70,7 @@ Connection: Closed
     def connectionLost(self, reason):
         task_config_item = TaskConfigItem.objects.filter(task_config__key=self.key,
                                                          task__status=1).first()
-        if task_config_item and task_config_item.template.name == "HTTP" or task_config_item.template.name == "HTTPS":
+        if task_config_item and task_config_item.template.name == "HTTP":
             username = task_config_item.task.user.username
             send_email_message(username, self.remote_addr)
             Message.objects.create(domain=self.domain + '/' + self.uri, message_type=MESSAGE_TYPES.HTTPS,

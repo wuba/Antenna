@@ -17,13 +17,7 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
     def get_queryset(self):
         return ApiKey.objects.filter(user=self.request.user)
 
-    @action(
-        methods=["GET"],
-        detail=False,
-        permission_classes=[
-            IsAuthenticated,
-        ],
-    )
+    @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated])
     def refresh(self, request, *args, **kwargs):
         """
         刷新apikey
@@ -32,13 +26,7 @@ class ApiKeyViewSet(mixins.ListModelMixin, GenericViewSet):
         ApiKey.objects.filter(user=self.request.user).update(key=new_apikey)
         return Response({"key": new_apikey}, status=status.HTTP_200_OK)
 
-    @action(
-        methods=["GET"],
-        detail=False,
-        permission_classes=[
-            IsAuthenticated,
-        ],
-    )
+    @action(methods=["GET"], detail=False, permission_classes=[IsAuthenticated])
     def url_list(self, request, *args, **kwargs):
         """
         获取api列表

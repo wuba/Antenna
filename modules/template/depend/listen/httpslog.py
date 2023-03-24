@@ -12,6 +12,10 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
 from modules.template.depend.base import BaseTemplate
+from modules.message.constants import MESSAGE_TYPES
+from modules.message.models import Message
+from modules.task.models import TaskConfigItem
+from utils.helper import send_message, send_email_message
 
 
 class ProxyWebProtocol(Protocol):
@@ -47,15 +51,29 @@ class ProxyWebFactory(ClientFactory):
 
 class ProxyProtocol(Protocol):
     def __init__(self):
+        super().__init__()
         self.host = ''
         self.port = ''
         self.request = ''
+        self.html = None
+        self.remote_addr = None
+        self.uri = None
+        self.content = None
+        self.key = None
+        self.ip = ""
+        self.domain = ""
 
     def connectionMade(self):
-        self.host = self.transport.getPeer().host
         self.port = self.transport.getPeer().port
+        self.remote_addr = self.transport.getPeer().host
 
     def dataReceived(self, data):
+        content = str(data, encoding="utf-8")
+        print(content)
+        self.domain = re.findall(r'Host: (.*?)\r\n', content)[0]
+        self.key = self.domain.split('.')[0]
+        self.content = content
+        self.uri = re.findall(r'/(.*?) HTTP', content)[0]
         self.request = data
         index1 = self.request.index(b' ')
         index2 = self.request.index(b' ', index1 + 1)
@@ -65,12 +83,26 @@ class ProxyProtocol(Protocol):
         # index3 = part1.index(b'/', 8)
         # url = part1[7:index3]
         # print('get the url: ', url, flush=True)
+        task_config_item = TaskConfigItem.objects.filter(task_config__key=self.key, task__status=1).first()
+        if task_config_item and task_config_item.template.name == "HTTPS":
+            username = task_config_item.task.user.username
+            send_email_message(username, self.remote_addr)
+            Message.objects.create(domain=self.domain, message_type=MESSAGE_TYPES.HTTPS,
+                                   remote_addr=self.remote_addr,
+                                   task_id=task_config_item.task_id,
+                                   uri=self.uri,
+                                   template_id=task_config_item.template_id,
+                                   html=self.content)
+            send_message(url=self.domain, remote_addr=self.remote_addr, uri=self.uri, header='',
+                         message_type=MESSAGE_TYPES.HTTPS, content=self.content,
+                         task_id=task_config_item.task_id)
+
         proxy_factory = ProxyWebFactory(self.request, self)
         reactor.connectTCP("0.0.0.0", 80, proxy_factory)
 
     # self.transport.loseConnection()
 
-    def connectionLost(self, reason):
+    def connectionLost(self):
         pass
 
 
