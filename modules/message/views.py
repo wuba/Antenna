@@ -160,7 +160,13 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         key = ApiKey.objects.filter(key=apikey).first()
         if not key:
             return Response({"code": 0, "message": "apikey错误"}, status=status.HTTP_400_BAD_REQUEST)
-        queryset = self.filter_queryset(Message.objects.filter(task__user=key.user_id))
+        if not key.user_id:
+            return Response({"code": 0, "message": "key对应的用户不存在"}, status=status.HTTP_400_BAD_REQUEST)
+        queryset = self.filter_queryset(Message.objects.filter(task__user=key.user_id)).order_by("-id")
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
