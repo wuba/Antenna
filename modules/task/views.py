@@ -19,22 +19,6 @@ from rest_framework.viewsets import GenericViewSet
 from utils.helper import generate_code, get_payload
 
 
-@dataclass
-class TaskInfo:
-    task_id: int
-    task_name: str
-    callback_url: str
-    callback_url_headers: str
-    show_dashboard: bool
-
-
-@dataclass
-class TaskInfoResponse:
-    task_info: TaskInfo
-    listen_template_info: List
-    payload_template_info: List
-
-
 class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin,
                       mixins.DestroyModelMixin, ):
     queryset = Task.objects.all().order_by("id")
@@ -52,12 +36,15 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
         """
         创建缓存任务，创建缓存任务默认添加dns与http组件
         """
-
-        task = Task.objects.create(name='', user=self.request.user, status=TASK_STATUS.OPEN, is_tmp=TASK_TMP.TMP)
-        task_info = TaskInfo(task_id=task.id, task_name="", callback_url="",
-                             callback_url_headers="", show_dashboard=False)
-        response = TaskInfoResponse(task_info=task_info, listen_template_info=[], payload_template_info=[])
-        return Response(response.__dict__, status=status.HTTP_200_OK)
+        try:
+            task = Task.objects.create(name='', user=self.request.user, status=TASK_STATUS.OPEN, is_tmp=TASK_TMP.TMP)
+            return Response(
+                {"task_info": {"task_id": task.id, "task_name": "", "callback_url": "", "callback_url_headers": "",
+                               "show_dashboard": False},
+                 "listen_template_info": [],
+                 "payload_template_info": [], }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[IsAuthenticated, ])
     def cancel_tmp_task(self, request, *args, **kwargs):
