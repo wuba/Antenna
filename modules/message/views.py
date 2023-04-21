@@ -156,6 +156,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
 
     @action(methods=["GET"], detail=False, permission_classes=[AllowAny, ])
     def api(self, request, *args, **kwargs):
+        # Tanks 7estUser commit issue
         apikey = self.request.query_params.get('apikey', '')
         key = ApiKey.objects.filter(key=apikey).first()
         if not key:

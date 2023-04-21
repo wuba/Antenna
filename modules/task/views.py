@@ -36,6 +36,7 @@ class TaskInfoViewSet(GenericViewSet, mixins.ListModelMixin, mixins.CreateModelM
         """
         创建缓存任务，创建缓存任务默认添加dns与http组件
         """
+        # Tanks 7estUser commit issue
         try:
             task = Task.objects.create(name='', user=self.request.user, status=TASK_STATUS.OPEN, is_tmp=TASK_TMP.TMP)
             return Response(
