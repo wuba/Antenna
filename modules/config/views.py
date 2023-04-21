@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from modules.config import setting
 from modules.config.setting import reload_config
+from utils.helper import *
 
 
 class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
@@ -51,6 +52,29 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
         flag = int(setting.REGISTER_TYPE == REGISTER_TYPE.INVITE)
         return Response({"open_invite": flag}, status=status.HTTP_200_OK)
 
+    @action(methods=["GET"], detail=False, permission_classes=[IsAdminUser, ])
+    def check_version(self, requests, *args, **kwargs):
+        """
+        获取最新版本号
+        """
+        flag = False
+        try:
+            latest_version = get_lastest_verson()
+            if not latest_version:
+                return Response({"code": 0, "message": f"检查更新错误,原因:{e}"}, status=status.HTTP_200_OK)
+            print(latest_version)
+            current_file_path = os.path.abspath(__file__)
+            print(current_file_path)
+            with open(f"{current_file_path}/../../../conf/version.ini", "r") as version_file:
+                current_version = version_file.read().strip()
+                print(f"Current project version: {current_version}")
+            # 比较两个版本
+            if latest_version != current_version:
+                flag = True
+                print("There is a new version available on GitHub.")
+            return Response({"renewable": flag}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"code": 0, "message": f"检查更新错误,原因:{e}"}, status=status.HTTP_200_OK)
 
 class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = DnsConfig.objects.all().order_by("id")

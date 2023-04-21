@@ -1,6 +1,8 @@
 from django.contrib import auth
 from django.contrib.auth.models import update_last_login
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
 from rest_framework.authtoken.models import Token
@@ -196,3 +198,22 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         if (self.request.user.last_login is None) or self.request.user.last_login == "2022-01-01 00:00:00":
             result = FIRST_LOGIN.FALSE
         return Response({"first_login": result}, status=status.HTTP_200_OK)
+
+    @action(methods=["GET"], detail=False, permission_classes=[AllowAny])
+    def api(self, request, *args, **kwargs):
+        """
+        通过api获取对应token
+        """
+        apikey = request.query_params.get('apikey', '')
+
+        try:
+            key = get_object_or_404(ApiKey, key=apikey)
+            if not key.user_id:
+                return Response({"code": 0, "message": "key对应的用户不存在"}, status=status.HTTP_400_BAD_REQUEST)
+            token, created = Token.objects.get_or_create(user_id=key.user_id)
+            return Response({"token": token.key}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({"code": 0, "message": "apikey错误"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"code": 0, "message": f"发生未知错误: {str(e)}"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
