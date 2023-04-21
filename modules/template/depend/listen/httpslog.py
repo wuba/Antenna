@@ -18,7 +18,7 @@ sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 
 django.setup()
-
+from modules.template.depend.base import BaseTemplate
 from modules.message.constants import MESSAGE_TYPES
 from modules.message.models import Message
 from modules.task.models import TaskConfigItem
@@ -47,7 +47,7 @@ class MyResource(Resource):
         self.uri = urlparse(request.uri.decode('utf-8')).path.strip("/")
         self.body = request.content.read().decode('utf-8')
         request.content.seek(0)
-       # Extract request line
+        # Extract request line
         request_line = f"{request.method.decode('utf-8')} {request.uri.decode('utf-8')} {request.clientproto.decode('utf-8')}"
 
         # Extract headers
@@ -111,10 +111,42 @@ class FinishedRequest(Protocol):
         self.request.finish()
 
 
-root = MyResource()
+class HttpsTemplate(BaseTemplate):
+    info = [{
+        "template_info": {
+            "name": "HTTPS",  # 组件名
+            "title": "HTTPS协议监听组件",  # 组件展示标题名
+            "author": "bios000",  # 组件作者
+            "type": 1,  # 组件类型，1是监听0是利用
+            "desc": "",  # 组件介绍
+            "desc_url": "",  # 组件使用说明链接
+            "choice_type": 0,  # 组件选择类型0是单选，1是多选
+            "payload": "https://{key}.{domain}",
+            "file_name": "httpslog.py",
+        },
+        "item_info": [{
+            "name": "https_log",
+            "config": [],
 
-factory = Site(root)
-reactor.listenSSL(443, factory,
-                  ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/conf/server.key',
-                                                   f'{PROJECT_ROOT}/conf/server.crt'))
-reactor.run()
+        }]}]
+
+    def __init__(self):
+        super().__init__()
+
+
+def main():
+    try:
+        print(f"HTTPS 协议监听模块已开启 443 port starting listen ...", flush=True)
+        root = MyResource()
+
+        factory = Site(root)
+        reactor.listenSSL(443, factory,
+                          ssl.DefaultOpenSSLContextFactory(f'{PROJECT_ROOT}/conf/server.key',
+                                                           f'{PROJECT_ROOT}/conf/server.crt'))
+        reactor.run()
+    except Exception as e:
+        print(e)
+
+
+if __name__ == '__main__':
+    main()

@@ -253,3 +253,18 @@ def get_param_message(request):
     base64_message = params.get('message', '')
     message = is_base64(base64_message) if base64_message else ''
     return params, message
+
+
+def get_lastest_verson():
+    """
+    获取github 最新版本
+    """
+    latest_version = ""
+    response = requests.get(f"https://api.github.com/repos/wuba/antenna/releases")
+    if response.status_code == 200:
+        releases = response.json()
+        latest_release = releases[0]  # 按时间顺序排列，最新版本在第一个位置
+        latest_version = latest_release['tag_name']
+        print(f"Latest version on GitHub: {latest_version}")
+
+    return latest_version
