@@ -268,3 +268,5 @@ def get_lastest_verson():
         print(f"Latest version on GitHub: {latest_version}")
 
     return latest_version
+
+

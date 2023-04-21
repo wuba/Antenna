@@ -1,7 +1,7 @@
 import django_filters
 from rest_framework import serializers
 from modules.message.models import Message
-from utils.helper import get_message_type_name
+from utils.helper import get_message_type_name, ListFilter
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class MessageSerializer(serializers.ModelSerializer):
 class MessageFilter(django_filters.FilterSet):
     month = django_filters.NumberFilter(field_name='create_time', lookup_expr='month')
     year = django_filters.NumberFilter(field_name='create_time', lookup_expr='year')
-    domain_in = django_filters.CharFilter(field_name='domain', lookup_expr='in')
+    domain = ListFilter(query_param='domain')
     content_contains = django_filters.CharFilter(field_name='content', lookup_expr='icontains')
     domain_contains = django_filters.CharFilter(field_name='domain', lookup_expr='icontains')
     order_desc = django_filters.CharFilter(method='order_by_desc', initial='desc')
