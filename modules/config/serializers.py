@@ -30,6 +30,7 @@ class ProtocalUpdateSerializer(serializers.Serializer):
     """
     协议配置序列化器
     """
+    # TODO 大写问题, 如后续需要大写，可以用upper()
     JNDI_PORT = serializers.CharField(required=True, help_text="JNDI端口")
     DNS_DOMAIN = serializers.CharField(required=True, help_text="DNS域名")
     NS1_DOMAIN = serializers.CharField(required=True, help_text="NS1域名")
@@ -46,6 +47,7 @@ class PlatformUpdateSerializer(serializers.Serializer):
     """
     平台序列化器
     """
+    # TODO 大写问题
     PLATFORM_DOMAIN = serializers.CharField(required=True, help_text="平台域名")
     SERVER_IP = serializers.IPAddressField(required=True, help_text="平台IP")
     LOGIN_PATH = serializers.CharField(required=True, help_text="后台注册地址")

