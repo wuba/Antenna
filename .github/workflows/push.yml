@@ -1,9 +1,12 @@
-name: 版本镜像打包
+name: push镜像打包
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   docker:
@@ -29,5 +32,3 @@ jobs:
           file: ./Dockerfile
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/antenna:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/antenna:${{ steps.tag.outputs.tag }}
-
