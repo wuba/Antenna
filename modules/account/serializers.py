@@ -135,7 +135,7 @@ class VerifyCodeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('验证码错误')
         # 判断验证码是否过期
         five_minutes_ago = timezone.now() - datetime.timedelta(minutes=5)
-        if verify_records.create_time < five_minutes_ago.replace(tzinfo=None):
+        if verify_records.create_time < five_minutes_ago:
             raise serializers.ValidationError('验证码过期')
         return verify_code
 
@@ -149,6 +149,7 @@ class UserRegisterSerializer(VerifyCodeSerializer):
         'blank': '请输入名字'
     }, validators=[UniqueValidator(queryset=User.objects.
                                    all(), message="用户已存在")])
+
     password = serializers.CharField(required=True, allow_blank=False, min_length=6, max_length=16,
                                      help_text='用户密码',
                                      error_messages={
@@ -162,8 +163,9 @@ class UserRegisterSerializer(VerifyCodeSerializer):
         model = User
         fields = ('username', 'password', 'verify_code', 'invite_code',)
 
-    def validate_invite_code(self, invite_code=""):
+    def validate_invite_code(self, invite_code):
         register_type = self.context["REGISTER_TYPE"]
+        print(REGISTER_TYPE.INVITE)
         if register_type == REGISTER_TYPE.INVITE:
             if not InviteCode.objects.filter(code=invite_code).exists():
                 raise serializers.ValidationError('邀请码错误或失效')
@@ -171,6 +173,7 @@ class UserRegisterSerializer(VerifyCodeSerializer):
 
     def validate(self, attrs):
         register_type = self.context["REGISTER_TYPE"]
+        print(REGISTER_TYPE.REFUSE)
         if register_type == REGISTER_TYPE.REFUSE:
             raise serializers.ValidationError('禁止注册')
         return attrs
