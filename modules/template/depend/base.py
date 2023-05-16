@@ -100,7 +100,8 @@ def message_callback(domain, remote_addr, task_config_item, uri, header, message
         Message.objects.create(domain=domain, message_type=message_type,
                                remote_addr=remote_addr,
                                task_id=task_config_item.task_id,
-                               template_id=task_config_item.template_id)
+                               template_id=task_config_item.template_id, uri=uri, header=header, content=content,
+                               html=raw)
         send_email_message(task_config_item.task.user.username, remote_addr)
         send_message(url=domain, remote_addr=remote_addr, uri=uri, header=header,
                      message_type=message_type, content=content, task_id=task_config_item.task_id, raw=raw)
