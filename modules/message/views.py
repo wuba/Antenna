@@ -179,7 +179,6 @@ def index(request):
     message = is_base64(message_to_base64)
     host = request.get_host()  # 项目域名
     domain_key = host.split('.')[0]
-    url = host + '/' + path
     remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
     regex = re.compile('^HTTP_')
     headers = dict((regex.sub('', header), value) for (header, value) in request.META.items() if
@@ -198,8 +197,9 @@ def index(request):
                                  header=headers, message_type=MESSAGE_TYPES.HTTP, content=message, raw=raw_response)
     # http 请求日志
     elif len(domain_key) == 4 and domain_key != setting.PLATFORM_DOMAIN.split('.')[0]:
-        flag, task_config_item = hit(key=domain_key, template_name=["HTTP"], iexact=True)
-        if flag:
+        task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
+                                                         task__status=1).first()
+        if task_config_item and task_config_item.template.name == "HTTP":
             message_callback(domain=host, remote_addr=remote_addr, task_config_item=task_config_item, uri=path,
                              header=headers, message_type=MESSAGE_TYPES.HTTP, content=message, raw=raw_response)
     return HttpResponse('', content_type='text/html;charset=utf-8')
