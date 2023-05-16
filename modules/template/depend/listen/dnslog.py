@@ -96,6 +96,7 @@ class DynamicResolver(object):
                     ttl = 60
                 else:
                     ttl = 0
+                print("ttl:", ttl, flush=True)
                 answers.append(dns.RRHeader(
                     name=name,
                     payload=dns.Record_A(address=bytes(next(self.dns_config[domain.lower()]), encoding="utf-8")), ttl=ttl))
