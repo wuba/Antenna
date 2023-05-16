@@ -12,6 +12,8 @@ import fnmatch
 import django
 from itertools import cycle
 
+from twisted.internet import reactor
+from twisted.names import dns, server
 from twisted.names.dns import DNSDatagramProtocol
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
@@ -19,15 +21,9 @@ sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
-from modules.config import setting
-from twisted.internet import reactor
-from twisted.names import dns, server
-from utils.helper import send_message, send_email_message
 from modules.message.constants import MESSAGE_TYPES
 from modules.config.models import DnsConfig
-from modules.message.models import Message
-from modules.task.models import TaskConfig, TaskConfigItem
-from modules.template.depend.base import BaseTemplate
+from modules.template.depend.base import *
 
 
 class DNSServerFactory(server.DNSServerFactory):
@@ -58,6 +54,7 @@ class DynamicResolver(object):
         # 初始化变量
         self._peer_address = None
         self.dns_config = {}
+        close_old_connections()
         dns_recoed = DnsConfig.objects.all()
         self.dns_config_domain = [_dns.domain for _dns in dns_recoed]
         for _dns in dns_recoed:
@@ -101,18 +98,10 @@ class DynamicResolver(object):
                 # 存储数据
                 udomain = re.findall(r'\.?([^\.]+)\.%s' % setting.DNS_DOMAIN.strip("*."), name.decode("utf-8").lower())
                 if udomain:
-                    task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain[0],
-                                                                     task__status=1).first()
-                    if task_config_item and task_config_item.template.name == "DNS":
-                        username = task_config_item.task.user.username
-                        Message.objects.create(domain=name.decode("utf-8"), message_type=MESSAGE_TYPES.DNS,
-                                               remote_addr=addr,
-                                               task_id=task_config_item.task_id,
-                                               template_id=task_config_item.template_id)
-                        print("完成保存")
-                        send_email_message(username, addr)
-                        send_message(url=name.decode("utf-8"), remote_addr=addr, uri='', header='',
-                                     message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
+                    flag, task_config_item = hit(udomain[0], template_name=["DNS"], iexact=True)  # 不区分大小写
+                    if flag:
+                        message_callback(domain=name.decode("utf-8"), remote_addr=addr, task_config_item=task_config_item, uri='',
+                                         header='', message_type=MESSAGE_TYPES.DNS, content='')  # 命中回调
                 break
         authority = []
         additional = []

@@ -3,9 +3,20 @@ from django.http import HttpResponse, HttpResponseRedirect
 from rest_framework.response import Response
 from modules.config.models import Config
 from modules.config import setting
+from modules.message.models import Message
 from modules.task.models import TaskConfigItem
 import requests
 import json
+from utils.helper import send_email_message, send_message
+from modules.task.constants import TASK_STATUS
+from modules.message.constants import MESSAGE_TYPES
+from django.db import connections
+
+
+def close_old_connections():
+    for conn in connections.all():
+        conn.close_if_unusable_or_obsolete()
+
 
 class BaseTemplate:
     info = [{
@@ -58,3 +69,37 @@ class BaseTemplate:
     @abstractmethod
     def generate(self, key, config):
         pass
+
+
+def hit(key, template_name, iexact=False):
+    """
+    命中
+    """
+    close_old_connections()
+    found = False
+    if iexact:
+        found_item = TaskConfigItem.objects.filter(
+            task_config__key__iexact=key, task__status=TASK_STATUS.OPEN
+        ).first()
+    else:
+        found_item = TaskConfigItem.objects.filter(
+            task_config__key=key, task__status=TASK_STATUS.OPEN
+        ).first()
+
+    if found_item and found_item.template.name in template_name:
+        found = True
+
+    return found, found_item
+
+
+def message_callback(domain, remote_addr, task_config_item, uri, header, message_type, content, raw=""):
+    """
+    命中回调
+    """
+    Message.objects.create(domain=domain, message_type=message_type,
+                           remote_addr=remote_addr,
+                           task_id=task_config_item.task_id,
+                           template_id=task_config_item.template_id)
+    send_email_message(task_config_item.task.user.username, remote_addr)
+    send_message(url=domain, remote_addr=remote_addr, uri=uri, header=header,
+                 message_type=message_type, content=content, task_id=task_config_item.task_id, raw=raw)
