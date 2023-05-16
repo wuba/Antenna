@@ -130,6 +130,7 @@ def send_mail(to, message):
         port = int(setting.EMAIL_PORT)
         username_send = setting.EMAIL_HOST_USER  # 邮箱用户名
         password = setting.EMAIL_HOST_PASSWORD  # 邮箱密码：需要使用授权码
+        print(setting.EMAIL_HOST_USER, setting.EMAIL_HOST_PASSWORD)
         username_recv = "".join(to)  # 收件人，多个收件人用逗号隔开
         mail = MIMEText(message)
         mail['Subject'] = 'Antenna平台邮件'
@@ -150,12 +151,26 @@ def send_mail(to, message):
         return False
 
 
+import time
+
+SENT_TIME_MAP = {}  # 记录每个用户上次发送邮件的时间
+
 def send_email_message(username, ip):
     """接收到消息发送给对应用户"""
     try:
         if setting.OPEN_EMAIL == 1:
-            message = f"""
-        【ANTENNA】平台接收到来自{ip}的请求,请查看"""
+            # 检查用户上次发送邮件的时间
+            last_sent_time = SENT_TIME_MAP.get(username, 0)
+            current_time = int(time.time())
+            if current_time - last_sent_time < 60:
+                # 如果距离上次发送邮件的时间不足 60 秒，则不发送本次邮件
+                return
+            else:
+                # 更新用户上次发送邮件的时间
+                SENT_TIME_MAP[username] = current_time
+
+            # 发送邮件
+            message = f"""【ANTENNA】平台接收到来自{ip}的请求,请查看"""
             send_mail(username, message)
     except Exception as e:
         print("send_email_message error", repr(e))
