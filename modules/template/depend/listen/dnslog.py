@@ -55,9 +55,9 @@ class DynamicResolver(object):
         self._peer_address = None
         self.dns_config = {}
         close_old_connections()
-        dns_recoed = DnsConfig.objects.all()
-        self.dns_config_domain = [_dns.domain for _dns in dns_recoed]
-        for _dns in dns_recoed:
+        self.dns_recoed = DnsConfig.objects.all()
+        self.dns_config_domain = [_dns.domain for _dns in self.dns_recoed]
+        for _dns in self.dns_recoed:
             self.dns_config[_dns.domain] = cycle(_dns.value)
 
     @property
@@ -90,15 +90,15 @@ class DynamicResolver(object):
         self.dns_config_domain.sort(key=lambda x: x.startswith("*"))  # 进行排序
         print("请求解析域名：", name.decode("utf-8"), flush=True)
         for domain in self.dns_config_domain:
-            print("匹配域名", domain, "匹配结果:", fnmatch.fnmatch(name.decode("utf-8"), domain))
+            print("匹配域名", domain, "匹配结果:", fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()))
             if fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()):
-                if len(self.dns_config[domain]) != 1:
-                    ttl = 0
-                else:
+                if len(list(self.dns_recoed.get(domain=domain.lower()).value)) == 1:
                     ttl = 60
+                else:
+                    ttl = 0
                 answers.append(dns.RRHeader(
                     name=name,
-                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain]), encoding="utf-8")), ttl=ttl))
+                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain.lower()]), encoding="utf-8")), ttl=ttl))
                 # 存储数据
                 udomain = re.findall(r'\.?([^\.]+)\.%s' % setting.DNS_DOMAIN.strip("*."), name.decode("utf-8").lower())
                 if udomain:
@@ -159,4 +159,4 @@ class DnsTemplate(BaseTemplate):
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    main()
