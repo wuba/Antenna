@@ -92,15 +92,20 @@ class DynamicResolver(object):
         for domain in self.dns_config_domain:
             print("匹配域名", domain, "匹配结果:", fnmatch.fnmatch(name.decode("utf-8"), domain))
             if fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()):
+                if len(self.dns_config[domain]) != 1:
+                    ttl = 0
+                else:
+                    ttl = 60
                 answers.append(dns.RRHeader(
                     name=name,
-                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain]), encoding="utf-8")), ttl=0))
+                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain]), encoding="utf-8")), ttl=ttl))
                 # 存储数据
                 udomain = re.findall(r'\.?([^\.]+)\.%s' % setting.DNS_DOMAIN.strip("*."), name.decode("utf-8").lower())
                 if udomain:
                     flag, task_config_item = hit(udomain[0], template_name=["DNS"], iexact=True)  # 不区分大小写
                     if flag:
-                        message_callback(domain=name.decode("utf-8"), remote_addr=addr, task_config_item=task_config_item, uri='',
+                        message_callback(domain=name.decode("utf-8"), remote_addr=addr,
+                                         task_config_item=task_config_item, uri='',
                                          header='', message_type=MESSAGE_TYPES.DNS, content='')  # 命中回调
                 break
         authority = []
