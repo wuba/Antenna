@@ -10,7 +10,7 @@ import json
 from utils.helper import send_email_message, send_message
 from modules.task.constants import TASK_STATUS
 from modules.message.constants import MESSAGE_TYPES
-from django.db import connections
+from django.db import connections, transaction
 
 
 def close_old_connections():
@@ -70,7 +70,7 @@ class BaseTemplate:
     def generate(self, key, config):
         pass
 
-
+@transaction.non_atomic_requests
 def hit(key, template_name, iexact=False):
     """
     命中
