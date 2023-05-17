@@ -6,12 +6,10 @@ import datetime
 from django.db.models.functions import Cast
 from django.db.models import DateField
 from modules.api.models import ApiKey
-from modules.message.models import Message
 from modules.message.serializers import MessageFilter, MessageSerializer
-from modules.task.models import Task, TaskConfigItem
+from modules.task.models import Task
 from modules.template.choose_template import match_template
 from modules.template.constants import PRIVATE_TYPES
-from modules.message.constants import MESSAGE_TYPES
 from modules.template.models import Template
 from rest_framework import filters, mixins, status
 from rest_framework.decorators import action
@@ -19,11 +17,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from django.db.models import Avg, Max, Min, Count, Sum, Q
-from utils.helper import get_payload, send_message, get_message_type_name, reconstruct_request, get_param_message, \
-    send_email_message
+from utils.helper import get_payload, get_message_type_name, reconstruct_request, get_param_message
 from modules.task.constants import TASK_TMP
-from modules.config import setting
 from utils.helper import is_base64
+from modules.template.depend.base import *
 
 
 class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixin):
@@ -182,7 +179,6 @@ def index(request):
     message = is_base64(message_to_base64)
     host = request.get_host()  # 项目域名
     domain_key = host.split('.')[0]
-    url = host + '/' + path
     remote_addr = request.META.get('REMOTE_ADDR', '')  # 请求ip
     regex = re.compile('^HTTP_')
     headers = dict((regex.sub('', header), value) for (header, value) in request.META.items() if
@@ -197,26 +193,13 @@ def index(request):
                 template_response = match_template(task_config_item, param_list)
                 return template_response
             else:
-                Message.objects.create(domain=url, remote_addr=remote_addr, uri=path, header=headers,
-                                       message_type=MESSAGE_TYPES.HTTP, content=message,
-                                       task_id=task_config_item.task_id, html=raw_response,
-                                       template_id=task_config_item.template_id)
-                send_message(url=url, remote_addr=remote_addr, uri=path, header=headers,
-                             message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
-                             raw=raw_response)
-
+                message_callback(domain=host, remote_addr=remote_addr, task_config_item=task_config_item, uri=path,
+                                 header=headers, message_type=MESSAGE_TYPES.HTTP, content=message, raw=raw_response)
     # http 请求日志
     elif len(domain_key) == 4 and domain_key != setting.PLATFORM_DOMAIN.split('.')[0]:
         task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=domain_key,
                                                          task__status=1).first()
         if task_config_item and task_config_item.template.name == "HTTP":
-            username = task_config_item.task.user.username
-            send_email_message(username, remote_addr)
-            Message.objects.create(domain=host, remote_addr=remote_addr, uri=path, header=headers,
-                                   message_type=MESSAGE_TYPES.HTTP, content=message,
-                                   task_id=task_config_item.task_id,
-                                   template_id=task_config_item.template_id, html=raw_response, )
-            send_message(url=host, remote_addr=remote_addr, uri=path, header=headers,
-                         message_type=MESSAGE_TYPES.HTTP, content=message, task_id=task_config_item.task_id,
-                         raw=raw_response)
+            message_callback(domain=host, remote_addr=remote_addr, task_config_item=task_config_item, uri=path,
+                             header=headers, message_type=MESSAGE_TYPES.HTTP, content=message, raw=raw_response)
     return HttpResponse('', content_type='text/html;charset=utf-8')

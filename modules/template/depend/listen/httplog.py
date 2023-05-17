@@ -11,7 +11,7 @@ sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
-from modules.template.depend.base import BaseTemplate
+from modules.template.depend.base import *
 from modules.message.constants import MESSAGE_TYPES
 from modules.message.models import Message
 from modules.task.models import TaskConfigItem
@@ -68,20 +68,10 @@ Connection: Closed
                              message_type=MESSAGE_TYPES.HTTP, content=self.html, task_id=task_config_item.task_id)
 
     def connectionLost(self, reason):
-        task_config_item = TaskConfigItem.objects.filter(task_config__key=self.key,
-                                                         task__status=1).first()
-        if task_config_item and task_config_item.template.name == "HTTP":
-            username = task_config_item.task.user.username
-            send_email_message(username, self.remote_addr)
-            Message.objects.create(domain=self.domain + '/' + self.uri, message_type=MESSAGE_TYPES.HTTPS,
-                                   remote_addr=self.remote_addr,
-                                   task_id=task_config_item.task_id,
-                                   uri=self.uri,
-                                   template_id=task_config_item.template_id,
-                                   content=self.content)
-            send_message(url=self.domain + '/' + self.uri, remote_addr=self.remote_addr, uri=self.uri, header='',
-                         message_type=MESSAGE_TYPES.HTTPS, content=self.content,
-                         task_id=task_config_item.task_id)
+        flag, task_config_item = hit(self.key, template_name=["HTTP"], iexact=False)
+        if flag:
+            message_callback(domain=self.domain, remote_addr=self.remote_addr, task_config_item=task_config_item,
+                             uri=self.uri, header='', message_type=MESSAGE_TYPES.HTTP, content=self.content)
 
 
 class HttpTemplate(BaseTemplate):

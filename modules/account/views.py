@@ -97,7 +97,6 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
     permission_classes = (IsAdminUser,)
 
     @action(methods=["POST"], detail=False, permission_classes=[AllowAny])
-    @transaction.atomic()
     def register(self, request, *args, **kwargs):
         """
         注册用户
@@ -107,13 +106,14 @@ class UserViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet
         serializer.is_valid(raise_exception=True)
         username = request.data["username"]
         password = request.data["password"]
-        user = User.objects.create_user(username=username, password=password)
-        invite_code = request.data.get("invite_code", "")
-        if setting.REGISTER_TYPE == REGISTER_TYPE.INVITE:  # 判断是开放邀请注册
-            InviteCode.objects.filter(code=invite_code).delete()
         apikey = generate_code(32)
-        ApiKey.objects.create(user=user, key=apikey)
-        TaskCreator().create_initial_task(user.id)
+        invite_code = request.data.get("invite_code", "")
+        with transaction.atomic():
+            user = User.objects.create_user(username=username, password=password)
+            if setting.REGISTER_TYPE == REGISTER_TYPE.INVITE:  # 判断是开放邀请注册
+                InviteCode.objects.filter(code=invite_code).delete()
+            ApiKey.objects.create(user=user, key=apikey)
+            TaskCreator().create_initial_task(user.id)
         response_data = {
             "username": username,
             "apikey": apikey
