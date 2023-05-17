@@ -12,6 +12,8 @@ import fnmatch
 import django
 from itertools import cycle
 
+from twisted.internet import reactor
+from twisted.names import dns, server
 from twisted.names.dns import DNSDatagramProtocol
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__) + "../../../../../")
@@ -19,15 +21,9 @@ sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'antenna.settings'
 django.setup()
 
-from modules.config import setting
-from twisted.internet import reactor
-from twisted.names import dns, server
-from utils.helper import send_message, send_email_message
 from modules.message.constants import MESSAGE_TYPES
 from modules.config.models import DnsConfig
-from modules.message.models import Message
-from modules.task.models import TaskConfig, TaskConfigItem
-from modules.template.depend.base import BaseTemplate
+from modules.template.depend.base import *
 
 
 class DNSServerFactory(server.DNSServerFactory):
@@ -58,9 +54,10 @@ class DynamicResolver(object):
         # 初始化变量
         self._peer_address = None
         self.dns_config = {}
-        dns_recoed = DnsConfig.objects.all()
-        self.dns_config_domain = [_dns.domain for _dns in dns_recoed]
-        for _dns in dns_recoed:
+        close_old_connections()
+        self.dns_recoed = DnsConfig.objects.all()
+        self.dns_config_domain = [_dns.domain for _dns in self.dns_recoed]
+        for _dns in self.dns_recoed:
             self.dns_config[_dns.domain] = cycle(_dns.value)
 
     @property
@@ -93,26 +90,24 @@ class DynamicResolver(object):
         self.dns_config_domain.sort(key=lambda x: x.startswith("*"))  # 进行排序
         print("请求解析域名：", name.decode("utf-8"), flush=True)
         for domain in self.dns_config_domain:
-            print("匹配域名", domain, "匹配结果:", fnmatch.fnmatch(name.decode("utf-8"), domain))
+            print("匹配域名", domain, "匹配结果:", fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()))
             if fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()):
+                if len(list(self.dns_recoed.get(domain=domain.lower()).value)) == 1:
+                    ttl = 60
+                else:
+                    ttl = 0
+                print("ttl:", ttl, flush=True)
                 answers.append(dns.RRHeader(
                     name=name,
-                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain]), encoding="utf-8")), ttl=0))
+                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain.lower()]), encoding="utf-8")), ttl=ttl))
                 # 存储数据
                 udomain = re.findall(r'\.?([^\.]+)\.%s' % setting.DNS_DOMAIN.strip("*."), name.decode("utf-8").lower())
                 if udomain:
-                    task_config_item = TaskConfigItem.objects.filter(task_config__key__iexact=udomain[0],
-                                                                     task__status=1).first()
-                    if task_config_item and task_config_item.template.name == "DNS":
-                        username = task_config_item.task.user.username
-                        Message.objects.create(domain=name.decode("utf-8"), message_type=MESSAGE_TYPES.DNS,
-                                               remote_addr=addr,
-                                               task_id=task_config_item.task_id,
-                                               template_id=task_config_item.template_id)
-                        print("完成保存")
-                        send_email_message(username, addr)
-                        send_message(url=name.decode("utf-8"), remote_addr=addr, uri='', header='',
-                                     message_type=MESSAGE_TYPES.DNS, content='', task_id=task_config_item.task_id)
+                    flag, task_config_item = hit(udomain[0], template_name=["DNS"], iexact=True)  # 不区分大小写
+                    if flag:
+                        message_callback(domain=name.decode("utf-8"), remote_addr=addr,
+                                         task_config_item=task_config_item, uri='',
+                                         header='', message_type=MESSAGE_TYPES.DNS, content='')  # 命中回调
                 break
         authority = []
         additional = []
@@ -165,4 +160,4 @@ class DnsTemplate(BaseTemplate):
 
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    main()
