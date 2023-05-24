@@ -3,7 +3,7 @@ from typing import List
 
 from django.db import transaction
 from modules.api.models import ApiKey
-from modules.template.models import Template
+from modules.template.models import Template, UrlTemplate
 
 from django_filters.rest_framework import DjangoFilterBackend
 from modules.task.constants import TASK_STATUS, TASK_TMP
@@ -153,8 +153,9 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
                 "template_type": templates[item["template"]].type,
                 "template_choice_type": templates[item["template"]].choice_type,
                 "task_config_id": item["task_config"],
-                "url_template": task_configs[item["task_config"]].url_template.url if task_configs[
-                    item["task_config"]].url_template_id else templates[item["template"]].payload,
+                "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
+                    item["task_config"]].url_template_id else UrlTemplate.objects.filter(
+                    template__name=templates[item["template"]].name).first().id,
                 "key": get_payload(task_configs[item["task_config"]], templates[item["template"]].payload),
                 "task_config_item_list": [{
                     "template_config_item": item["template_config_item"],
