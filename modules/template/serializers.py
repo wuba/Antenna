@@ -1,8 +1,7 @@
-from pip._internal.cli.cmdoptions import help_
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
-from modules.template.models import Template, TemplateConfigItem
+from modules.template.models import Template, TemplateConfigItem, UrlTemplate
 
 
 class TemplateInfoSerializer(serializers.ModelSerializer):
@@ -42,6 +41,7 @@ class UpdateTemplateInfoSerializer(serializers.Serializer):
     title = serializers.CharField(required=True, help_text="组件标题")
     desc = serializers.CharField(allow_blank=True, default="", help_text="组件介绍")
     payload = serializers.CharField(required=True, help_text="组件实例格式")
+    payload_list = serializers.JSONField(required=True, help_text="组件实例格式列表")
     choice_type = serializers.IntegerField(required=True, help_text="组件是否支持多选")
     is_private = serializers.IntegerField(required=True, help_text="组件是否公开")
     type = serializers.IntegerField(required=True, help_text="组件类型")
@@ -75,4 +75,10 @@ class DeleteTmplateSerializer(serializers.Serializer):
 class TemplateConfigItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = TemplateConfigItem
+        fields = "__all__"
+
+
+class UrlTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UrlTemplate
         fields = "__all__"

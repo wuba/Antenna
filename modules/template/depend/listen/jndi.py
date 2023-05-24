@@ -87,7 +87,7 @@ class SocketTemplate(BaseTemplate):
                     task_id = task_config_record.task_id
                     username = task_config_record.task.user.username
                     send_email_message(username, remote_addr)
-                    Message.objects.create(domain=self.domain, remote_addr=remote_addr, uri=path,
+                    Message.objects.create(domain=self.domain + "/" + self.key, remote_addr=remote_addr, uri=path,
                                            message_type=MESSAGE_TYPES.LDAP, task_id=task_id, template_id=10)
                     send_message(url=self.domain, remote_addr=remote_addr, uri=path, header='',
                                  message_type=MESSAGE_TYPES.LDAP, content='', task_id=task_id)
@@ -105,7 +105,7 @@ class SocketTemplate(BaseTemplate):
                     username = task_config_record.task.user.username
                     send_email_message(username, remote_addr)
                     task_id = task_config_record.task_id
-                    Message.objects.create(domain=self.domain, remote_addr=remote_addr, uri=path,
+                    Message.objects.create(domain=self.domain + "/" + self.key, remote_addr=remote_addr, uri=path,
                                            message_type=MESSAGE_TYPES.RMI, task_id=task_id, template_id=10)
                     send_message(url=self.domain, remote_addr=remote_addr, uri=path, header='',
                                  message_type=MESSAGE_TYPES.RMI, content='', task_id=task_id)
