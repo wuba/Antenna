@@ -154,7 +154,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
                 "task_config_id": item["task_config"],
                 "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
                     item["task_config"]].url_template_id else UrlTemplate.objects.filter(
-                    template_id=templates[item["template"]].id).first().id,
+                    template_id=item["template"]).first().id,
                 "key": get_payload(task_configs[item["task_config"]], templates[item["template"]].payload),
                 "task_config_item_list": [{
                     "template_config_item": item["template_config_item"],
