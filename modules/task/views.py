@@ -153,8 +153,8 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
                 "template_choice_type": templates[item["template"]].choice_type,
                 "task_config_id": item["task_config"],
                 "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
-                    item["task_config"]].url_template_id else UrlTemplate.objects.filter(
-                    template_id=item["template"]).first().id,
+                    item["task_config"]].url_template_id else item["template"],
+                # UrlTemplate.objects.filter(template_id=item["template"]).first().id,
                 "key": get_payload(task_configs[item["task_config"]], templates[item["template"]].payload),
                 "task_config_item_list": [{
                     "template_config_item": item["template_config_item"],
@@ -186,6 +186,8 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
                             "template_type": template.type,
                             "template_choice_type": template.choice_type,
                             "task_config_id": item["task_config"],
+                            "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
+                                item["task_config"]].url_template_id else item["template"],
                             "key": url,
                             "task_config_item_list": [task_config_item_list]
                         })
