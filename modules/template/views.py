@@ -201,7 +201,8 @@ class TemplateViewSet(ModelViewSet):
             del data["template_id"]
             data["user_id"] = self.request.user.id
             data["author"] = self.request.user.username
-
+            if "payload" not in data.keys():
+                data["payload"] = Template.objects.filter(id=template_id).first().payload
             # 查询旧有的TemplateConfigItem
             old_config_items = {item.name: item for item in TemplateConfigItem.objects.filter(template_id=template_id)}
             template = Template.objects.select_for_update().get(id=template_id)
