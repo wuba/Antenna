@@ -118,7 +118,7 @@ def get_payload(task_config, payload):
     {dns_domain}  dns域名
     """
 
-    url = payload if not task_config.url_template_id else task_config.url_template.url
+    url = payload if not task_config.url_template_id else task_config.url_template.payload
     return url.replace("{domain}", setting.PLATFORM_DOMAIN).replace("{key}", task_config.key).replace(
         "{jndi_port}", str(setting.JNDI_PORT)).replace("{dns_domain}", setting.DNS_DOMAIN)
 
