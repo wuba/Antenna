@@ -264,6 +264,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
     "task": 242,
     "template": 4,
     "task_config":5,
+    "url_template":1,
     "template_config_item_list": [
         {
             "id":1,
@@ -281,6 +282,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         template_id = serializer.data["template"]
         task_config_id = serializer.data["task_config"]
         template_config_item_list = request.data["template_config_item_list"]
+        url_template_id = serializer.data["url_template"]
         with transaction.atomic():
             task_config = TaskConfig.objects.filter(id=task_config_id, task__user_id=self.request.user.id).first()
             if not task_config:
@@ -292,7 +294,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
             TaskConfig.objects.filter(id=task_config_id).delete()
 
             # 创建新的任务配置
-            new_task_config = TaskConfig.objects.create(task_id=task_id, key=old_key)
+            new_task_config = TaskConfig.objects.create(task_id=task_id, key=old_key, url_template=url_template_id)
             new_task_config_id = new_task_config.id
 
             # 创建新的任务配置项
