@@ -145,7 +145,6 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
 
             task_configs = TaskConfig.objects.in_bulk(item["task_config"] for item in data)
             templates = Template.objects.in_bulk(item["template"] for item in data)
-
             listen_data_list = [{
                 "task": item["task"],
                 "template": item["template"],
@@ -155,7 +154,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
                 "task_config_id": item["task_config"],
                 "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
                     item["task_config"]].url_template_id else UrlTemplate.objects.filter(
-                    template__name=templates[item["template"]].name).first().id,
+                    template_id=templates[item["template"]].id).first().id,
                 "key": get_payload(task_configs[item["task_config"]], templates[item["template"]].payload),
                 "task_config_item_list": [{
                     "template_config_item": item["template_config_item"],
