@@ -282,7 +282,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         template_id = serializer.data["template"]
         task_config_id = serializer.data["task_config"]
         template_config_item_list = request.data["template_config_item_list"]
-        url_template_id = serializer.data["url_template"]
+        url_template_id = request.data["url_template"]
         with transaction.atomic():
             task_config = TaskConfig.objects.filter(id=task_config_id, task__user_id=self.request.user.id).first()
             if not task_config:
