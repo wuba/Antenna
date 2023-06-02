@@ -26,6 +26,11 @@ from modules.config.models import DnsConfig
 from modules.template.depend.base import *
 
 
+def get_dns_record():
+    close_old_connections()
+    return DnsConfig.objects.all()
+
+
 class DNSServerFactory(server.DNSServerFactory):
     def handleQuery(self, message, protocol, address):
         # 感谢 suppress\excessive 同学发现python3.6版本运行bug，已fix
@@ -55,7 +60,7 @@ class DynamicResolver(object):
         self._peer_address = None
         self.dns_config = {}
         close_old_connections()
-        self.dns_recoed = DnsConfig.objects.all()
+        self.dns_recoed = get_dns_record()
         self.dns_config_domain = [_dns.domain for _dns in self.dns_recoed]
         for _dns in self.dns_recoed:
             self.dns_config[_dns.domain] = cycle(_dns.value)
@@ -92,6 +97,7 @@ class DynamicResolver(object):
         for domain in self.dns_config_domain:
             print("匹配域名", domain, "匹配结果:", fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()))
             if fnmatch.fnmatch(name.decode("utf-8").lower(), domain.lower()):
+                close_old_connections()
                 if len(list(self.dns_recoed.get(domain=domain.lower()).value)) == 1:
                     ttl = 60
                 else:
@@ -99,7 +105,8 @@ class DynamicResolver(object):
                 print("ttl:", ttl, flush=True)
                 answers.append(dns.RRHeader(
                     name=name,
-                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain.lower()]), encoding="utf-8")), ttl=ttl))
+                    payload=dns.Record_A(address=bytes(next(self.dns_config[domain.lower()]), encoding="utf-8")),
+                    ttl=ttl))
                 # 存储数据
                 udomain = re.findall(r'\.?([^\.]+)\.%s' % setting.DNS_DOMAIN.strip("*."), name.decode("utf-8").lower())
                 if udomain:
