@@ -3,7 +3,7 @@ from typing import List
 
 from django.db import transaction
 from modules.api.models import ApiKey
-from modules.template.models import Template
+from modules.template.models import Template, UrlTemplate
 
 from django_filters.rest_framework import DjangoFilterBackend
 from modules.task.constants import TASK_STATUS, TASK_TMP
@@ -137,67 +137,74 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         """
         修改任务详情接口返回格式
         """
-        if not data:
-            return Response(data={}, status=status.HTTP_200_OK)
-        task_id = data[0]["task"]
-        task_record = Task.objects.get(id=task_id)
+        try:
+            if not data:
+                return Response(data={}, status=status.HTTP_200_OK)
+            task_id = data[0]["task"]
+            task_record = Task.objects.get(id=task_id)
 
-        task_configs = TaskConfig.objects.in_bulk(item["task_config"] for item in data)
-        templates = Template.objects.in_bulk(item["template"] for item in data)
-
-        listen_data_list = [{
-            "task": item["task"],
-            "template": item["template"],
-            "template_name": templates[item["template"]].name,
-            "template_type": templates[item["template"]].type,
-            "template_choice_type": templates[item["template"]].choice_type,
-            "task_config_id": item["task_config"],
-            "key": get_payload(task_configs[item["task_config"]].key, templates[item["template"]].payload),
-            "task_config_item_list": [{
-                "template_config_item": item["template_config_item"],
-                "id": item["id"],
-                "value": item["value"]
-            }]
-        } for item in data if templates[item["template"]].type == 1]
-
-        payload_data_list = []
-        for item in data:
-            task_config = task_configs[item["task_config"]]
-            template = templates[item["template"]]
-            if template.type != 1:
-                url = get_payload(task_config.key, template.payload)
-                task_config_item_list = {
+            task_configs = TaskConfig.objects.in_bulk(item["task_config"] for item in data)
+            templates = Template.objects.in_bulk(item["template"] for item in data)
+            listen_data_list = [{
+                "task": item["task"],
+                "template": item["template"],
+                "template_name": templates[item["template"]].name,
+                "template_type": templates[item["template"]].type,
+                "template_choice_type": templates[item["template"]].choice_type,
+                "task_config_id": item["task_config"],
+                "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
+                    item["task_config"]].url_template_id else UrlTemplate.objects.filter(template_id=item["template"]).first().id,
+                "key": get_payload(task_configs[item["task_config"]], templates[item["template"]].payload),
+                "task_config_item_list": [{
                     "template_config_item": item["template_config_item"],
                     "id": item["id"],
                     "value": item["value"]
-                }
-                for payload_data in payload_data_list:
-                    if payload_data["task_config_id"] == item["task_config"]:
-                        payload_data["task_config_item_list"].append(task_config_item_list)
-                        break
-                else:
-                    payload_data_list.append({
-                        "task": item["task"],
-                        "template": item["template"],
-                        "template_name": template.name,
-                        "template_type": template.type,
-                        "template_choice_type": template.choice_type,
-                        "task_config_id": item["task_config"],
-                        "key": url,
-                        "task_config_item_list": [task_config_item_list]
-                    })
+                }]
+            } for item in data if templates[item["template"]].type == 1]
 
-        result = {
-            "task_info": {
-                "task_id": task_id,
-                "task_name": task_record.name,
-                "callback_url": task_record.callback_url,
-                "callback_url_headers": task_record.callback_url_headers,
-                "show_dashboard": bool(task_record.show_dashboard)},
-            "listen_template_info": listen_data_list,
-            "payload_template_info": payload_data_list,
-        }
-        return Response(result, status=status.HTTP_200_OK)
+            payload_data_list = []
+            for item in data:
+                task_config = task_configs[item["task_config"]]
+                template = templates[item["template"]]
+                if template.type != 1:
+                    url = get_payload(task_config, template.payload)
+                    task_config_item_list = {
+                        "template_config_item": item["template_config_item"],
+                        "id": item["id"],
+                        "value": item["value"]
+                    }
+                    for payload_data in payload_data_list:
+                        if payload_data["task_config_id"] == item["task_config"]:
+                            payload_data["task_config_item_list"].append(task_config_item_list)
+                            break
+                    else:
+                        payload_data_list.append({
+                            "task": item["task"],
+                            "template": item["template"],
+                            "template_name": template.name,
+                            "template_type": template.type,
+                            "template_choice_type": template.choice_type,
+                            "task_config_id": item["task_config"],
+                            "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
+                                item["task_config"]].url_template_id else item["template"],
+                            "key": url,
+                            "task_config_item_list": [task_config_item_list]
+                        })
+
+            result = {
+                "task_info": {
+                    "task_id": task_id,
+                    "task_name": task_record.name,
+                    "callback_url": task_record.callback_url,
+                    "callback_url_headers": task_record.callback_url_headers,
+                    "show_dashboard": bool(task_record.show_dashboard)},
+                "listen_template_info": listen_data_list,
+                "payload_template_info": payload_data_list,
+            }
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(repr(e))
+            return Response({"code": 0, "message": f"错误原因:{e}"}, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -210,10 +217,10 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         {
     "task": 1,
     "template": 32,
+    "url_template":1,
     "template_config_item_list": [
         {
             "template_config_item": 52,
-            "id": 7,
             "value": {
                 "ip": "219.137.78.61",
                 "port": 75
@@ -226,10 +233,11 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         serializer.is_valid(raise_exception=True)
         task_id = serializer.data["task"]
         template_id = serializer.data["template"]
+        url_template_id = serializer.data["url_template"]
         code = generate_code(4)
 
         with transaction.atomic():
-            task_config = TaskConfig.objects.create(task_id=task_id, key=code)
+            task_config = TaskConfig.objects.create(task_id=task_id, key=code, url_template_id=url_template_id)
             template_config_item_list = request.data["template_config_item_list"]
             task_config_items = [
                 TaskConfigItem(
@@ -255,6 +263,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
     "task": 242,
     "template": 4,
     "task_config":5,
+    "url_template":1,
     "template_config_item_list": [
         {
             "id":1,
@@ -266,12 +275,15 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         }]
 }
         """
+        print(request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task_id = serializer.data["task"]
         template_id = serializer.data["template"]
         task_config_id = serializer.data["task_config"]
         template_config_item_list = request.data["template_config_item_list"]
+        url_template_id = request.data["url_template"]
+        print(2)
         with transaction.atomic():
             task_config = TaskConfig.objects.filter(id=task_config_id, task__user_id=self.request.user.id).first()
             if not task_config:
@@ -283,7 +295,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
             TaskConfig.objects.filter(id=task_config_id).delete()
 
             # 创建新的任务配置
-            new_task_config = TaskConfig.objects.create(task_id=task_id, key=old_key)
+            new_task_config = TaskConfig.objects.create(task_id=task_id, key=old_key, url_template_id=url_template_id)
             new_task_config_id = new_task_config.id
 
             # 创建新的任务配置项
@@ -337,13 +349,11 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
 
         task_config_items = TaskConfigItem.objects.filter(
             task__user=key.user_id, task__status=TASK_STATUS.OPEN, task__show_dashboard=True
-        ).values('template__payload', 'task_config__key')
+        ).values('template__payload', 'task_config')
 
         payload_list = set()
         for task_config_item in task_config_items:
-            payload = get_payload(task_config_item['task_config__key'], task_config_item['template__payload'])
+            payload = get_payload(task_config_item['task_config'], task_config_item['template__payload'])
             if payload:
                 payload_list.add(payload)
         return Response(data={"payload": payload_list}, status=status.HTTP_200_OK)
-
-    from django.db import transaction

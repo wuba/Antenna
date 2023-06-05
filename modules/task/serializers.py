@@ -22,6 +22,7 @@ class CreateTaskConfigItemSerializer(serializers.Serializer):
     template = serializers.IntegerField(required=True, help_text="组件id")
     template_config_item_list = serializers.JSONField(required=True, help_text="组件配置列表")
     task = serializers.IntegerField(required=True, help_text="任务id")
+    url_template = serializers.IntegerField(required=True, help_text="url模板id")
 
 
 class TaskConfigSerializer(serializers.ModelSerializer):

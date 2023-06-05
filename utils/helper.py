@@ -109,14 +109,18 @@ def convert(data):
     return data
 
 
-def get_payload(key, payload):
+def get_payload(task_config, payload):
     """
-    获取地址
+    转换地址，可选用关键字
+    {domain} 平台域名
+    {key}  任务key
+    {jndi_port}  jndi端口
+    {dns_domain}  dns域名
     """
 
-    return payload.replace("{domain}", setting.PLATFORM_DOMAIN).replace("{key}", key).replace("{jndi_port}",
-                                                                                              str(setting.JNDI_PORT)).replace(
-        "{dns_domain}", setting.DNS_DOMAIN)
+    url = payload if not task_config.url_template_id else task_config.url_template.payload
+    return url.replace("{domain}", setting.PLATFORM_DOMAIN).replace("{key}", task_config.key).replace(
+        "{jndi_port}", str(setting.JNDI_PORT)).replace("{dns_domain}", setting.DNS_DOMAIN)
 
 
 def send_mail(to, message):
@@ -154,6 +158,7 @@ def send_mail(to, message):
 import time
 
 SENT_TIME_MAP = {}  # 记录每个用户上次发送邮件的时间
+
 
 def send_email_message(username, ip):
     """接收到消息发送给对应用户"""

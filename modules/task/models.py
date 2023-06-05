@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from modules.task.constants import TASK_TMP, TASK_STATUS, SHOW_DASHBOARD
-from modules.template.models import Template, TemplateConfigItem
+from modules.template.models import Template, TemplateConfigItem, UrlTemplate
 
 
 class Task(models.Model):
@@ -32,6 +32,10 @@ class TaskConfig(models.Model):
     task = models.ForeignKey(Task, related_name='task_task_config', on_delete=models.CASCADE, db_constraint=False,
                              help_text="所属任务")
     key = models.CharField(max_length=32, help_text='key')
+
+    url_template = models.ForeignKey(UrlTemplate, related_name='url_template_task_config_item',
+                                     on_delete=models.CASCADE, db_column=False,
+                                     null=True, help_text="链接模板")
 
     class Meta:
         db_table = 'task_config'
