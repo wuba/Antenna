@@ -239,6 +239,13 @@
                         </div>
                     </div>
                 </div>
+                <a-form-model-item label="生成链接" prop="configs">
+                    <a-select v-model="form.url_template" placeholder="请选择生成链接" @change="changeLink">
+                        <a-select-option v-for="i in linkList" :key="i.id" :value="i.id">
+                            {{ i.payload }}
+                        </a-select-option>
+                    </a-select>
+                </a-form-model-item>
             </a-form-model>
         </a-modal>
     </div>
@@ -266,6 +273,7 @@ export default {
             wrapperCol: { span: 18 },
             wrapperCol1: { span: 3, offset: 21 },
             form: {
+                url_template: undefined,
                 template: undefined,
                 configs: undefined,
                 domains: [
@@ -312,6 +320,7 @@ export default {
             manageDataChoice: {},
             configDataChoice: {},
             regionData: [],
+            linkList: [],
             onSubmitLoading: false,
             isSingleConfig: true,
             task_id: '',
@@ -414,6 +423,7 @@ export default {
                     let data = {
                         task: this.task_id,
                         template: this.form.template,
+                        url_template: this.form.url_template,
                         template_config_item_list: [],
                     }
                     if (this.isSingleConfig) {
@@ -614,7 +624,18 @@ export default {
                 onCancel() {},
             })
         },
+        getLinkList(template) {
+            Service.linkList({ template: template }).then((res) => {
+                this.linkList = res?.data?.results
+            })
+        },
+        changeLink(i) {
+            this.form.url_template = i
+        },
         openAddDomain(item, type) {
+            if (item?.template) {
+                this.getLinkList(item.template)
+            }
             // console.log(item, '编辑的时候的数据', this.form)
             Service.getTemplatesManage({ type }).then((res) => {
                 if (res.code === 1) {
@@ -648,6 +669,8 @@ export default {
         },
         hanlderEidtData(item) {
             this.form.template = item.template
+            this.form.url_template = item.url_template
+
             this.form.task_config_id = item.task_config_id
             if (item.template_choice_type === 1) {
                 this.isSingleConfig = false
@@ -700,6 +723,8 @@ export default {
             ]
             this.form.configs = this.form.configs ? '' : this.form.configs
             this.getConfigSelectData(this.form.template)
+            this.getLinkList(i)
+            this.form.url_template = undefined
         },
         getConfigSelectData(data) {
             Service.getTemplatessConfigs({ template: data }).then((res) => {

@@ -13,9 +13,9 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet, ViewSet
 
 from modules.template.choose_template import load_template, view_template_code
 from modules.template.constants import PRIVATE_TYPES, TEMPLATE_TYPES
-from modules.template.models import Template, TemplateConfigItem
+from modules.template.models import Template, TemplateConfigItem, UrlTemplate
 from modules.template.serializers import (DeleteTmplateSerializer, TemplateConfigItemSerializer, TemplateInfoSerializer,
-                                          UpdateTemplateInfoSerializer, )
+                                          UpdateTemplateInfoSerializer, UrlTemplateSerializer, )
 from utils.helper import generate_code
 
 BASE_PATH = str(os.path.abspath(os.path.dirname(__file__)))
@@ -118,6 +118,7 @@ class TemplateViewSet(ModelViewSet):
         },
         "type":1,
         "code":"",
+        "payload":"",
         "template_item_info":[
                 {
                 "item_name":"xss_config_item",
@@ -131,14 +132,22 @@ class TemplateViewSet(ModelViewSet):
         """
         try:
             template_id = int(request.query_params.get('template', 0))
-            template_record = Template.objects.filter(id=template_id, user_id=self.request.user.id).first()
+            template_record = Template.objects.filter(
+                Q(id=template_id),
+                Q(user_id=self.request.user.id) | Q(template_url_template__isnull=True)
+            ).prefetch_related('template_url_template').first()
+
             if not template_record.user:
                 return Response({"code": 0, "message": f"没有权限查看该组件"}, status=status.HTTP_200_OK)
             template_info = model_to_dict(template_record)
-
             item_record = TemplateConfigItem.objects.filter(template_id=template_id).values('name', 'config')
             item_info = [{"item_name": item["name"], "config": item["config"]} for item in item_record]
             template_info["template_item_info"] = item_info
+
+            # 获取payload模板列表
+            template_payload_list = [url_template.payload for url_template in
+                                     template_record.template_url_template.all()]
+            template_info["payload_list"] = template_payload_list
 
             # 如果code没有及时更新，重新更新数据库
             if template_info["code"] == "this is a test code":
@@ -166,6 +175,9 @@ class TemplateViewSet(ModelViewSet):
     "url_type": 1,
     "type":1,
     "code":"",
+    "payload":"",
+    "payload_list":[
+    ],
     "template_item_info": [{
             "item_name": "xss_config_item",
             "config": ["a", "b"]
@@ -182,11 +194,15 @@ class TemplateViewSet(ModelViewSet):
             serializer.is_valid(raise_exception=True)
             template_id = int(data["template_id"])
             template_item_info = request.data["template_item_info"]
+            payload_list = request.data.get("payload_list", [])
+            if "payload_list" in data.keys():
+                del data["payload_list"]
             del data["template_item_info"]
             del data["template_id"]
             data["user_id"] = self.request.user.id
             data["author"] = self.request.user.username
-
+            if "payload" not in data.keys():
+                data["payload"] = Template.objects.filter(id=template_id).first().payload
             # 查询旧有的TemplateConfigItem
             old_config_items = {item.name: item for item in TemplateConfigItem.objects.filter(template_id=template_id)}
             template = Template.objects.select_for_update().get(id=template_id)
@@ -194,6 +210,15 @@ class TemplateViewSet(ModelViewSet):
                 # 修改template 本身
                 template.__dict__.update(**data)
                 template.save()
+
+                # 更新或新增 UrlTemplate
+                url_template = []
+                if payload_list:
+                    for payload in payload_list:
+                        payload = payload.strip()
+                        obj, created = UrlTemplate.objects.get_or_create(template_id=template_id,payload=payload)
+                    # 删除旧数据
+                    UrlTemplate.objects.filter(template_id=template_id).exclude(payload__in=payload_list).delete()
 
                 # 更新或新增 TemplateConfigItem
                 for template_item in template_item_info:
@@ -272,6 +297,14 @@ class TemplateViewSet(ModelViewSet):
 class TemplateConfigItemViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = TemplateConfigItem.objects.all().order_by("-id")
     serializer_class = TemplateConfigItemSerializer
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ("template",)
+    permission_classes = (IsAuthenticated,)
+
+
+class UrlTemplateViewSet(mixins.ListModelMixin, GenericViewSet):
+    queryset = UrlTemplate.objects.all().order_by("-id")
+    serializer_class = UrlTemplateSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filter_fields = ("template",)
     permission_classes = (IsAuthenticated,)

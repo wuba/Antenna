@@ -146,6 +146,10 @@ export default {
     initial_template(data) {
         return axios.get('/api/v1/templates/manage/initial_template/', data)
     },
+    //获取linkList
+    linkList(data) {
+        return axios.get('/api/v1/templates/url/', data)
+    },
     //获取dns解析配置
     get_dns(data) {
         return axios.get('/api/v1/configs/dns/', data)

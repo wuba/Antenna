@@ -41,3 +41,12 @@ class TemplateConfigItem(models.Model):
 
     class Meta:
         db_table = 'template_config_item'
+
+
+class UrlTemplate(models.Model):
+    payload = models.TextField(default="http://{domain}/{key}", help_text='利用代码实例')
+    template = models.ForeignKey(Template, related_name='template_url_template', on_delete=models.CASCADE,
+                                  db_constraint=False, help_text="所属模板")
+
+    class Meta:
+        db_table = 'template_url'

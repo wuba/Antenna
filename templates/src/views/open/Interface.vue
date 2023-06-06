@@ -2,7 +2,10 @@
     <div class="platform">
         <div class="div_card">
             <div class="title clearfix">
-                <div class="left">API设置</div>
+                <div class="left">
+                    API设置
+                    <a-icon type="question-circle" style="cursor: pointer" @click="gotoInfo" />
+                </div>
             </div>
             <div class="content">
                 <a-form-model :model="form" :label-col="labelCol" :wrapper-col="wrapperCol">
@@ -118,6 +121,9 @@ export default {
     },
     mounted() {},
     methods: {
+        gotoInfo() {
+            window.open('https://blog.antenna.cool/docs/api_back')
+        },
         initData() {
             Service.all([
                 Service.getOpenAPI().then((res) => {

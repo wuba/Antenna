@@ -34,12 +34,13 @@
                             />
                         </a-form-item>
                         <a-form-item label="生成链接格式" v-bind="waiformItemLayout">
-                            <a-input
+                            <a-select
                                 :required="true"
+                                mode="tags"
                                 style="width: 80%"
                                 placeholder="使用http协议为http://{domain}/{key}"
                                 v-decorator="[
-                                    'payload',
+                                    'payload_list',
                                     { rules: [{ required: true, message: '请输入生成链接格式' }] },
                                 ]"
                             />
@@ -284,7 +285,7 @@ export default {
             this.form.getFieldDecorator('is_private', { initialValue: this.content.is_private, preserve: true })
             this.form.getFieldDecorator('choice_type', { initialValue: this.content.choice_type, preserve: true })
             this.form.getFieldDecorator('desc', { initialValue: this.content.desc, preserve: true })
-            this.form.getFieldDecorator('payload', { initialValue: this.content.payload, preserve: true })
+            this.form.getFieldDecorator('payload_list', { initialValue: this.content.payload_list, preserve: true })
             this.form.getFieldDecorator('title', { initialValue: this.content.title, preserve: true })
             this.form.getFieldDecorator('name', { initialValue: this.content.name, preserve: true })
             this.form.getFieldDecorator('keys', { initialValue: keys, preserve: true })

@@ -22,12 +22,14 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
 
     def get_paginated_response(self, data):
         _data = {}
-        mapping = {"1": True, "true": True, "0": False, "false": False}
+        mapping = {"1": True, "true": True, "0": False, "false": False, "True": True, "False": False}
         for i in data:
+            print(i)
             if i["name"] == "REGISTER_TYPE":
                 _data[i["name"]] = int(i['value'])
             else:
                 _data[i["name"]] = mapping.get(i['value'], i['value'])
+        print(_data)
         return Response(_data, status=status.HTTP_200_OK)
 
     @action(methods=["POST"], detail=False, permission_classes=[IsAdminUser, ])
@@ -75,6 +77,7 @@ class ConfigViewSet(mixins.ListModelMixin, GenericViewSet):
             return Response({"renewable": flag}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"code": 0, "message": f"检查更新错误,原因:{e}"}, status=status.HTTP_200_OK)
+
 
 class DnsConfigViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = DnsConfig.objects.all().order_by("id")

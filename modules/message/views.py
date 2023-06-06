@@ -102,7 +102,7 @@ class MessageView(GenericViewSet, mixins.ListModelMixin, mixins.DestroyModelMixi
         url_list = [
             {
                 "task_name": tci.task.name,
-                tci.template.name: get_payload(tci.task_config.key, tci.template.payload)
+                tci.template.name: get_payload(tci.task_config, tci.template.payload)
             } for tci in task_config_item_record[:30]
         ]
         return url_list
