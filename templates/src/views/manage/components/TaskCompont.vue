@@ -273,7 +273,7 @@ export default {
             wrapperCol: { span: 18 },
             wrapperCol1: { span: 3, offset: 21 },
             form: {
-                url_template: '',
+                url_template: undefined,
                 template: undefined,
                 configs: undefined,
                 domains: [
@@ -633,7 +633,9 @@ export default {
             this.form.url_template = i
         },
         openAddDomain(item, type) {
-            this.getLinkList(item.template)
+            if (item?.template) {
+                this.getLinkList(item.template)
+            }
             // console.log(item, '编辑的时候的数据', this.form)
             Service.getTemplatesManage({ type }).then((res) => {
                 if (res.code === 1) {
