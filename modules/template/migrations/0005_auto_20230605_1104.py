@@ -4,9 +4,8 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('template', '0005_rename_templates_urltemplate_template'),
+        ('template', '0004_urltemplate'),
     ]
 
     operations = [
