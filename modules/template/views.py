@@ -216,10 +216,9 @@ class TemplateViewSet(ModelViewSet):
                 if payload_list:
                     for payload in payload_list:
                         payload = payload.strip()
-                        url_template.append({"template_id": template_id, "payload": payload})
-
-                    UrlTemplate.objects.filter(template_id=template_id).delete()
-                    UrlTemplate.objects.bulk_create([UrlTemplate(**item) for item in url_template])
+                        obj, created = UrlTemplate.objects.get_or_create(template_id=template_id,payload=payload)
+                    # 删除旧数据
+                    UrlTemplate.objects.filter(template_id=template_id).exclude(payload__in=payload_list).delete()
 
                 # 更新或新增 TemplateConfigItem
                 for template_item in template_item_info:
