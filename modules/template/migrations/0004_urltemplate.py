@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('payload', models.TextField(default='http://{domain}/{key}', help_text='利用代码实例')),
-                ('templates', models.ForeignKey(db_constraint=False, help_text='所属模板', on_delete=django.db.models.deletion.CASCADE, related_name='template_url_template', to='template.template')),
+                ('template', models.ForeignKey(db_constraint=False, help_text='所属模板', on_delete=django.db.models.deletion.CASCADE, related_name='template_url_template', to='template.template')),
             ],
             options={
                 'db_table': 'template_url',
