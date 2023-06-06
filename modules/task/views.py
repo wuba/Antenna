@@ -186,7 +186,7 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
                             "template_choice_type": template.choice_type,
                             "task_config_id": item["task_config"],
                             "url_template": task_configs[item["task_config"]].url_template_id if task_configs[
-                                item["task_config"]].url_template_id else item["template"],
+                                item["task_config"]].url_template_id else UrlTemplate.objects.filter(template_id=item["template"]).first().id,
                             "key": url,
                             "task_config_item_list": [task_config_item_list]
                         })
@@ -275,7 +275,6 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         }]
 }
         """
-        print(request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         task_id = serializer.data["task"]
@@ -283,7 +282,6 @@ class TaskConfigItemViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Gene
         task_config_id = serializer.data["task_config"]
         template_config_item_list = request.data["template_config_item_list"]
         url_template_id = request.data["url_template"]
-        print(2)
         with transaction.atomic():
             task_config = TaskConfig.objects.filter(id=task_config_id, task__user_id=self.request.user.id).first()
             if not task_config:
